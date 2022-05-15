@@ -4,9 +4,14 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <sstream>
+
 #include "LocationBlock.hpp"
 #include "Dummy.hpp"
 #include "System.hpp"
+
+#define S_DEFAULT 1
+#define S_LOCATION 2
 
 class LocationBlock;
 

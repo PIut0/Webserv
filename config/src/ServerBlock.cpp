@@ -16,10 +16,17 @@ ServerBlock::~ServerBlock()
 
 void ServerBlock::init_server_block(const std::vector<std::string> &data)
 {
-	std::cout << "[NEW SERVER BLOCK]" << std::endl;
+	std::string token;
+	std::vector<std::string> temp;
+	// u_short state = S_DEFAULT;
+
+	this->getMonitor().print("new server block");
 	for(size_t i = 0 ; i < data.size() ; i++) {
-		std::cout << data[i] << std::endl;
+		std::stringstream ss(data[i]);
 		if (data[i][0] != '\t')
 			getMonitor().log("config error");
+		if (data[i].substr(0, 9) == "\tlocation") {
+			this->getMonitor().print("new location block");
+		}
 	}
 }
