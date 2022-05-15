@@ -7,6 +7,7 @@ ServerManager::ServerManager()
 
 ServerManager::ServerManager(std::string path)
 {
+    getMonitor().log("hi");
     init_server(path);
 }
 

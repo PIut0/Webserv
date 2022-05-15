@@ -8,13 +8,14 @@
 
 #include "ServerBlock.hpp"
 #include "Dummy.hpp"
+#include "System.hpp"
 
 #define S_DEFAULT	1
 #define S_SERVER	2
 
 class ServerBlock;
 
-class ServerManager
+class ServerManager : public System
 {
 private:
 	std::vector<ServerBlock> server;
