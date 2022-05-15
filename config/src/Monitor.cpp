@@ -31,3 +31,8 @@ void Monitor::log(const std::string &data)
 	_log += "\n";
 	this->logfile.write(_log.c_str(), _log.length());
 }
+
+void Monitor::print(const std::string &data)
+{
+	std::cout << data << std::endl;
+}
