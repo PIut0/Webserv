@@ -1,12 +1,16 @@
 #ifndef SERVERBLOCK_HPP
 #define SERVERBLOCK_HPP
 
-#include "LocationBlock.hpp"
 #include <vector>
+#include <string>
+#include <iostream>
+#include "LocationBlock.hpp"
+#include "Dummy.hpp"
+#include "System.hpp"
 
 class LocationBlock;
 
-class ServerBlock
+class ServerBlock : public System
 {
 private:
 	// std::vector<LocationBlock> location;
@@ -18,9 +22,11 @@ private:
 	// unsigned int req_uri_limit_size;	 //
 	// unsigned int req_header_limit_size;	 //
 	// std::string default_err_page;
+	void init_server_block(const std::vector<std::string>&);
 
 public:
-	ServerBlock(/* args */);
+	ServerBlock();
+	ServerBlock(const std::vector<std::string>&);
 	~ServerBlock();
 };
 
