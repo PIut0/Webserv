@@ -1,27 +1,43 @@
 NAME			=	kqueue_practice
 
+INCLUDE 		=	-I./include
+
+CXX				=	c++
+CXXFLAGS		=	-Wall -Wextra -Werror -std=c++98 $(INCLUDE)
+
+
 SRCS			=	main.cpp \
-						kqueue.cpp \
-						server.cpp \
-						client.cpp \
-						util.cpp
+					kqueue.cpp \
+					server.cpp \
+					client.cpp \
+					util.cpp
 
-OBJS			= $(SRCS:.cpp=.o)
+SRC_DIR 		=	./src
+SRCS			=	$(addprefix $(SRC_DIR),$(SRC))
 
-CPP				= c++
-CPPFLAGS	= -Wall -Wextra -Werror -I. --std=c++98
+OBJ_DIR			=	./obj
+OBJS			=	$(addprefix $(OBJ_DIR)/, $(patsubst %.cpp,%.o,$(SRC)))
 
-all:			$(NAME)
 
-$(NAME):		$(OBJS)
-				${CPP} ${CPPFLAGS} -o ${NAME} ${OBJS}
+all		:	$(NAME)
 
-clean:
-				rm -rf $(OBJS)
+$(OBJ_DIR)/%.o	: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-fclean:			clean
-				rm -rf $(NAME)
+$(NAME)	:	$(OBJS)
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
-re:				fclean $(NAME)
+bonus	: all
 
-.PHONY			: all clean fclean re
+clean	:
+	@rm -rf $(OBJ_DIR)
+
+fclean	:	clean
+	@rm -f $(NAME)
+
+re		:
+	make fclean
+	make all
+
+.PHONY	:	all clean fclean re bonus norm
