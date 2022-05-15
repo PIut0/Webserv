@@ -9,6 +9,8 @@ SRC			=	main.cpp \
 				ServerBlock.cpp \
 				ServerManager.cpp \
 				LocationBlock.cpp \
+				Monitor.cpp \
+				System.cpp \
 				utils.cpp
 
 
