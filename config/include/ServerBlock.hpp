@@ -2,14 +2,17 @@
 #define SERVERBLOCK_HPP
 
 #include "LocationBlock.hpp"
+#include <vector>
+
+class LocationBlock;
 
 class ServerBlock
 {
 private:
-	LocationBlock location[];	 //
-	std::string server_name; //
-	unsigned int port;		 // uintshort?
-	std::string host;		 //
+	std::vector<LocationBlock> location;
+	std::string server_name;	//
+	unsigned int port;			// uintshort?
+	std::string host;			//
 
 	unsigned int limit_client_body_size; //
 	unsigned int req_uri_limit_size;	 //
