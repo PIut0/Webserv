@@ -1,16 +1,16 @@
 #ifndef SERVERMANAGER_HPP
 #define SERVERMANAGER_HPP
 
-#include "ServerBlock.hpp"
 #include <iostream>
 #include <vector>
 #include <fstream>
 #include <sstream>
 
-#define DEFAULT_CONFIG_PATH "./config_example.config"
+#include "ServerBlock.hpp"
+#include "Dummy.hpp"
+
 #define S_DEFAULT	1
 #define S_SERVER	2
-#define S_LOCATION	4
 
 class ServerBlock;
 
