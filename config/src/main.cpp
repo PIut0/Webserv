@@ -2,14 +2,14 @@
 #include <string>
 
 #include "ServerManager.hpp"
-#include "utils.cpp"
+#include "utils.hpp"
 
 
 int main(int argc, char** argv) {
-	if (check_arg(argv)) {
-		perror("error!");
-		exit(1);
-	}
-	ServerManager serverManager(argv[1]);
-
+	// if (!check_arg(argc, argv)) {
+	// 	std::cerr << "error" << std::endl;
+	// 	exit(1);
+	// }
+	ServerManager serverManager(check_arg(argc, argv));
+	return (0);
 }
