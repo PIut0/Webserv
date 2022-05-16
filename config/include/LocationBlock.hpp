@@ -7,6 +7,7 @@
 class LocationBlock
 {
 private:
+	std::string location_path;
 	// std::string root;		  // root directory path
 	// std::string allow_method; //
 	// std::string index;		  //
@@ -15,7 +16,7 @@ private:
 
 public:
 	LocationBlock();
-	LocationBlock(std::vector<std::string>&);
+	LocationBlock(std::string&, std::vector<std::string>&);
 	~LocationBlock();
 };
 
