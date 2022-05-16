@@ -7,11 +7,11 @@
 #include <sstream>
 
 #include "LocationBlock.hpp"
-#include "Dummy.hpp"
+#include "Defines.hpp"
 #include "System.hpp"
 
-#define S_DEFAULT 1
-#define S_LOCATION 2
+#define S_SERVER 2
+#define S_LOCATION 4
 
 class LocationBlock;
 

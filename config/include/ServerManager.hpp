@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include "ServerBlock.hpp"
-#include "Dummy.hpp"
+#include "Defines.hpp"
 #include "System.hpp"
 
 #define S_DEFAULT	1

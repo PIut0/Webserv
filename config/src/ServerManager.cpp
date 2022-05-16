@@ -27,9 +27,9 @@ void ServerManager::init_server(std::string path)
     if (!ifs.is_open())
         exit(1);
     while (std::getline(ifs, line)) {
-        if (state & S_DEFAULT && line == "server {") {
+        if (state & S_DEFAULT && line == SERVER_BLOCK_OPEN) {
             state <<= 1;
-        } else if (state & S_SERVER && line == "}") {
+        } else if (state & S_SERVER && line == SERVER_BLOCK_CLOSE) {
             this->server.push_back(ServerBlock(temp));
             temp.clear();
             std::vector<std::string>().swap(temp);
