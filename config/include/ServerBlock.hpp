@@ -10,9 +10,6 @@
 #include "Defines.hpp"
 #include "System.hpp"
 
-#define S_SERVER 2
-#define S_LOCATION 4
-
 class LocationBlock;
 
 class ServerBlock : public System

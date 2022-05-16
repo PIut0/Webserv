@@ -10,9 +10,6 @@
 #include "Defines.hpp"
 #include "System.hpp"
 
-#define S_DEFAULT	1
-#define S_SERVER	2
-
 class ServerBlock;
 
 class ServerManager : public System

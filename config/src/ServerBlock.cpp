@@ -28,7 +28,7 @@ void ServerBlock::init_server_block(const std::vector<std::string> &data)
 			getMonitor().log("config error");
 		if (state & S_SERVER) {
 			if (data[i].substr(0, 9) == LOCATION_BLOCK_OPEN) {
-				location_path = data[i].substr(10, data[i].end() - std::find(data[i].begin(), data[i].end(), "{"));
+				location_path = data[i].substr(10, data[i].find('{', 0) - 1);
 				this->getMonitor().print("new location block open");
 				state <<= 1;
 			} else {
@@ -38,8 +38,8 @@ void ServerBlock::init_server_block(const std::vector<std::string> &data)
 			if (data[i].substr(0, 2) == LOCATION_BLOCK_CLOSE) {
 				this->getMonitor().print("location block close");
 				this->location.push_back(LocationBlock(location_path, temp));
-				temp.clear();
-				std::vector<std::string>().swap(temp);
+                CLEAR_VECTOR_COMPLETLY(temp)
+                // TO_SERVER(state)
 				state >>= 1;
 			} else {
 				temp.push_back(data[i]);
