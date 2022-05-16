@@ -2,6 +2,7 @@
 #define LOCATIONBLOCK_HPP
 
 #include <string>
+#include <vector>
 
 class LocationBlock
 {
@@ -13,7 +14,8 @@ private:
 	// std::string cgi;		  // .extension
 
 public:
-	LocationBlock(/* args */);
+	LocationBlock();
+	LocationBlock(std::vector<std::string>&);
 	~LocationBlock();
 };
 

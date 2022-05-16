@@ -1,6 +1,10 @@
 #include "LocationBlock.hpp"
 
-LocationBlock::LocationBlock(/* args */)
+LocationBlock::LocationBlock()
+{
+}
+
+LocationBlock::LocationBlock(std::vector<std::string> &data)
 {
 }
 
