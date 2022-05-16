@@ -1,5 +1,4 @@
 #include "Monitor.hpp"
-#include "utils.hpp"
 
 Monitor::Monitor()
 {
@@ -32,7 +31,7 @@ void Monitor::log(const std::string &data)
 	this->logfile.write(_log.c_str(), _log.length());
 }
 
-void Monitor::print(const std::string &data)
+void Monitor::print(const std::string &color, const std::string &data)
 {
-	std::cout << data << std::endl;
+	std::cout << color << data << COLOR_DEFAULT << std::endl;
 }

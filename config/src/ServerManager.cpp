@@ -27,10 +27,10 @@ void ServerManager::init_server(std::string path)
         exit(1);
     while (std::getline(ifs, line)) {
         if (state & S_DEFAULT && line == SERVER_BLOCK_OPEN) {
-            this->getMonitor().print("new server block open");
+            this->getMonitor().print(COLOR_GREEN, "new server block open");
             state <<= 1;
         } else if (state & S_SERVER && line == SERVER_BLOCK_CLOSE) {
-            this->getMonitor().print("server block close");
+            this->getMonitor().print(COLOR_RED, "server block close");
             this->server.push_back(ServerBlock(temp));
             temp.clear();
             std::vector<std::string>().swap(temp);

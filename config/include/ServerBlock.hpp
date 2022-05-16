@@ -9,6 +9,7 @@
 #include "LocationBlock.hpp"
 #include "Defines.hpp"
 #include "System.hpp"
+#include "Color.hpp"
 
 class LocationBlock;
 
