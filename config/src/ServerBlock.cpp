@@ -22,7 +22,7 @@ void ServerBlock::init_server_block(const std::vector<std::string> &data)
 	u_short state = S_SERVER;
 	std::string location_path = "";
 
-	for(size_t i = 0 ; i < data.size() ; i++) {
+	for (size_t i = 0 ; i < data.size() ; i++) {
 		std::stringstream ss(data[i]);
 		if (data[i][0] != '\t')
 			getMonitor().log("config error");

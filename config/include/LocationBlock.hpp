@@ -14,6 +14,8 @@ private:
 	// std::string autoindex;	  // boolean?
 	// std::string cgi;		  // .extension
 
+	void init_location_block(std::string&, std::vector<std::string>&);
+
 public:
 	LocationBlock();
 	LocationBlock(std::string&, std::vector<std::string>&);
