@@ -20,19 +20,26 @@ void ServerBlock::init_server_block(const std::vector<std::string> &data)
 	std::vector<std::string> temp;
 	u_short state = S_SERVER;
 
-	this->getMonitor().print("new server block");
 	for(size_t i = 0 ; i < data.size() ; i++) {
 		std::stringstream ss(data[i]);
 		if (data[i][0] != '\t')
 			getMonitor().log("config error");
 		if (state & S_SERVER) {
 			if (data[i].substr(0, 9) == LOCATION_BLOCK_OPEN) {
-				this->getMonitor().print("new location block");
+				this->getMonitor().print("new location block open");
 				state <<= 1;
+			} else {
+			// TODO 여기는 Server Block Contents 처리하면됨
 			}
 		} else if (state & S_LOCATION) {
 			if (data[i].substr(0, 2) == LOCATION_BLOCK_CLOSE) {
-
+				this->getMonitor().print("location block close");
+				this->location.push_back(LocationBlock(temp));
+				temp.clear();
+				std::vector<std::string>().swap(temp);
+				state >>= 1;
+			} else {
+				temp.push_back(data[i]);
 			}
 		}
 	}

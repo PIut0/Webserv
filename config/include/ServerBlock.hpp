@@ -18,7 +18,7 @@ class LocationBlock;
 class ServerBlock : public System
 {
 private:
-	// std::vector<LocationBlock> location;
+	std::vector<LocationBlock> location;
 	// std::string server_name; //
 	// unsigned int port;		 // uintshort?
 	// std::string host;		 //
