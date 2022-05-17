@@ -18,13 +18,14 @@ ServerManager::~ServerManager()
 void ServerManager::init_server(std::string path)
 {
     std::string     line;
-    std::ifstream   ifs;
+    std::ifstream   config_file;
     std::vector<std::string> temp;
     u_short         state = S_DEFAULT;
-    ifs.open(path);
-    if (!ifs.is_open())
+
+    config_file.open(path);
+    if (!config_file.is_open())
         exit(1);
-    while (std::getline(ifs, line)) {
+    while (std::getline(config_file, line)) {
         if (state & S_DEFAULT && line == SERVER_BLOCK_OPEN) {
             this->getMonitor().print(COLOR_GREEN, "new server block open");
             state <<= 1;
