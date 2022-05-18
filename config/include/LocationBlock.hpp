@@ -3,8 +3,11 @@
 
 #include <string>
 #include <vector>
+#include "System.hpp"
 
-class LocationBlock
+#include <iostream> // DEBUG
+
+class LocationBlock : public System
 {
 private:
 	std::string location_path;

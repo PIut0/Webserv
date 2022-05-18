@@ -37,14 +37,12 @@ void ServerBlock::init_server_block(const std::vector<std::string> &data)
 			}
 		} else if (state & S_LOCATION) {
 			if (data[i].substr(0, 2) == LOCATION_BLOCK_CLOSE) {
-				this->getMonitor().print(COLOR_RED, "location block close");
 				this->location.push_back(LocationBlock(location_path, temp));
                 CLEAR_VECTOR_COMPLETLY(temp)
                 // TO_SERVER(state)
 				state >>= 1;
 			} else {
 				temp.push_back(data[i]);
-                std::cout << "[ Location ]" << data[i] << std::endl;
 			}
 		}
 	}
