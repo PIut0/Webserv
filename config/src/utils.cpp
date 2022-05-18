@@ -10,3 +10,8 @@ std::string check_arg(int argc, char **argv) {
     return argv[1];
 }
 
+void error_with_exit() {
+    std::cerr << "error" << std::endl;
+    exi(1);
+}
+
