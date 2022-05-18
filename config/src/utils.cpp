@@ -12,6 +12,6 @@ std::string check_arg(int argc, char **argv) {
 
 void error_with_exit() {
     std::cerr << "error" << std::endl;
-    exi(1);
+    exit(1);
 }
 
