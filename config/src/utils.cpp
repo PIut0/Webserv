@@ -10,6 +10,22 @@ std::string check_arg(int argc, char **argv) {
     return argv[1];
 }
 
+std::vector<std::string> string_split(const std::string &data, const std::string &delim, const int &start_pos)
+{
+    std::vector<std::string> res;
+    std::string token;
+    u_long pos = start_pos;
+    u_long bpos = start_pos; // block scope 만큼 탭 제외
+
+    while ((pos = data.find(delim, pos + 1)) != std::string::npos)
+    {
+        token = data.substr(bpos, pos - bpos);
+        res.push_back(token);
+        bpos = pos;
+    }
+    return res;
+}
+
 void error_with_exit() {
     std::cerr << "error" << std::endl;
     exit(1);
