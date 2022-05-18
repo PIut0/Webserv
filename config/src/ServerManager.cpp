@@ -26,6 +26,7 @@ void ServerManager::init_server(std::string path)
     if (!config_file.is_open())
         exit(1);
     while (std::getline(config_file, line)) {
+        line = line.substr(0, line.find('#', 0));
         if (state & S_DEFAULT && line == SERVER_BLOCK_OPEN) {
             this->getMonitor().print(COLOR_GREEN, "new server block open");
             state <<= 1;
