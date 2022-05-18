@@ -33,8 +33,8 @@ private:
 	// std::string autoindex;	  // boolean?
 	// std::string cgi;		  // .extension
 
-	void init_location_block(std::string&, std::vector<std::string>&);
-	LocationAttribute check_validate(std::string&);
+	void init_location_block(const std::string&, std::vector<std::string>&);
+	LocationAttribute check_validate(const std::string&);
 };
 
 

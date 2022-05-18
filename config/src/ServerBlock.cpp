@@ -14,6 +14,16 @@ ServerBlock::~ServerBlock()
 {
 }
 
+ServerBlock::ServserAttribute ServerBlock::check_validate(const std::string &data)
+{
+	if (data[0] != '\t') {
+		getMonitor().log("server block config error");
+		return ERROR;
+	}
+	return TRUE;
+}
+
+
 void ServerBlock::init_server_block(const std::vector<std::string> &data)
 {
 	std::string token;
@@ -23,12 +33,11 @@ void ServerBlock::init_server_block(const std::vector<std::string> &data)
 	std::string location_path = "";
 
 	for (size_t i = 0 ; i < data.size() ; i++) {
-		std::stringstream ss(data[i]);
-		if (data[i][0] != '\t')
-			getMonitor().log("config error");
+		if (check_validate(data[i]) == ERROR)
+			error_with_exit();
 		if (state & S_SERVER) {
 			if (data[i].substr(0, 9) == LOCATION_BLOCK_OPEN) {
-				location_path = data[i].substr(10, data[i].find('{', 0) - 1);
+				location_path = data[i].substr(10, data[i].find('{', 0) - 10);
                 this->getMonitor().print(COLOR_GREEN, "new location block open");
 				state <<= 1;
 			} else {
