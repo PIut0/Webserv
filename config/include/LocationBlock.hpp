@@ -4,12 +4,28 @@
 #include <string>
 #include <vector>
 #include "System.hpp"
+#include "utils.hpp"
 
 #include <iostream> // DEBUG
 
 class LocationBlock : public System
 {
+public:
+	LocationBlock();
+	LocationBlock(std::string&, std::vector<std::string>&);
+	~LocationBlock();
+
+	enum LocationAttribute {
+		ERROR = -1,
+		ALLOW_METHOD,
+		INDEX,
+		AUTO_INDEX,
+		CGI_INFO,
+
+	};
+
 private:
+
 	std::string location_path;
 	// std::string root;		  // root directory path
 	// std::string allow_method; //
@@ -18,11 +34,7 @@ private:
 	// std::string cgi;		  // .extension
 
 	void init_location_block(std::string&, std::vector<std::string>&);
-
-public:
-	LocationBlock();
-	LocationBlock(std::string&, std::vector<std::string>&);
-	~LocationBlock();
+	LocationAttribute check_validate(std::string&);
 };
 
 
