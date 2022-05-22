@@ -3,8 +3,8 @@
 
 #include "ServerManager.hpp"
 #include "utils.hpp"
-#include "kqueue.hpp"
-#include "server.hpp"
+#include "KQueue.hpp"
+#include "Server.hpp"
 
 int main(int argc, char** argv) {
 	ServerManager serverManager(check_arg(argc, argv));

@@ -9,9 +9,10 @@
 #include <string>
 #include <unistd.h>
 #include <fcntl.h>
-#include "kqueue.hpp"
-#include "socket.hpp"
-#include "client.hpp"
+
+#include "KQueue.hpp"
+#include "Socket.hpp"
+#include "Client.hpp"
 #include "utils.hpp"
 #include "ServerBlock.hpp"
 

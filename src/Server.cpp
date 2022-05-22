@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "Server.hpp"
 #include "utils.hpp"
 
 Server::Server(KQueue &_kq, ServerBlock &_sb) : Socket(_kq), server_block(_sb)

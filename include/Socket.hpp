@@ -1,7 +1,7 @@
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
 
-#include "kqueue.hpp"
+#include "KQueue.hpp"
 #include "utils.hpp"
 
 class KQueue;

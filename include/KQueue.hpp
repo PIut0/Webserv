@@ -9,8 +9,9 @@
 #include <string>
 #include <unistd.h>
 #include <fcntl.h>
+
 #include "utils.hpp"
-#include "server.hpp"
+#include "Server.hpp"
 
 #define EVENT_SIZE 64
 
