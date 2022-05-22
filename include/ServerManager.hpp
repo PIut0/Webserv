@@ -14,11 +14,10 @@ class ServerBlock;
 
 class ServerManager : public System
 {
-private:
+public:
 	std::vector<ServerBlock> serverBlock;
 	void init_server(std::string path);
 
-public:
 	ServerManager();
 	ServerManager(std::string);
 	~ServerManager();

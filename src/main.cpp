@@ -8,12 +8,13 @@
 
 int main(int argc, char** argv) {
 	ServerManager serverManager(check_arg(argc, argv));
-	std::vector<Server> servers;
+	std::vector<Server *> servers;
 	KQueue kq;
 	for(size_t i = 0 ; i < serverManager.serverBlock.size() ; i++) {
-		servers.push_back(Server(kq, serverManager.serverBlock[i]));
-		kq.add_server(servers[i]);
+		servers.push_back(new Server(kq, serverManager.serverBlock[i]));
+		kq.add_server(*(servers[i]));
 	}
+
 	int status;
 
 	while (1) {

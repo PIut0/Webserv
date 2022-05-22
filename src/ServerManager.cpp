@@ -26,7 +26,7 @@ void ServerManager::init_server(std::string path)
             // this->getMonitor().print(COLOR_GREEN, "new server block open");
             state <<= 1;
         } else if (state & S_SERVER && line == SERVER_BLOCK_CLOSE) {
-            this->server.push_back(ServerBlock(temp));
+            this->serverBlock.push_back(ServerBlock(temp));
             CLEAR_VECTOR_COMPLETLY(temp)
             state >>= 1;
         } else if (state & S_SERVER && line.length() > 0) {

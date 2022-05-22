@@ -53,7 +53,7 @@ public:
 private:
 	LocationBlock();
 
-	void init_location_block(const std::string&, std::vector<std::string>&);
+	void init_location_block(std::vector<std::string>&);
 	void printBlock();
 
 	LocationAttribute parseRoot(const std::string&);

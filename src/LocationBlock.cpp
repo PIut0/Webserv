@@ -2,6 +2,7 @@
 
 LocationBlock::LocationBlock(std::string &location_path, std::vector<std::string> &data)
 {
+	this->location_path_ = location_path;
 	this->allow_methods_ = GET | POST | PUT | DELETE;
 	this->root_ = "../html";
 	this->index_.push_back("index.html");
@@ -13,8 +14,8 @@ LocationBlock::LocationBlock(std::string &location_path, std::vector<std::string
 	defaultErrorPage.url = "error.html";
 
 	this->error_page_.push_back(defaultErrorPage);
-	init_location_block(location_path, data);
-	printBlock();
+	init_location_block(data);
+	// printBlock();
 }
 
 LocationBlock::~LocationBlock()
@@ -32,7 +33,6 @@ LocationBlock::LocationAttribute LocationBlock::parseAllowMethod(const std::stri
 	this->allow_methods_ = 0;
 	std::vector<std::string> split_data = string_split(data, " ", 0);
 	for (size_t i = 0 ; i < split_data.size() ; i++) {
-		std::cout << split_data[i] << std::endl;
 		if (split_data[i] == "POST")
 			this->allow_methods_ |= POST;
 		else if (split_data[i] == "PUT")
@@ -102,7 +102,6 @@ LocationBlock::LocationAttribute LocationBlock::check_validate(const std::string
 	int index = data.find(' ');
 	std::string command = data.substr(2, index - 2);
 	std::string contents = data.substr(index + 1, data.find(';') - index - 1);
-	std::cout << command << std::endl;
 
 	if (data[0] != '\t' && data[1] != '\t')
 		return ERROR_;
@@ -125,17 +124,16 @@ LocationBlock::LocationAttribute LocationBlock::check_validate(const std::string
 	return ERROR_;
 }
 
-void LocationBlock::init_location_block(const std::string &location_path, std::vector<std::string> &data)
+void LocationBlock::init_location_block(std::vector<std::string> &data)
 {
 	LocationAttribute type;
 	std::vector<std::string> element;
-	std::cout << "lo_path : " << location_path <<  std::endl;
+
 	for (size_t i = 0 ; i < data.size() ; i++) {
 		if ((type = check_validate(data[i])) == ERROR_)
 			exit_with_perror("error");
 		element = string_split(data[i], " ", strlen(LOCATION_BLOCK_TAP));
 	}
-	this->getMonitor().print(COLOR_RED, "location block close");
 }
 
 void LocationBlock::printBlock()
