@@ -1,3 +1,4 @@
 .vscode
 .DS*
 *.o
+log.txt
