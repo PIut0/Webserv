@@ -23,6 +23,19 @@ ServerBlock::ServserAttribute ServerBlock::check_validate(const std::string &dat
 	return TRUE;
 }
 
+void ServerBlock::parse_server(const std::string &data)
+{
+	std::vector<std::string> tocken;
+	if (check_validate(data) == ERROR)
+		error_with_exit();
+	if (data.substr(1,11) == "server_name")
+		this->server_name = data.substr(13, data.length());
+	if (data.substr(1, 6) == "listen") {
+		this->port = atoi(data.substr(8, data.substr(8, data.length()).find(' ')).c_str());
+		this->host = data.substr(data.substr(8, data.length()).find(' ') + 9, data.find(';')-1);
+		std::cout << "port =" << this->port << ";\nhost="<<data.substr(data.substr(8, data.length()).find(' ') + 9, data.find(';')-1) << this->host << "==" << std::endl;
+	}
+}
 
 void ServerBlock::init_server_block(const std::vector<std::string> &data)
 {
@@ -43,6 +56,7 @@ void ServerBlock::init_server_block(const std::vector<std::string> &data)
 			} else {
 			// TODO 여기는 Server Block Contents 처리하면됨 함수 만들면 될듯
                 std::cout << "[ Server ]" << data[i] << std::endl;
+				parse_server(data[i]);
 			}
 		} else if (state & S_LOCATION) {
 			if (data[i].substr(0, 2) == LOCATION_BLOCK_CLOSE) {
