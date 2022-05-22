@@ -3,24 +3,72 @@
 
 #include <string>
 #include <vector>
+#include <map>
+#include "System.hpp"
+#include "utils.hpp"
+#include "Defines.hpp"
+#include "LocationBlockStruct.hpp"
 
-class LocationBlock
+#include <iostream> // DEBUG
+
+#define GET		1
+#define POST	2
+#define PUT		4
+#define DELETE	8
+
+#define OFF		0
+#define ON		1
+
+#define DEFAULT_REQUEST_MAX_BODY_SIZE 1024
+
+class LocationBlock : public System
 {
-private:
-	std::string location_path;
-	// std::string root;		  // root directory path
-	// std::string allow_method; //
-	// std::string index;		  //
-	// std::string autoindex;	  // boolean?
-	// std::string cgi;		  // .extension
-
-	void init_location_block(std::string&, std::vector<std::string>&);
-
 public:
-	LocationBlock();
 	LocationBlock(std::string&, std::vector<std::string>&);
 	~LocationBlock();
+
+	enum LocationAttribute {
+		ERROR_ = -1,
+		ROOT_,
+		ALLOW_METHODS_,
+		INDEX_,
+		AUTO_INDEX_,
+		CGI_INFO_,
+		AUTH_KEY_,
+		ERROR_PAGE_,
+		REQUEST_MAX_BODY_SIZE_,
+		RETURN_,
+	};
+
+private:
+	LocationBlock();
+
+	// TODO 생성자에서 초기화하기
+	std::string 				location_path_;
+	std::string 				root_;						// TODO root 두개 있으면 에러
+	int							allow_methods_;				// 초기값 0b1111
+	std::vector<std::string>	index_;						// ""
+	bool						auto_index_;				// off
+	std::vector<CgiInfo>		cgi_info_;					// .extension
+	std::vector<ErrorPage>		error_page_;				// 초기값 루트
+	long						request_max_body_size_;
+	std::string 				return_;					//
+
+	void init_location_block(const std::string&, std::vector<std::string>&);
+	void printBlock();
+
+	LocationAttribute parseRoot(const std::string&);
+	LocationAttribute parseAllowMethod(const std::string&);
+	LocationAttribute parseIndex(const std::string&);
+	LocationAttribute parseAutoIndex(const std::string&);
+	LocationAttribute parseCgiInfo(const std::string&);
+	LocationAttribute parseReturn(const std::string&);
+	LocationAttribute parseErrorPage(const std::string&);
+	LocationAttribute parseRequestBodySize(const std::string&);
+
+	LocationAttribute check_validate(const std::string&);
 };
+
 
 
 #endif

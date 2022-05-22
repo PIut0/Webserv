@@ -7,7 +7,6 @@ ServerManager::ServerManager()
 
 ServerManager::ServerManager(std::string path)
 {
-    getMonitor().log("hi");
     init_server(path);
 }
 
@@ -19,18 +18,19 @@ ServerManager::~ServerManager()
 void ServerManager::init_server(std::string path)
 {
     std::string     line;
-    std::ifstream   ifs;
+    std::ifstream   config_file;
     std::vector<std::string> temp;
     u_short         state = S_DEFAULT;
-    ifs.open(path);
-    if (!ifs.is_open())
+
+    config_file.open(path);
+    if (!config_file.is_open())
         exit(1);
-    while (std::getline(ifs, line)) {
+    while (std::getline(config_file, line)) {
+        line = line.substr(0, line.find('#', 0));
         if (state & S_DEFAULT && line == SERVER_BLOCK_OPEN) {
-            this->getMonitor().print(COLOR_GREEN, "new server block open");
+            // this->getMonitor().print(COLOR_GREEN, "new server block open");
             state <<= 1;
         } else if (state & S_SERVER && line == SERVER_BLOCK_CLOSE) {
-            this->getMonitor().print(COLOR_RED, "server block close");
             this->server.push_back(ServerBlock(temp));
             CLEAR_VECTOR_COMPLETLY(temp)
             state >>= 1;
@@ -38,6 +38,7 @@ void ServerManager::init_server(std::string path)
             temp.push_back(line);
         }
     }
+    // this->getMonitor().print(COLOR_RED, "server block close");
 }
 
 
