@@ -1,9 +1,9 @@
 #include "server.hpp"
 #include "util.hpp"
 
-Server::Server(KQueue &_kq, int port) : kq(_kq)
+Server::Server(KQueue &_kq, int port) : Socket(_kq)
 {
-	if ((server_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
+	if ((socket_fd = socket(PF_INET, SOCK_STREAM, 0)) == -1)
 		exit_with_perror("socket");
 
 	memset(&server_addr, 0, sizeof(server_addr));
@@ -11,26 +11,31 @@ Server::Server(KQueue &_kq, int port) : kq(_kq)
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	server_addr.sin_port = htons(port);
 
-	if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
+	if (bind(socket_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
 		exit_with_perror("bind");
 
-	if (listen(server_socket, 64) == -1)
+	if (listen(socket_fd, 64) == -1)
 		exit_with_perror("listen");
 
-	fcntl(server_socket, F_SETFL, O_NONBLOCK);
+	fcntl(socket_fd, F_SETFL, O_NONBLOCK);
 }
 
 Server::~Server()
 {
-	close(server_socket);
+	close(socket_fd);
 }
 
 int Server::event_read()
 {
-	int client_socket;
-	if ((client_socket = accept(server_socket, NULL, NULL)) == -1)
+	int client_socket_fd;
+	if ((client_socket_fd = accept(socket_fd, NULL, NULL)) == -1)
 		exit_with_perror("server_event_read");
-	new Client(kq, client_socket);
+	new Client(kq, client_socket_fd);
 
+	return 1;
+}
+
+int Server::event_write()
+{
 	return 1;
 }

@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "kqueue.hpp"
+#include "socket.hpp"
 #include "client.hpp"
 #include "util.hpp"
 
@@ -18,17 +19,16 @@
 class Client;
 class KQueue;
 
-class Server
+class Server : public Socket
 {
 public:
-	KQueue &kq;
-	int server_socket;
 	struct sockaddr_in server_addr;
 
 	Server(KQueue &_kq, int port);
 	~Server();
 
 	int event_read();
+	int event_write();
 };
 
 #endif
