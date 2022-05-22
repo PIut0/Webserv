@@ -1,12 +1,13 @@
+#include "Defines.hpp"
 #include "utils.hpp"
 
 // 인자가 없거나 많거나 체크
 std::string check_arg(int argc, char **argv) {
     if (argc == 1) {
-        return "./config_example.config";
+        return DEFAULT_CONFIG_PATH;
     }
     if (argc != 2)
-        return "";
+        exit_with_perror("Usage: ./server [config_file]");
     return argv[1];
 }
 
@@ -27,8 +28,10 @@ std::vector<std::string> string_split(const std::string &data, const std::string
     return res;
 }
 
-void error_with_exit() {
-    std::cerr << "error" << std::endl;
-    exit(1);
+void exit_with_perror(const std::string &msg)
+{
+	std::cerr << msg << ": " << strerror(errno) << std::endl;
+	exit(1);
 }
+
 

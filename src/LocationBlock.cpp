@@ -132,7 +132,7 @@ void LocationBlock::init_location_block(const std::string &location_path, std::v
 	std::cout << "lo_path : " << location_path <<  std::endl;
 	for (size_t i = 0 ; i < data.size() ; i++) {
 		if ((type = check_validate(data[i])) == ERROR_)
-			error_with_exit();
+			exit_with_perror("error");
 		element = string_split(data[i], " ", strlen(LOCATION_BLOCK_TAP));
 	}
 	this->getMonitor().print(COLOR_RED, "location block close");

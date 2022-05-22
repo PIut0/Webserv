@@ -54,7 +54,7 @@ void ServerBlock::init_server_block(const std::vector<std::string> &data)
 		{
 		case S_SERVER:
 			if ((type = check_validate(data[i])) == ERROR_)
-				error_with_exit();
+				exit_with_perror("error");
 			if (type == LOCATION_) {
 				location_path = data[i].substr(10, data[i].find('{', 0) - 10);
 				this->getMonitor().print(COLOR_GREEN, "new location block open");
@@ -62,7 +62,7 @@ void ServerBlock::init_server_block(const std::vector<std::string> &data)
 			} else {
 				std::cout << data[i] << std::endl;
 				if ((type = check_validate(data[i])) == ERROR_)
-					error_with_exit();
+					exit_with_perror("error");
 			}
 			break;
 		case S_LOCATION:

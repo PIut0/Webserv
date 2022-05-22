@@ -15,7 +15,7 @@ class ServerBlock;
 class ServerManager : public System
 {
 private:
-	std::vector<ServerBlock> server;
+	std::vector<ServerBlock> serverBlock;
 	void init_server(std::string path);
 
 public:

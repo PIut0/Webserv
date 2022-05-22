@@ -1,10 +1,5 @@
 #include "ServerManager.hpp"
 
-ServerManager::ServerManager()
-{
-    init_server(DEFAULT_CONFIG_PATH);
-}
-
 ServerManager::ServerManager(std::string path)
 {
     init_server(path);
