@@ -21,8 +21,9 @@ std::vector<std::string> string_split(const std::string &data, const std::string
     {
         token = data.substr(bpos, pos - bpos);
         res.push_back(token);
-        bpos = pos;
+        bpos = pos + delim.length();
     }
+    res.push_back(data.substr(bpos, data.length() - bpos));
     return res;
 }
 
