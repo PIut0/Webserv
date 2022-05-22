@@ -11,28 +11,24 @@ int main(int argc, char **argv)
 	(void)argv;
 	KQueue kq;
 	Server serv(kq, PORT);
-	std::cout << "Server: " << serv.server_socket << std::endl;
+	std::cout << "Server: " << serv.socket_fd << std::endl;
 	kq.add_server(serv);
 	int status;
 
 	while (1) {
 		kq.refresh();
 		for (int i = 0; i < kq.event_count; i++) {
+			Socket *socket_class = static_cast<Socket *>(kq.events[i].udata);
 			if (kq.events[i].filter == EVFILT_READ){
-				if (kq.events[i].ident == static_cast<uintptr_t>(serv.server_socket))
-					static_cast<Server *>(kq.events[i].udata)->event_read();
-				else {
-					if ((status = static_cast<Client *>(kq.events[i].udata)->event_read()) <= 0
-						&& !static_cast<Client *>(kq.events[i].udata)->read_more) {
-						if (status < 0)
-							delete static_cast<Client *>(kq.events[i].udata);
-						std::cout << "fd: " << kq.events[i].ident << ": delete client" << std::endl;
-						close(static_cast<Client *>(kq.events[i].udata)->client_socket);
-					}
+				if ((status = socket_class->event_read()) <= 0
+					&& !static_cast<Client *>(socket_class)->has_body) {
+					delete socket_class;
+					std::cout << "fd: " << kq.events[i].ident << ": delete client" << std::endl;
+					close(socket_class->socket_fd);
 				}
 			}
 			else if (kq.events[i].filter == EVFILT_WRITE) {
-				if ((static_cast<Client *>(kq.events[i].udata)->event_write()) <= 0) {
+				if ((socket_class->event_write()) <= 0) {
 					kq.delete_event(kq.events[i].ident, kq.events[i].filter);
 				}
 			}
