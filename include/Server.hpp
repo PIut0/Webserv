@@ -11,7 +11,7 @@
 #include <fcntl.h>
 
 #include "KQueue.hpp"
-#include "Socket.hpp"
+#include "FdInterface.hpp"
 #include "Client.hpp"
 #include "utils.hpp"
 #include "ServerBlock.hpp"
@@ -22,7 +22,7 @@ class Client;
 class KQueue;
 class ServerBlock;
 
-class Server : public Socket
+class Server : public FdInterface
 {
  public:
   struct sockaddr_in  server_addr;

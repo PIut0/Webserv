@@ -1,7 +1,7 @@
 #include "Server.hpp"
 #include "utils.hpp"
 
-Server::Server(KQueue &kq, ServerBlock &_sb) : Socket(kq), server_block(_sb)
+Server::Server(KQueue &kq, ServerBlock &_sb) : FdInterface(kq), server_block(_sb)
 {
   if ((socket_fd = socket(PF_INET, SOCK_STREAM, 0)) == -1)
     ExitWithPerror("socket");

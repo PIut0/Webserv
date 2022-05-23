@@ -18,7 +18,7 @@ int main(int argc, char **argv)
   while (1) {
     kq.refresh();
     for (int i = 0; i < kq.event_count; i++) {
-      Socket *socket_class = static_cast<Socket *>(kq.events[i].udata);
+      FdInterface *socket_class = static_cast<FdInterface *>(kq.events[i].udata);
       if (kq.events[i].filter == EVFILT_READ){
         if ((status = socket_class->event_read()) <= 0
           && !static_cast<Client *>(socket_class)->has_body) {

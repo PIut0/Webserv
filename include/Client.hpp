@@ -2,14 +2,14 @@
 #define CLIENT_HPP
 
 #include "KQueue.hpp"
-#include "Socket.hpp"
+#include "FdInterface.hpp"
 #include "utils.hpp"
 
 #define CRLF "\r\n\r\n"
 
 class KQueue;
 
-class Client : public Socket
+class Client : public FdInterface
 {
   public:
   Client(KQueue &kq, int fd);
