@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+
 #include "System.hpp"
 #include "utils.hpp"
 #include "Defines.hpp"
@@ -27,6 +28,16 @@ public:
 	LocationBlock(std::string&, std::vector<std::string>&);
 	~LocationBlock();
 
+	std::string 				location_path_;
+	std::string 				root_;
+	int							allow_methods_;
+	std::vector<std::string>	index_;
+	bool						auto_index_;
+	std::vector<CgiInfo>		cgi_info_;
+	std::vector<ErrorPage>		error_page_;
+	long						request_max_body_size_;
+	std::string 				return_;
+
 	enum LocationAttribute {
 		ERROR_ = -1,
 		ROOT_,
@@ -43,18 +54,7 @@ public:
 private:
 	LocationBlock();
 
-	// TODO 생성자에서 초기화하기
-	std::string 				location_path_;
-	std::string 				root_;						// TODO root 두개 있으면 에러
-	int							allow_methods_;				// 초기값 0b1111
-	std::vector<std::string>	index_;						// ""
-	bool						auto_index_;				// off
-	std::vector<CgiInfo>		cgi_info_;					// .extension
-	std::vector<ErrorPage>		error_page_;				// 초기값 루트
-	long						request_max_body_size_;
-	std::string 				return_;					//
-
-	void init_location_block(const std::string&, std::vector<std::string>&);
+	void init_location_block(std::vector<std::string>&);
 	void printBlock();
 
 	LocationAttribute parseRoot(const std::string&);

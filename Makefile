@@ -1,4 +1,4 @@
-NAME		=	config
+NAME		=	webserv
 
 INCLUDE 	=	-I./include
 
@@ -11,7 +11,10 @@ SRC			=	main.cpp \
 				LocationBlock.cpp \
 				Monitor.cpp \
 				System.cpp \
-				utils.cpp
+				utils.cpp \
+				kqueue.cpp \
+				server.cpp \
+				client.cpp \
 
 
 SRC_DIR 	=	./src
@@ -28,8 +31,6 @@ $(OBJ_DIR)/%.o	: $(SRC_DIR)/%.cpp
 
 $(NAME)	:	$(OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o $@
-
-
 
 bonus	: all
 

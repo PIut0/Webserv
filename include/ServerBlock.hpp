@@ -21,6 +21,11 @@ public:
 	ServerBlock(const std::vector<std::string>&);
 	~ServerBlock();
 
+	std::vector<LocationBlock>	location;
+	std::string					server_name;
+	std::string					host;
+	u_short						port;
+
 	enum ServerAttribute {
 		ERROR_ = -1,
 		LOCATION_,
@@ -30,11 +35,6 @@ public:
 
 private:
 	ServerBlock();
-
-	std::vector<LocationBlock>	location;
-	std::string					server_name;
-	std::string					host;
-	u_short						port;
 
 	void init_server_block(const std::vector<std::string>&);
 	void check_essentail_commands();

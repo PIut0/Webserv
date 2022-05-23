@@ -18,19 +18,21 @@ int main(int argc, char **argv)
 {
 	static char buff[BUFF_SIZE];
 
+	int port = argc > 1 ? atoi(argv[1]) : PORT ;
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd == -1)
 	{
 		fprintf(stderr, "socket 생성 실패\n", errno);
 		exit(errno);
 	}
+	printf("port: %d\n", port);
 
 	struct sockaddr_in addr;
 
 	memset(&addr, 0, sizeof(addr));
 
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(PORT);
+	addr.sin_port = htons(port);
 	addr.sin_addr.s_addr = inet_addr(IPADDR);
 
 	if (connect(sockfd, (struct sockaddr *)&addr, sizeof(addr)) == -1)

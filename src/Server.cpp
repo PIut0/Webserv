@@ -1,7 +1,7 @@
-#include "server.hpp"
-#include "util.hpp"
+#include "Server.hpp"
+#include "utils.hpp"
 
-Server::Server(KQueue &_kq, int port) : Socket(_kq)
+Server::Server(KQueue &_kq, ServerBlock &_sb) : Socket(_kq), server_block(_sb)
 {
 	if ((socket_fd = socket(PF_INET, SOCK_STREAM, 0)) == -1)
 		exit_with_perror("socket");
@@ -9,7 +9,7 @@ Server::Server(KQueue &_kq, int port) : Socket(_kq)
 	memset(&server_addr, 0, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	server_addr.sin_port = htons(port);
+	server_addr.sin_port = htons(_sb.port);
 
 	if (bind(socket_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
 		exit_with_perror("bind");
