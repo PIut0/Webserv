@@ -2,14 +2,14 @@
 
 ServerManager::ServerManager(std::string path)
 {
-  init_server(path);
+  InitServer(path);
 }
 
 ServerManager::~ServerManager()
 {
 }
 
-void ServerManager::init_server(std::string path)
+void ServerManager::InitServer(std::string path)
 {
   std::string line;
   std::ifstream config_file;

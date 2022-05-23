@@ -19,10 +19,10 @@ public:
   Client(KQueue &_kq, int fd);
   ~Client();
 
-  int event_read();
-  int event_write();
+  int EventRead();
+  int EventWrite();
 
-  void parse_req();
+  void ParseReq();
 };
 
 #endif

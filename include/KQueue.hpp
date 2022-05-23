@@ -27,10 +27,10 @@ public:
   KQueue();
   ~KQueue();
 
-  void refresh();
-  void add_event(int ident, int16_t filter, void *udata);
-  void delete_event(int ident, int16_t filter);
-  void add_server(Server &serv);
+  void Refresh();
+  void AddEvent(int ident, int16_t filter, void *udata);
+  void DeleteEvent(int ident, int16_t filter);
+  void AddServer(Server &serv);
 };
 
 #endif

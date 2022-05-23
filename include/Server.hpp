@@ -31,8 +31,8 @@ public:
   Server(KQueue &_kq, ServerBlock &_sb);
   ~Server();
 
-  int event_read();
-  int event_write();
+  int EventRead();
+  int EventWrite();
 };
 
 #endif

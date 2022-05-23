@@ -4,7 +4,7 @@
 Client::Client(KQueue &_kq, int fd) : Socket(_kq, fd), has_body(0)
 {
   fcntl(socket_fd, F_SETFL, O_NONBLOCK);
-  kq.add_event(socket_fd, EVFILT_READ, this);
+  kq.AddEvent(socket_fd, EVFILT_READ, this);
 }
 
 Client::~Client()
@@ -12,7 +12,7 @@ Client::~Client()
   close(socket_fd);
 }
 
-int Client::event_read()
+int Client::EventRead()
 {
   char buf[1025];
   int n = read(socket_fd, buf, sizeof(buf) - 1);
@@ -24,14 +24,14 @@ int Client::event_read()
   std::cout << "====== " << "fd: " << socket_fd <<  " buffer ======" << std::endl;
   std::cout << req << std::endl;
   if (req.find(CRLF) != std::string::npos) {
-    parse_req();
-    kq.add_event(socket_fd, EVFILT_WRITE, this);
+    ParseReq();
+    kq.AddEvent(socket_fd, EVFILT_WRITE, this);
   }
 
   return n;
 }
 
-int Client::event_write()
+int Client::EventWrite()
 {
   int n = write(socket_fd, res.c_str(), res.size());
   if (n <= 0)
@@ -43,7 +43,7 @@ int Client::event_write()
 }
 
 // TODO : parse http req
-void Client::parse_req()
+void Client::ParseReq()
 {
   std::string tmp = req.substr(req.find(CRLF) + 4);
   req = req.substr(0, req.find(CRLF));

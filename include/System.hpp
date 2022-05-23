@@ -10,7 +10,7 @@
 class System
 {
 public:
-  Monitor& getMonitor();
+  Monitor& GetMonitor();
 
 private:
   static Monitor monitor;

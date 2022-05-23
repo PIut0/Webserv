@@ -36,13 +36,13 @@ public:
 private:
   ServerBlock();
 
-  void init_server_block(const std::vector<std::string>&);
-  void check_essentail_commands();
-  void printBlock();
+  void InitServerBlock(const std::vector<std::string>&);
+  void CheckEssentailCommands();
+  void PrintBlock();
 
-  ServerAttribute parseListen(const std::string&);
-  ServerAttribute parseServerName(const std::string&);
-  ServerAttribute check_validate(const std::string&);
+  ServerAttribute ParseListen(const std::string&);
+  ServerAttribute ParseServerName(const std::string&);
+  ServerAttribute CheckValidate(const std::string&);
 };
 
 #endif

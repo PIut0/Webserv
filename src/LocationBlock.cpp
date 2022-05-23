@@ -14,24 +14,24 @@ LocationBlock::LocationBlock(std::string &location_path, std::vector<std::string
   defaultErrorPage.url = "error.html";
 
   this->error_page_.push_back(defaultErrorPage);
-  init_location_block(data);
-  // printBlock();
+  InitLocationBlock(data);
+  // PrintBlock();
 }
 
 LocationBlock::~LocationBlock()
 {
 }
 
-LocationBlock::LocationAttribute LocationBlock::parseRoot(const std::string &data)
+LocationBlock::LocationAttribute LocationBlock::ParseRoot(const std::string &data)
 {
   this->root_ = data;
   return ROOT_;
 }
 
-LocationBlock::LocationAttribute LocationBlock::parseAllowMethod(const std::string &data)
+LocationBlock::LocationAttribute LocationBlock::ParseAllowMethod(const std::string &data)
 {
   this->allow_methods_ = 0;
-  std::vector<std::string> split_data = string_split(data, " ", 0);
+  std::vector<std::string> split_data = StringSplit(data, " ", 0);
   for (size_t i = 0 ; i < split_data.size() ; i++) {
     if (split_data[i] == "POST")
       this->allow_methods_ |= POST;
@@ -47,17 +47,17 @@ LocationBlock::LocationAttribute LocationBlock::parseAllowMethod(const std::stri
   return ALLOW_METHODS_;
 }
 
-LocationBlock::LocationAttribute LocationBlock::parseIndex(const std::string &data)
+LocationBlock::LocationAttribute LocationBlock::ParseIndex(const std::string &data)
 {
    // "index index.html index.htm"
-  std::vector<std::string> split_data = string_split(data, " ", 0);
+  std::vector<std::string> split_data = StringSplit(data, " ", 0);
   for (size_t i = 0 ; i < split_data.size() ; i++) {
     this->index_.push_back(split_data[i]);
   }
   return INDEX_;
 }
 
-LocationBlock::LocationAttribute LocationBlock::parseAutoIndex(const std::string &data)
+LocationBlock::LocationAttribute LocationBlock::ParseAutoIndex(const std::string &data)
 {
   if (data == "on")
     this->auto_index_ = ON;
@@ -66,9 +66,9 @@ LocationBlock::LocationAttribute LocationBlock::parseAutoIndex(const std::string
   return AUTO_INDEX_;
 }
 
-LocationBlock::LocationAttribute LocationBlock::parseCgiInfo(const std::string &data)
+LocationBlock::LocationAttribute LocationBlock::ParseCgiInfo(const std::string &data)
 {
-  std::vector<std::string> split_data = string_split(data, " ", 0);
+  std::vector<std::string> split_data = StringSplit(data, " ", 0);
   CgiInfo cgi_info_;
   cgi_info_.anjwl = split_data[0];
   cgi_info_.url = split_data[1];
@@ -76,28 +76,28 @@ LocationBlock::LocationAttribute LocationBlock::parseCgiInfo(const std::string &
   return CGI_INFO_;
 }
 
-LocationBlock::LocationAttribute LocationBlock::parseRequestBodySize(const std::string &data)
+LocationBlock::LocationAttribute LocationBlock::ParseRequestBodySize(const std::string &data)
 {
   this->request_max_body_size_ = atoi(data.c_str());
   return REQUEST_MAX_BODY_SIZE_;
 }
 
-LocationBlock::LocationAttribute LocationBlock::parseErrorPage(const std::string &data)
+LocationBlock::LocationAttribute LocationBlock::ParseErrorPage(const std::string &data)
 {
-  std::vector<std::string> split_data = string_split(data, " ", 0);
+  std::vector<std::string> split_data = StringSplit(data, " ", 0);
   ErrorPage error_page_;
   error_page_.code = atoi(split_data[0].c_str());
   error_page_.url = split_data[1];
   return ERROR_PAGE_;
 }
 
-LocationBlock::LocationAttribute LocationBlock::parseReturn(const std::string &data)
+LocationBlock::LocationAttribute LocationBlock::ParseReturn(const std::string &data)
 {
   this->return_ = data;
   return RETURN_;
 }
 
-LocationBlock::LocationAttribute LocationBlock::check_validate(const std::string &data)
+LocationBlock::LocationAttribute LocationBlock::CheckValidate(const std::string &data)
 {
   int index = data.find(' ');
   std::string command = data.substr(2, index - 2);
@@ -106,37 +106,37 @@ LocationBlock::LocationAttribute LocationBlock::check_validate(const std::string
   if (data[0] != '\t' && data[1] != '\t')
     return ERROR_;
   if (command == "root")
-    return parseRoot(contents);
+    return ParseRoot(contents);
   else if (command == "allow_methods")
-    return parseAllowMethod(contents);
+    return ParseAllowMethod(contents);
   else if (command == "index")
-    return parseIndex(contents);
+    return ParseIndex(contents);
   else if (command == "auto_index")
-    return parseAutoIndex(contents);
+    return ParseAutoIndex(contents);
   else if (command == "cgi_info")
-    return parseCgiInfo(contents);
+    return ParseCgiInfo(contents);
   else if (command == "error_page")
-    return parseErrorPage(contents);
+    return ParseErrorPage(contents);
   else if (command == "return")
-    return parseReturn(contents);
+    return ParseReturn(contents);
   else if (command == "request_max_body_size")
-    return parseRequestBodySize(contents);
+    return ParseRequestBodySize(contents);
   return ERROR_;
 }
 
-void LocationBlock::init_location_block(std::vector<std::string> &data)
+void LocationBlock::InitLocationBlock(std::vector<std::string> &data)
 {
   LocationAttribute type;
   std::vector<std::string> element;
 
   for (size_t i = 0 ; i < data.size() ; i++) {
-    if ((type = check_validate(data[i])) == ERROR_)
-      exit_with_perror("error");
-    element = string_split(data[i], " ", strlen(LOCATION_BLOCK_TAP));
+    if ((type = CheckValidate(data[i])) == ERROR_)
+      ExitWithPerror("error");
+    element = StringSplit(data[i], " ", strlen(LOCATION_BLOCK_TAP));
   }
 }
 
-void LocationBlock::printBlock()
+void LocationBlock::PrintBlock()
 {
   std::cout << "root : " << this->root_ << std::endl;
   std::cout << "allow_methods : " << (this->allow_methods_ & GET) << (this->allow_methods_ & POST) << (this->allow_methods_ & PUT) << (this->allow_methods_ & DELETE) << std::endl;

@@ -54,19 +54,19 @@ public:
 private:
   LocationBlock();
 
-  void init_location_block(std::vector<std::string>&);
-  void printBlock();
+  void InitLocationBlock(std::vector<std::string>&);
+  void PrintBlock();
 
-  LocationAttribute parseRoot(const std::string&);
-  LocationAttribute parseAllowMethod(const std::string&);
-  LocationAttribute parseIndex(const std::string&);
-  LocationAttribute parseAutoIndex(const std::string&);
-  LocationAttribute parseCgiInfo(const std::string&);
-  LocationAttribute parseReturn(const std::string&);
-  LocationAttribute parseErrorPage(const std::string&);
-  LocationAttribute parseRequestBodySize(const std::string&);
+  LocationAttribute ParseRoot(const std::string&);
+  LocationAttribute ParseAllowMethod(const std::string&);
+  LocationAttribute ParseIndex(const std::string&);
+  LocationAttribute ParseAutoIndex(const std::string&);
+  LocationAttribute ParseCgiInfo(const std::string&);
+  LocationAttribute ParseReturn(const std::string&);
+  LocationAttribute ParseErrorPage(const std::string&);
+  LocationAttribute ParseRequestBodySize(const std::string&);
 
-  LocationAttribute check_validate(const std::string&);
+  LocationAttribute CheckValidate(const std::string&);
 };
 
 

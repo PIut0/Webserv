@@ -2,18 +2,18 @@
 #include "Defines.hpp"
 
 // 인자가 없거나 많거나 체크
-std::string check_arg(int argc, char **argv)
+std::string CheckArg(int argc, char **argv)
 {
   if (argc == 1)
   {
     return DEFAULT_CONFIG_PATH;
   }
   if (argc != 2)
-    exit_with_perror("Usage: ./server [config_file]");
+    ExitWithPerror("Usage: ./server [config_file]");
   return argv[1];
 }
 
-std::vector<std::string> string_split(const std::string &data,
+std::vector<std::string> StringSplit(const std::string &data,
                     const std::string &delim,
                     const int &start_pos)
 {
@@ -32,7 +32,7 @@ std::vector<std::string> string_split(const std::string &data,
   return res;
 }
 
-void exit_with_perror(const std::string &msg)
+void ExitWithPerror(const std::string &msg)
 {
   std::cerr << msg << ": " << strerror(errno) << std::endl;
   exit(1);

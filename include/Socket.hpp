@@ -16,8 +16,8 @@ public:
   Socket(KQueue &_kq, int fd) : kq(_kq), socket_fd(fd) {};
   virtual ~Socket() {};
 
-  virtual int event_read() = 0;
-  virtual int event_write() = 0;
+  virtual int EventRead() = 0;
+  virtual int EventWrite() = 0;
 };
 
 #endif

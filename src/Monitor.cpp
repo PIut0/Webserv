@@ -20,7 +20,7 @@ time_t Monitor::getTimeStamp() {
 }
 
 // TODO log 출력 형식 맞추기 [hhmmssms] Scope Content (errno - errstr)
-void Monitor::log(const std::string &data)
+void Monitor::Log(const std::string &data)
 {
   std::string time = std::to_string(this->getTimeStamp());
   std::string _log = time + " " + "Scope" + " " + data;
@@ -31,7 +31,7 @@ void Monitor::log(const std::string &data)
   this->logfile.write(_log.c_str(), _log.length());
 }
 
-void Monitor::print(const std::string &color, const std::string &data)
+void Monitor::Print(const std::string &color, const std::string &data)
 {
   std::cout << color << data << COLOR_DEFAULT << std::endl;
 }

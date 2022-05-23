@@ -2,7 +2,7 @@
 
 ServerBlock::ServerBlock(const std::vector<std::string> &data)
 {
-  init_server_block(data);
+  InitServerBlock(data);
   // printBlock();
 }
 
@@ -10,20 +10,20 @@ ServerBlock::~ServerBlock()
 {
 }
 
-ServerBlock::ServerAttribute ServerBlock::parseListen(const std::string &data)
+ServerBlock::ServerAttribute ServerBlock::ParseListen(const std::string &data)
 {
-  std::vector<std::string> split_data = string_split(data, " ", 0);
+  std::vector<std::string> split_data = StringSplit(data, " ", 0);
   this->port = atoi(split_data[0].c_str());
   this->host = split_data[1];
   return LISTEN_;
 }
-ServerBlock::ServerAttribute ServerBlock::parseServerName(const std::string &data)
+ServerBlock::ServerAttribute ServerBlock::ParseServerName(const std::string &data)
 {
   this->server_name = data;
   return SERVER_NAME_;
 }
 
-ServerBlock::ServerAttribute ServerBlock::check_validate(const std::string &data)
+ServerBlock::ServerAttribute ServerBlock::CheckValidate(const std::string &data)
 {
 
   int index = data.find(' ');
@@ -33,15 +33,15 @@ ServerBlock::ServerAttribute ServerBlock::check_validate(const std::string &data
   if (data[0] != '\t')
     return ERROR_;
   if (command == "server_name")
-    return parseServerName(contents);
+    return ParseServerName(contents);
   else if (command == "listen")
-    return parseListen(contents);
+    return ParseListen(contents);
   else if (command == "location")
     return LOCATION_;
   return ERROR_;
 }
 
-void ServerBlock::init_server_block(const std::vector<std::string> &data)
+void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
 {
   std::vector<std::string> element;
   ServerAttribute type;
@@ -53,14 +53,14 @@ void ServerBlock::init_server_block(const std::vector<std::string> &data)
     switch (state)
     {
     case S_SERVER:
-      if ((type = check_validate(data[i])) == ERROR_)
-        exit_with_perror("error");
+      if ((type = CheckValidate(data[i])) == ERROR_)
+        ExitWithPerror("error");
       if (type == LOCATION_) {
         location_path = data[i].substr(10, data[i].find('{', 0) - 10);
         state <<= 1;
       } else {
-        if ((type = check_validate(data[i])) == ERROR_)
-          exit_with_perror("error");
+        if ((type = CheckValidate(data[i])) == ERROR_)
+          ExitWithPerror("error");
       }
       break;
     case S_LOCATION:
@@ -77,7 +77,7 @@ void ServerBlock::init_server_block(const std::vector<std::string> &data)
   }
 }
 
-void ServerBlock::printBlock()
+void ServerBlock::PrintBlock()
 {
   std::cout << "server_name : " << this->server_name << std::endl;
   std::cout << "host : " << this->host << std::endl;

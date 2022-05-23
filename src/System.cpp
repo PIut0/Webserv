@@ -2,7 +2,7 @@
 
 Monitor System::monitor;
 
-Monitor& System::getMonitor()
+Monitor& System::GetMonitor()
 {
   return this->monitor;
 }

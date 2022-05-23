@@ -14,9 +14,9 @@ class Monitor
 {
 public:
   time_t getTimeStamp();
-  void log(const std::string&);
-  void print(const std::string&, const std::string&);
-  void error();
+  void Log(const std::string&);
+  void Print(const std::string&, const std::string&);
+  void Error();
 
   ~Monitor();
   Monitor();
