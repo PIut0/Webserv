@@ -1,8 +1,8 @@
 #include "System.hpp"
 
-Monitor System::monitor;
+Monitor System::monitor_;
 
 Monitor& System::GetMonitor()
 {
-  return this->monitor;
+  return this->monitor_;
 }

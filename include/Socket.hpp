@@ -9,12 +9,12 @@ class KQueue;
 class Socket
 {
  public:
-  KQueue  &kq;
-  int     socket_fd;
-
   Socket(KQueue &kq) : kq(kq) {};
   Socket(KQueue &kq, int fd) : kq(kq), socket_fd(fd) {};
   virtual ~Socket() {};
+
+  KQueue  &kq;
+  int     socket_fd;
 
   virtual int EventRead() = 0;
   virtual int EventWrite() = 0;

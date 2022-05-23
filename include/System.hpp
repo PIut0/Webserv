@@ -13,7 +13,7 @@ class System
   Monitor& GetMonitor();
 
  private:
-  static Monitor monitor;
+  static Monitor monitor_;
 };
 
 #endif

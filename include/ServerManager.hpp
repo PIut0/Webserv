@@ -15,12 +15,13 @@ class ServerBlock;
 class ServerManager : public System
 {
  public:
-  std::vector<ServerBlock> serverBlock;
-  void InitServer(std::string path);
-
   ServerManager();
   ServerManager(std::string);
   ~ServerManager();
+
+  std::vector<ServerBlock> serverBlock;
+
+  void InitServer(std::string path);
 };
 
 #endif

@@ -12,13 +12,13 @@
 
 #include <iostream> // DEBUG
 
-#define GET		1
-#define POST	2
-#define PUT		4
-#define DELETE	8
+#define GET     1
+#define POST    2
+#define PUT     4
+#define DELETE  8
 
-#define OFF		0
-#define ON		1
+#define OFF     0
+#define ON      1
 
 #define DEFAULT_REQUEST_MAX_BODY_SIZE 1024
 
