@@ -11,10 +11,10 @@ SRC			=	main.cpp \
 				LocationBlock.cpp \
 				Monitor.cpp \
 				System.cpp \
-				utils.cpp \
-				kqueue.cpp \
-				server.cpp \
-				client.cpp \
+				KQueue.cpp \
+				Server.cpp \
+				Client.cpp \
+				utils.cpp
 
 
 SRC_DIR 	=	./src

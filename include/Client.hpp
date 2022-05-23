@@ -11,18 +11,17 @@ class KQueue;
 
 class Client : public Socket
 {
-public:
+  public:
+  Client(KQueue &kq, int fd);
+  ~Client();
+
   std::string req;
   std::string res;
   int has_body;
 
-  Client(KQueue &_kq, int fd);
-  ~Client();
-
-  int event_read();
-  int event_write();
-
-  void parse_req();
+  int EventRead();
+  int EventWrite();
+  void ParseReq();
 };
 
 #endif

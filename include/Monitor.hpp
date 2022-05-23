@@ -12,18 +12,18 @@
 
 class Monitor
 {
-public:
-	time_t getTimeStamp();
-	void log(const std::string&);
-	void print(const std::string&, const std::string&);
-	void error();
+ public:
+  time_t getTimeStamp();
+  void Log(const std::string&);
+  void Print(const std::string&, const std::string&);
+  void Error();
 
-	~Monitor();
-	Monitor();
-private:
+  ~Monitor();
+  Monitor();
 
-	std::ofstream logfile;
-	int _seek;
+ private:
+  std::ofstream logfile_;
+  int           seek_;
 };
 
 #endif
