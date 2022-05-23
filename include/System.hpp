@@ -9,10 +9,10 @@
 
 class System
 {
-public:
+ public:
   Monitor& GetMonitor();
 
-private:
+ private:
   static Monitor monitor;
 };
 

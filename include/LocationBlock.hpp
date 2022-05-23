@@ -24,34 +24,33 @@
 
 class LocationBlock : public System
 {
-public:
+ public:
   LocationBlock(std::string&, std::vector<std::string>&);
   ~LocationBlock();
 
-  std::string 				location_path_;
-  std::string 				root_;
-  int							allow_methods_;
-  std::vector<std::string>	index_;
-  bool						auto_index_;
-  std::vector<CgiInfo>		cgi_info_;
-  std::vector<ErrorPage>		error_page_;
-  long						request_max_body_size_;
-  std::string 				return_;
+  std::string                 location_path;
+  std::string                 root;
+  int                         allow_methods;
+  std::vector<std::string>    index;
+  bool                        auto_index;
+  std::vector<CgiInfo>        cgi_info;
+  std::vector<ErrorPage>      error_page;
+  long                        request_max_body_size;
+  std::string                 ret;
 
   enum LocationAttribute {
-    ERROR_ = -1,
-    ROOT_,
-    ALLOW_METHODS_,
-    INDEX_,
-    AUTO_INDEX_,
-    CGI_INFO_,
-    AUTH_KEY_,
-    ERROR_PAGE_,
-    REQUEST_MAX_BODY_SIZE_,
-    RETURN_,
+    kError = -1,
+    kRoot,
+    kAllowMethods,
+    kIndex,
+    kAutoIndex,
+    kCgiInfo,
+    kErrorPage,
+    kRequestMaxBodySize,
+    kRet,
   };
 
-private:
+ private:
   LocationBlock();
 
   void InitLocationBlock(std::vector<std::string>&);

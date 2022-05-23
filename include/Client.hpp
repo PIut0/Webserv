@@ -11,12 +11,12 @@ class KQueue;
 
 class Client : public Socket
 {
-public:
+ public:
   std::string req;
   std::string res;
   int has_body;
 
-  Client(KQueue &_kq, int fd);
+  Client(KQueue &kq, int fd);
   ~Client();
 
   int EventRead();

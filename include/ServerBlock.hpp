@@ -17,23 +17,23 @@ class LocationBlock;
 
 class ServerBlock : public System
 {
-public:
+ public:
   ServerBlock(const std::vector<std::string>&);
   ~ServerBlock();
 
-  std::vector<LocationBlock>	location;
-  std::string					server_name;
-  std::string					host;
-  u_short						port;
+  std::vector<LocationBlock>  location;
+  std::string                 server_name;
+  std::string                 host;
+  u_short                     port;
 
   enum ServerAttribute {
-    ERROR_ = -1,
-    LOCATION_,
-    SERVER_NAME_,
-    LISTEN_
+    kError = -1,
+    kLocation,
+    kServerName,
+    kListen
   };
 
-private:
+ private:
   ServerBlock();
 
   void InitServerBlock(const std::vector<std::string>&);

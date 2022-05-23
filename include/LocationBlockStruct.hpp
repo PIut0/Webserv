@@ -10,7 +10,7 @@ struct CgiInfo {
 };
 
 struct ErrorPage {
-  int			code;
+  int         code;
   std::string url;
 };
 

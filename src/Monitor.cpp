@@ -2,12 +2,12 @@
 
 Monitor::Monitor()
 {
-    this->logfile.open("log.txt");
+    this->logfile_.open("log.txt");
 }
 
 Monitor::~Monitor()
 {
-  this->logfile.close();
+  this->logfile_.close();
 }
 
 // TODO 시간 출력 형식 바꾸기
@@ -28,7 +28,7 @@ void Monitor::Log(const std::string &data)
     _log += "(" + std::to_string(errno) + static_cast<std::string>(std::strerror(errno)) + ")";
   }
   _log += "\n";
-  this->logfile.write(_log.c_str(), _log.length());
+  this->logfile_.write(_log.c_str(), _log.length());
 }
 
 void Monitor::Print(const std::string &color, const std::string &data)

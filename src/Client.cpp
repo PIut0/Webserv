@@ -1,7 +1,7 @@
 #include "Client.hpp"
 #include "utils.hpp"
 
-Client::Client(KQueue &_kq, int fd) : Socket(_kq, fd), has_body(0)
+Client::Client(KQueue &kq, int fd) : Socket(kq, fd), has_body(0)
 {
   fcntl(socket_fd, F_SETFL, O_NONBLOCK);
   kq.AddEvent(socket_fd, EVFILT_READ, this);

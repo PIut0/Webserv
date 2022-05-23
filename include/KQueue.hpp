@@ -19,7 +19,7 @@ class Server;
 
 class KQueue
 {
-public:
+ public:
   int kq;
   int event_count;
   struct kevent events[EVENT_SIZE];

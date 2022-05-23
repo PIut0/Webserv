@@ -12,7 +12,7 @@
 
 class Monitor
 {
-public:
+ public:
   time_t getTimeStamp();
   void Log(const std::string&);
   void Print(const std::string&, const std::string&);
@@ -20,10 +20,10 @@ public:
 
   ~Monitor();
   Monitor();
-private:
 
-  std::ofstream logfile;
-  int _seek;
+ private:
+  std::ofstream logfile_;
+  int           seek_;
 };
 
 #endif

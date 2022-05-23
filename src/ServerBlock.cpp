@@ -15,12 +15,12 @@ ServerBlock::ServerAttribute ServerBlock::ParseListen(const std::string &data)
   std::vector<std::string> split_data = StringSplit(data, " ", 0);
   this->port = atoi(split_data[0].c_str());
   this->host = split_data[1];
-  return LISTEN_;
+  return kListen;
 }
 ServerBlock::ServerAttribute ServerBlock::ParseServerName(const std::string &data)
 {
   this->server_name = data;
-  return SERVER_NAME_;
+  return kServerName;
 }
 
 ServerBlock::ServerAttribute ServerBlock::CheckValidate(const std::string &data)
@@ -31,14 +31,14 @@ ServerBlock::ServerAttribute ServerBlock::CheckValidate(const std::string &data)
   std::string contents = data.substr(index + 1, data.find(';') - index - 1);
 
   if (data[0] != '\t')
-    return ERROR_;
+    return kError;
   if (command == "server_name")
     return ParseServerName(contents);
   else if (command == "listen")
     return ParseListen(contents);
   else if (command == "location")
-    return LOCATION_;
-  return ERROR_;
+    return kLocation;
+  return kError;
 }
 
 void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
@@ -53,13 +53,13 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
     switch (state)
     {
     case S_SERVER:
-      if ((type = CheckValidate(data[i])) == ERROR_)
+      if ((type = CheckValidate(data[i])) == kError)
         ExitWithPerror("error");
-      if (type == LOCATION_) {
+      if (type == kLocation) {
         location_path = data[i].substr(10, data[i].find('{', 0) - 10);
         state <<= 1;
       } else {
-        if ((type = CheckValidate(data[i])) == ERROR_)
+        if ((type = CheckValidate(data[i])) == kError)
           ExitWithPerror("error");
       }
       break;
