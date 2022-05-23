@@ -20,17 +20,17 @@ int main(int argc, char** argv) {
   while (1) {
     kq.Refresh();
     for (int i = 0; i < kq.event_count; i++) {
-      FdInterface *socket_class = static_cast<FdInterface *>(kq.events[i].udata);
+      FdInterface *target = static_cast<FdInterface *>(kq.events[i].udata);
       if (kq.events[i].filter == EVFILT_READ){
-        if ((status = socket_class->EventRead()) <= 0
-          && !static_cast<Client *>(socket_class)->has_body) {
-          delete socket_class;
+        if ((status = target->EventRead()) <= 0
+          && !static_cast<Client *>(target)->has_body) {
+          delete target;
           std::cout << "fd: " << kq.events[i].ident << ": delete client" << std::endl;
-          close(socket_class->socket_fd);
+          close(target->socket_fd);
         }
       }
       else if (kq.events[i].filter == EVFILT_WRITE) {
-        if ((socket_class->EventWrite()) <= 0) {
+        if ((target->EventWrite()) <= 0) {
           kq.DeleteEvent(kq.events[i].ident, kq.events[i].filter);
         }
       }
