@@ -4,5 +4,5 @@ Monitor System::monitor;
 
 Monitor& System::getMonitor()
 {
-	return this->monitor;
+  return this->monitor;
 }

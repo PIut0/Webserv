@@ -5,13 +5,13 @@
 #include <vector>
 
 struct CgiInfo {
-	std::string anjwl;
-	std::string url;
+  std::string anjwl;
+  std::string url;
 };
 
 struct ErrorPage {
-	int			code;
-	std::string url;
+  int			code;
+  std::string url;
 };
 
 #endif

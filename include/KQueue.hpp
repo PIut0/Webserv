@@ -20,17 +20,17 @@ class Server;
 class KQueue
 {
 public:
-	int kq;
-	int event_count;
-	struct kevent events[EVENT_SIZE];
+  int kq;
+  int event_count;
+  struct kevent events[EVENT_SIZE];
 
-	KQueue();
-	~KQueue();
+  KQueue();
+  ~KQueue();
 
-	void refresh();
-	void add_event(int ident, int16_t filter, void *udata);
-	void delete_event(int ident, int16_t filter);
-	void add_server(Server &serv);
+  void refresh();
+  void add_event(int ident, int16_t filter, void *udata);
+  void delete_event(int ident, int16_t filter);
+  void add_server(Server &serv);
 };
 
 #endif

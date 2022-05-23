@@ -10,10 +10,10 @@
 class System
 {
 public:
-	Monitor& getMonitor();
+  Monitor& getMonitor();
 
 private:
-	static Monitor monitor;
+  static Monitor monitor;
 };
 
 #endif

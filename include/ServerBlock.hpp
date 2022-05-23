@@ -18,31 +18,31 @@ class LocationBlock;
 class ServerBlock : public System
 {
 public:
-	ServerBlock(const std::vector<std::string>&);
-	~ServerBlock();
+  ServerBlock(const std::vector<std::string>&);
+  ~ServerBlock();
 
-	std::vector<LocationBlock>	location;
-	std::string					server_name;
-	std::string					host;
-	u_short						port;
+  std::vector<LocationBlock>	location;
+  std::string					server_name;
+  std::string					host;
+  u_short						port;
 
-	enum ServerAttribute {
-		ERROR_ = -1,
-		LOCATION_,
-		SERVER_NAME_,
-		LISTEN_
-	};
+  enum ServerAttribute {
+    ERROR_ = -1,
+    LOCATION_,
+    SERVER_NAME_,
+    LISTEN_
+  };
 
 private:
-	ServerBlock();
+  ServerBlock();
 
-	void init_server_block(const std::vector<std::string>&);
-	void check_essentail_commands();
-	void printBlock();
+  void init_server_block(const std::vector<std::string>&);
+  void check_essentail_commands();
+  void printBlock();
 
-	ServerAttribute parseListen(const std::string&);
-	ServerAttribute parseServerName(const std::string&);
-	ServerAttribute check_validate(const std::string&);
+  ServerAttribute parseListen(const std::string&);
+  ServerAttribute parseServerName(const std::string&);
+  ServerAttribute check_validate(const std::string&);
 };
 
 #endif

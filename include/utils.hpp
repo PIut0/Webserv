@@ -9,3 +9,4 @@ std::vector<std::string> string_split(const std::string &data, const std::string
 void exit_with_perror(const std::string &msg);
 
 #endif
+

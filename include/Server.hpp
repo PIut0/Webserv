@@ -25,14 +25,14 @@ class ServerBlock;
 class Server : public Socket
 {
 public:
-	struct sockaddr_in server_addr;
-	ServerBlock &server_block;
+  struct sockaddr_in server_addr;
+  ServerBlock &server_block;
 
-	Server(KQueue &_kq, ServerBlock &_sb);
-	~Server();
+  Server(KQueue &_kq, ServerBlock &_sb);
+  ~Server();
 
-	int event_read();
-	int event_write();
+  int event_read();
+  int event_write();
 };
 
 #endif
