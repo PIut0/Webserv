@@ -1,31 +1,31 @@
 #include "Client.hpp"
 #include "utils.hpp"
 
-Client::Client(KQueue &kq, int fd) : FdInterface(kq, fd), has_body(0), type(kFdClient)
+Client::Client(KQueue &kq, int fd) : FdInterface(kq, kFdClient, fd), has_body(0)
 {
-  fcntl(socket_fd, F_SETFL, O_NONBLOCK);
-  kq.AddEvent(socket_fd, EVFILT_READ, this);
+  fcntl(interface_fd, F_SETFL, O_NONBLOCK);
+  kq.AddEvent(interface_fd, EVFILT_READ, this);
 }
 
 Client::~Client()
 {
-  close(socket_fd);
+  close(interface_fd);
 }
 
 int Client::EventRead()
 {
   char buf[1025];
-  int n = read(socket_fd, buf, sizeof(buf) - 1);
+  int n = read(interface_fd, buf, sizeof(buf) - 1);
   if (n <= 0)	// n == 0: 클라이언트에서 close & n == -1: 클라이언트 프로세스가 종료됨
     return n;
   buf[n] = '\0';
   req += buf;
 
-  std::cout << "====== " << "fd: " << socket_fd <<  " buffer ======" << std::endl;
+  std::cout << "====== " << "fd: " << interface_fd <<  " buffer ======" << std::endl;
   std::cout << req << std::endl;
   if (req.find(CRLF) != std::string::npos) {
     ParseReq();
-    kq.AddEvent(socket_fd, EVFILT_WRITE, this);
+    kq.AddEvent(interface_fd, EVFILT_WRITE, this);
   }
 
   return n;
@@ -33,7 +33,7 @@ int Client::EventRead()
 
 int Client::EventWrite()
 {
-  int n = write(socket_fd, res.c_str(), res.size());
+  int n = write(interface_fd, res.c_str(), res.size());
   if (n <= 0)
     return n;
   res = res.substr(n);

@@ -16,13 +16,13 @@ enum FdInterfaceType {
 class FdInterface
 {
  public:
-  FdInterface(KQueue &kq) : kq(kq) {};
-  FdInterface(KQueue &kq, int fd) : kq(kq), socket_fd(fd) {};
+  FdInterface(KQueue &kq, FdInterfaceType type) : kq(kq), interface_type(type) {};
+  FdInterface(KQueue &kq, FdInterfaceType type, int fd) : kq(kq), interface_type(type), interface_fd(fd) {};
   virtual ~FdInterface() {};
 
   KQueue          &kq;
-  int             socket_fd;
-  FdInterfaceType type;
+  FdInterfaceType interface_type;
+  int             interface_fd;
 
   virtual int EventRead() = 0;
   virtual int EventWrite() = 0;

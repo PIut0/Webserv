@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
           && !static_cast<Client *>(target)->has_body) {
           delete target;
           std::cout << "fd: " << kq.events[i].ident << ": delete client" << std::endl;
-          close(target->socket_fd);
+          close(target->interface_fd);
         }
       }
       else if (kq.events[i].filter == EVFILT_WRITE) {
