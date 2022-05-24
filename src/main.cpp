@@ -5,6 +5,7 @@
 #include "utils.hpp"
 #include "KQueue.hpp"
 #include "Server.hpp"
+#include "process.hpp"
 
 int main(int argc, char** argv) {
   ServerManager serverManager(CheckArg(argc, argv));
@@ -15,25 +16,10 @@ int main(int argc, char** argv) {
     kq.AddServer(*(servers[i]));
   }
 
-  int status;
-
   while (1) {
     kq.Refresh();
     for (int i = 0; i < kq.event_count; i++) {
-      FdInterface *target = static_cast<FdInterface *>(kq.events[i].udata);
-      if (kq.events[i].filter == EVFILT_READ){
-        if ((status = target->EventRead()) <= 0
-          && !static_cast<Client *>(target)->has_body) {
-          delete target;
-          std::cout << "fd: " << kq.events[i].ident << ": delete client" << std::endl;
-          close(target->interface_fd);
-        }
-      }
-      else if (kq.events[i].filter == EVFILT_WRITE) {
-        if ((target->EventWrite()) <= 0) {
-          kq.DeleteEvent(kq.events[i].ident, kq.events[i].filter);
-        }
-      }
+      Process(static_cast<FdInterface *>(kq.events[i].udata), kq.events[i]);
     }
   }
   return (0);

@@ -14,7 +14,8 @@ SRC			=	main.cpp \
 				KQueue.cpp \
 				Server.cpp \
 				Client.cpp \
-				utils.cpp
+				utils.cpp \
+				process.cpp
 
 
 SRC_DIR 	=	./src
