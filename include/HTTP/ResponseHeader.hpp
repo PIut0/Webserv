@@ -9,14 +9,14 @@
 
 class ResponseHeader
 {
+ public:
+  ResponseHeader();
+  ~ResponseHeader();
+
  private:
   HTTPEntityHeader    &http_entitiy_header_;
   HTTPGeneralHeader   &http_general_header_;
   HTTPResponseHeader  &http_Response_header_;
-
- public:
-  ResponseHeader();
-  ~ResponseHeader();
 };
 
 #endif

@@ -9,15 +9,14 @@
 
 class RequestHeader
 {
+ public:
+  RequestHeader();
+  ~RequestHeader();
+
  private:
   HTTPEntityHeader  &http_entitiy_header_;
   HTTPGeneralHeader &http_general_header_;
   HTTPRequestHeader &http_request_header_;
-
-
- public:
-  RequestHeader();
-  ~RequestHeader();
 };
 
 #endif
