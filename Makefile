@@ -1,6 +1,6 @@
 NAME		=	webserv
 
-INCLUDE 	=	-I./include
+INCLUDE 	=	-I./include -I./include/HTTP -I./include/HTTPConfig
 
 CXX			=	c++
 CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 $(INCLUDE)
@@ -14,7 +14,13 @@ SRC			=	main.cpp \
 				KQueue.cpp \
 				Server.cpp \
 				Client.cpp \
-				utils.cpp
+				utils.cpp \
+				HTTP/Header.cpp \
+				HTTP/RequestHeader.cpp \
+				HTTP/ResponseHeader.cpp \
+				HTTPConfig/HTTPEntityHeader.cpp \
+				HTTPConfig/HTTPGeneralHeader.cpp \
+				HTTPConfig/HTTPConfig.cpp \
 
 
 SRC_DIR 	=	./src

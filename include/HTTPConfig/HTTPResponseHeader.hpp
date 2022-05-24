@@ -3,13 +3,14 @@
 
 #include <string>
 
+// TODO Response 생성자 구현하기
 class HTTPResponseHeader
 {
  public:
-  HTTPResponseHeader();
-  ~HTTPResponseHeader();
+  HTTPResponseHeader() {};
+  ~HTTPResponseHeader() {};
 
- private:
+//  private:
   std::string access_control_allow_origin_;
   std::string allow_;
   std::string content_disposition_;

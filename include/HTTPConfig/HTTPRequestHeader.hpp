@@ -3,13 +3,14 @@
 
 #include <string>
 
+// TODO Request 생성자 구현하기
 class HTTPRequestHeader
 {
  public:
-  HTTPRequestHeader();
-  ~HTTPRequestHeader();
+  HTTPRequestHeader() {};
+  ~HTTPRequestHeader() {};
 
- private:
+//  private:
   std::string host_;
   std::string user_agent_;
   std::string accept_;

@@ -1,22 +1,22 @@
 #ifndef RESPONSEHEADER_HPP
 #define RESPONSEHEADER_HPP
 
-#include <string>
-
-#include "HTTPGeneralHeader.hpp"
-#include "HTTPEntityHeader.hpp"
+#include "Header.hpp"
 #include "HTTPResponseHeader.hpp"
 
-class ResponseHeader
+class HTTPResponseHeader;
+
+class ResponseHeader : public Header
 {
  public:
   ResponseHeader();
   ~ResponseHeader();
 
- private:
-  HTTPEntityHeader    &http_entitiy_header_;
-  HTTPGeneralHeader   &http_general_header_;
-  HTTPResponseHeader  &http_Response_header_;
+  void SetUpHeader(HttpContentsType &type);
+  void SetUpHeaderResponse(HttpContentsType &type);
+
+//  protected:
+  HTTPResponseHeader  *response_;
 };
 
 #endif
