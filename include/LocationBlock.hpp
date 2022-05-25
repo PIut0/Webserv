@@ -8,14 +8,10 @@
 #include "System.hpp"
 #include "utils.hpp"
 #include "Defines.hpp"
+#include "Header.hpp"
 #include "LocationBlockStruct.hpp"
 
 #include <iostream> // DEBUG
-
-#define GET     1
-#define POST    2
-#define PUT     4
-#define DELETE  8
 
 #define OFF     0
 #define ON      1
