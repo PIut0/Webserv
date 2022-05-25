@@ -1,39 +1,27 @@
 #include "ResponseHeader.hpp"
 
-ResponseHeader::ResponseHeader() : Header()
-{
-  this->response_ = new HTTPResponseHeader();
-}
+
+ResponseHeader::ResponseHeader() {}
 
 ResponseHeader::~ResponseHeader() {}
 
-void ResponseHeader::SetUpHeaderResponse(HttpContentsType &type)
+void ResponseHeader::SetItem(std::string &key, std::string &value)
 {
-  switch (H_MASKING(type))
-  {
-    case H_DATE:
-      break;
-    default: // If the masking range is wrong, you can handle the error here.
-      std::cerr << "error" << std::endl;
-      break;
-  }
+  (void)key;
+  (void)value;
 }
 
-void ResponseHeader::SetUpHeader(HttpContentsType &type)
+res_header_it_t ResponseHeader::FindItem(std::string &key)
 {
-  switch (G_MASKING(type)) {
-    case G_GENERAL:
-      SetUpHeaderGeneral(type);
-      break;
-    case G_ENTITY:
-      SetUpHeaderEntity(type);
-      break;
-    case G_RESPONSE:
-      SetUpHeaderResponse(type);
-      break;
-    default: // If the masking range is wrong, you can handle the error here.
-      std::cerr << "error" << std::endl;
-      break;
+  res_header_it_t it;
+
+  for (it = this->conf.begin() ; it != this->conf.end() ; ++it) {
+    if ((*it)->key == key) break;
   }
+  return it;
 }
 
+wsv_header_t& ResponseHeader::GetItem(std::string &key)
+{
+  return *(*FindItem(key));
+}

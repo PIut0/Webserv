@@ -1,39 +1,26 @@
 #include "RequestHeader.hpp"
-
-RequestHeader::RequestHeader() : Header()
-{
-  this->request_ = new HTTPRequestHeader();
-}
+#include <iostream>
+RequestHeader::RequestHeader() {}
 
 RequestHeader::~RequestHeader() {}
 
-void RequestHeader::SetUpHeaderRequest(HttpContentsType &type)
+void RequestHeader::SetItem(std::string &key, std::string &value)
 {
-  switch (H_MASKING(type))
-  {
-    case H_DATE:
-      break;
-    default: // If the masking range is wrong, you can handle the error here.
-      std::cerr << "error" << std::endl;
-      break;
-  }
+  if (FindItem(key) != this->conf.end())
+    throw AlreadyExistKey();
+
+  wsv_header_t *el = new wsv_header_t();
+  el->key = key;
+  el->value = value;
+  this->conf[key] = el;
 }
 
-void RequestHeader::SetUpHeader(HttpContentsType &type)
+req_header_it_t RequestHeader::FindItem(std::string &key)
 {
-  switch (G_MASKING(type)) {
-    case G_GENERAL:
-      SetUpHeaderGeneral(type);
-      break;
-    case G_ENTITY:
-      SetUpHeaderEntity(type);
-      break;
-    case G_REQUEST:
-      SetUpHeaderRequest(type);
-      break;
-    default: // If the masking range is wrong, you can handle the error here.
-      std::cerr << "error" << std::endl;
-      break;
-  }
+  return this->conf.find(key);
 }
 
+wsv_header_t& RequestHeader::GetItem(std::string &key)
+{
+  return *(FindItem(key)->second);
+}

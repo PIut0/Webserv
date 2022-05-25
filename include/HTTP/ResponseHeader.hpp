@@ -2,7 +2,6 @@
 #define RESPONSEHEADER_HPP
 
 #include "Header.hpp"
-#include "HTTPResponseHeader.hpp"
 
 class HTTPResponseHeader;
 
@@ -12,11 +11,13 @@ class ResponseHeader : public Header
   ResponseHeader();
   ~ResponseHeader();
 
-  void SetUpHeader(HttpContentsType &type);
-  void SetUpHeaderResponse(HttpContentsType &type);
+  void SetItem(std::string &key, std::string &value);
+  wsv_header_t& GetItem(std::string &key);
 
-//  protected:
-  HTTPResponseHeader  *response_;
+  res_header_it_t FindItem(std::string &key);
+
+  res_header_t conf;
 };
+
 
 #endif
