@@ -16,7 +16,7 @@ int main() {
     std::cout << *ptr;
   }
   std::cout << std::endl;
-  std::cout << "ret : " << ret << std::endl;
+  std::cout << "ret : " << ret << res << std::endl;
 }
 
 // int main(int argc, char** argv) {
