@@ -1,19 +1,14 @@
 #include <vector>
 #include <string>
 
-#include "ServerManager.hpp"
 #include "utils.hpp"
-#include "KQueue.hpp"
-#include "Server.hpp"
-#include "RequestHeader.hpp"
+#include "parsing.hpp"
 
+int main() {
+  char* dummy = (char*)"GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\r\nHost: code.tutsplus.com\r\nUser-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-us,en;q=0.5\r\nAccept-Encoding: gzip,deflate\r\nAccept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\nKeep-Alive: 300\r\nConnection: keep-alive\r\nCookie: PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120\r\nPragma: no-cache\r\nCache-Control: no-cache\r\n\r\n";
 
-int main(int argc, char** argv) {
-  (void)argc;
-  (void)argv;
   RequestHeader req_h;
-  std::string k = "key!!";
-  req_h.SetItem(k, k);
-  wsv_header_t& item = req_h.GetItem(k);
-  std::cout << item.key << std::endl;
+  HttpParseRequestLine(req_h, dummy);
+  HttpParseHeaderLine(req_h);
+  req_h.Print();
 }
