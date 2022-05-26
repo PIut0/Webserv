@@ -11,19 +11,21 @@ class RequestHeader : public Header
   RequestHeader();
   ~RequestHeader();
 
-  void SetItem(std::string &key, std::string &value);
-  wsv_header_t& GetItem(std::string &key);
-
+  void            SetItem(std::string &key, std::string &value);
+  wsv_header_t&   GetItem(std::string &key);
   req_header_it_t FindItem(std::string &key);
 
+  void            PrintItem();
+  void            Print();
+
   req_header_t  conf;
+
   int           method;
   char          *host_start;
   char          *host_end;
   short         http_major;
   short         http_minor;
   char*         pos;
-
 };
 
 

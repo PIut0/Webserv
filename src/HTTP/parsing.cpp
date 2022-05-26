@@ -3,8 +3,6 @@
 int HttpParseRequestLine(RequestHeader &req_h, char *value)
 {
   char  *ptr = value, *m;
-  // char  *pos = ptr;
-  // char  *bpos = ptr;
   u_char ch;
 
   enum {
@@ -24,7 +22,7 @@ int HttpParseRequestLine(RequestHeader &req_h, char *value)
   while (state != wsb_done)
   {
     ch = *ptr;
-    std::cout << "[" << state << "]" << "ch : " << ch << std::endl;
+
     switch (state)
     {
       case wsb_start:
@@ -142,7 +140,188 @@ int HttpParseRequestLine(RequestHeader &req_h, char *value)
 
 int HttpParseHeaderLine(RequestHeader &req_h)
 {
-  // HOST 부터 파싱 시작
-  std::cout << req_h.pos << std::endl;
-  return WSV_OK;
+  char          *ptr, *key_start, *key_end, *value_start, *value_end;
+  std::string   key, value;
+  u_char        ch;
+
+
+
+  enum {
+    wsv_start = 0,
+    wsv_header_key, // : 나오기 전까지
+    wsv_header_value_before, // 문자열 나오기 전까지
+    wsv_header_value, // CR나오기 전까지
+    wsv_invalid_key, // CR 나오기 전까지
+    wsv_invalid_key_newline,
+    wsv_valide_key_newline,
+    wsv_almost_done,
+    wsv_done // LF 나오면 끝
+  } state;
+
+  state = wsv_start;
+
+  for (ptr = req_h.pos ; *ptr ; ++ptr) {
+    ch = *ptr;
+
+    switch (state)
+    {
+      case wsv_start:
+        if ((ch < 'A' || ch > 'Z') && ch != '_' && ch != '-') {
+          state = wsv_invalid_key;
+        }
+
+        if (ch == ' ') {
+          break;
+        }
+        // TODO 대문자 시작 체크 해야하나 ??
+        if (isalpha(ch)) {
+          key_start = ptr;
+          state = wsv_header_key;
+        }
+        break;
+
+      case wsv_header_key:
+      // :나오면 wsv_header_value_before로
+      // CR나오면 wsv_invalid_key_newline으로
+      // 아니면 break;
+        switch (ch)
+        {
+          case ':':
+            key_end = ptr - 1;
+            state = wsv_header_value_before;
+            break;
+
+          case CR:
+            state = wsv_invalid_key_newline;
+            break;
+
+          default:
+            break;
+        }
+
+        break;
+
+      case wsv_header_value_before:
+      // 문자열 나오면 ptr저장 wsv_header_value로
+      // 공백 나오면 break;
+        if (ch != ' ' && isprint(ch)) {
+          state = wsv_header_value;
+          value_start = ptr;
+          break;
+        }
+
+        switch (ch)
+        {
+          case ' ':
+            break;
+
+          case CR:
+            state = wsv_invalid_key_newline;
+            break;
+
+          default:
+            break;
+        }
+
+        break;
+
+      case wsv_header_value:
+      // CR 나오면 wsv_newline으로
+      // 아니면 break;
+        switch (ch)
+        {
+          case CR:
+            value_end = ptr - 1;
+            state = wsv_valide_key_newline;
+            break;
+
+          default:
+            break;
+        }
+
+        break;
+
+      case wsv_invalid_key:
+      // CR 나오면 wsv_invalid_key_newline으로
+      // 아니면 break;
+        switch (ch)
+        {
+          case CR:
+            state = wsv_invalid_key_newline;
+            break;
+
+          default:
+            break;
+        }
+        break;
+      case wsv_invalid_key_newline:
+      // LF 나오면 wsv_almost_done으로
+      // 아니면 error
+        switch (ch)
+        {
+        case LF:
+          state = wsv_almost_done;
+          break;
+
+        default:
+          break;
+        }
+
+        break;
+
+      case wsv_valide_key_newline:
+      // LF 나오면 wsv_almost_done으로
+      // 아니면 error
+        switch (ch)
+        {
+          case LF:
+            state = wsv_almost_done;
+            key = strndup(key_start, key_end - key_start + 1);
+            value = strndup(value_start, value_end - value_start + 1);
+            req_h.SetItem(key, value);
+            break;
+
+          default:
+            break;
+        }
+
+        break;
+
+      case wsv_almost_done:
+      // CR 나오면 almost_done
+      // 아니면 wsv_start로
+        switch (ch)
+        {
+          case CR:
+            state = wsv_done;
+            break;
+
+          default:
+            key_start = ptr;
+            state = wsv_header_key;
+            break;
+        }
+
+        break;
+
+      case wsv_done:
+      // LF 나오면 끝
+      // 아니면 에러
+        switch (ch)
+        {
+          case LF:
+            return WSV_OK;
+
+          default:
+            break;
+        }
+
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  return WSV_HTTP_PARSE_INVALID_REQUEST;
 }

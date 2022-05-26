@@ -1,7 +1,8 @@
-#ifndef RESPONSEHEADER_HPP
-#define RESPONSEHEADER_HPP
+#ifndef PARSING_HPP
+#define PARSING_HPP
 
 #include "RequestHeader.hpp"
+#include "Header.hpp"
 #include "utils.hpp"
 
 int HttpParseRequestLine(RequestHeader &req_h, char *value);
