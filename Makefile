@@ -5,8 +5,9 @@ INCLUDE 	=	-I./include -I./include/http -I./include/config -I./include/error -I.
 CXX				=	c++
 CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 $(INCLUDE)
 
-SRC				= main.cpp \
-						KQueue.cpp \
+MAIN			= main.cpp
+
+SRC				=	KQueue.cpp \
 						Server.cpp \
 						Client.cpp \
 						utils.cpp \
@@ -24,13 +25,28 @@ SRC				= main.cpp \
 
 SRC_DIR 	=	./src
 OBJ_DIR		=	./obj
+TEST_DIR	= ./test
 
 SRCS		= $(addprefix $(SRC_DIR)/, $(SRC))
 OBJS		=	$(addprefix $(OBJ_DIR)/, $(patsubst %.cpp,%.o,$(SRC)))
 
+ifdef TEST
+SRCS		+=  $(TEST)
+OBJS		+=	$(addprefix $(OBJ_DIR)/, $(patsubst %.cpp,%.o,$(TEST)))
+else
+SRCS		+=  $(MAIN)
+OBJS		+=	$(addprefix $(OBJ_DIR)/, $(patsubst %.cpp,%.o,$(MAIN)))
+endif
+
 SHELL		=	/bin/bash
 
 all		:	$(NAME)
+
+ifdef TEST
+$(OBJ_DIR)/%.o	: $(TEST_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+endif
 
 $(OBJ_DIR)/%.o	: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
