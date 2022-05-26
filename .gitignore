@@ -2,3 +2,4 @@
 .DS*
 *.o
 log.txt
+webserv

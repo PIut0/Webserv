@@ -3,7 +3,7 @@
 LocationBlock::LocationBlock(std::string &location_path, std::vector<std::string> &data)
 {
   this->location_path = location_path;
-  this->allow_methods = GET | POST | PUT | DELETE;
+  this->allow_methods = HTTP_GET | HTTP_POST | HTTP_PUT | HTTP_DELETE;
   this->root = "../html";
   this->index.push_back("index.html");
   this->auto_index = OFF;
@@ -34,13 +34,13 @@ LocationBlock::LocationAttribute LocationBlock::ParseAllowMethod(const std::stri
   std::vector<std::string> split_data = StringSplit(data, " ", 0);
   for (size_t i = 0 ; i < split_data.size() ; i++) {
     if (split_data[i] == "POST")
-      this->allow_methods |= POST;
+      this->allow_methods |= HTTP_POST;
     else if (split_data[i] == "PUT")
-      this->allow_methods |= PUT;
+      this->allow_methods |= HTTP_PUT;
     else if (split_data[i] == "GET")
-      this->allow_methods |= GET;
+      this->allow_methods |= HTTP_GET;
     else if (split_data[i] == "DELETE")
-      this->allow_methods |= DELETE;
+      this->allow_methods |= HTTP_DELETE;
     else
       return kError;
   }
@@ -139,7 +139,7 @@ void LocationBlock::InitLocationBlock(std::vector<std::string> &data)
 void LocationBlock::PrintBlock()
 {
   std::cout << "root : " << this->root << std::endl;
-  std::cout << "allow_methods : " << (this->allow_methods & GET) << (this->allow_methods & POST) << (this->allow_methods & PUT) << (this->allow_methods & DELETE) << std::endl;
+  std::cout << "allow_methods : " << (this->allow_methods & HTTP_GET) << (this->allow_methods & HTTP_POST) << (this->allow_methods & HTTP_PUT) << (this->allow_methods & HTTP_DELETE) << std::endl;
   for (size_t i = 0; i < this->index.size(); i++)
     std::cout << "index : " << this->index[i] << std::endl;
   std::cout << "auto_index : " << (this->auto_index == ON ? "ON" : "OFF") << std::endl;

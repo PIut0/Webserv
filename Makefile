@@ -1,29 +1,52 @@
-NAME		=	webserv
+NAME			=	webserv
 
-INCLUDE 	=	-I./include
+INCLUDE 	=	-I./include -I./include/http -I./include/config -I./include/error -I./include/common -I./include/debug
 
-CXX			=	c++
+CXX				=	c++
 CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 $(INCLUDE)
 
-SRC			=	main.cpp \
-				ServerBlock.cpp \
-				ServerManager.cpp \
-				LocationBlock.cpp \
-				Monitor.cpp \
-				System.cpp \
-				KQueue.cpp \
-				Server.cpp \
-				Client.cpp \
-				utils.cpp
+MAIN			= main.cpp
+
+SRC				=	KQueue.cpp \
+						Server.cpp \
+						Client.cpp \
+						utils.cpp \
+						debug/System.cpp \
+						debug/Monitor.cpp \
+						http/Header.cpp \
+						http/RequestHeader.cpp \
+						http/ResponseHeader.cpp \
+						http/parsing.cpp \
+						config/ServerBlock.cpp \
+						config/ServerManager.cpp \
+						config/LocationBlock.cpp \
+
 
 
 SRC_DIR 	=	./src
-SRCS		=	$(addprefix $(SRC_DIR),$(SRC))
 OBJ_DIR		=	./obj
+TEST_DIR	= ./test
+
+SRCS		= $(addprefix $(SRC_DIR)/, $(SRC))
 OBJS		=	$(addprefix $(OBJ_DIR)/, $(patsubst %.cpp,%.o,$(SRC)))
+
+ifdef TEST
+SRCS		+=  $(TEST)
+OBJS		+=	$(addprefix $(OBJ_DIR)/, $(patsubst %.cpp,%.o,$(TEST)))
+else
+SRCS		+=  $(MAIN)
+OBJS		+=	$(addprefix $(OBJ_DIR)/, $(patsubst %.cpp,%.o,$(MAIN)))
+endif
+
 SHELL		=	/bin/bash
 
 all		:	$(NAME)
+
+ifdef TEST
+$(OBJ_DIR)/%.o	: $(TEST_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+endif
 
 $(OBJ_DIR)/%.o	: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
