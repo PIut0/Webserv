@@ -5,8 +5,6 @@
 #include "FdInterface.hpp"
 #include "utils.hpp"
 
-#define CRLF "\r\n\r\n"
-
 class KQueue;
 
 class Client : public FdInterface

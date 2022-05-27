@@ -1,22 +1,23 @@
 #ifndef RESPONSEHEADER_HPP
 #define RESPONSEHEADER_HPP
 
-#include <string>
+#include "Header.hpp"
 
-#include "HTTPGeneralHeader.hpp"
-#include "HTTPEntityHeader.hpp"
-#include "HTTPResponseHeader.hpp"
+class HTTPResponseHeader;
 
-class ResponseHeader
+class ResponseHeader : public Header
 {
- private:
-  HTTPEntityHeader    &http_entitiy_header_;
-  HTTPGeneralHeader   &http_general_header_;
-  HTTPResponseHeader  &http_Response_header_;
-
  public:
   ResponseHeader();
   ~ResponseHeader();
+
+  void SetItem(std::string &key, std::string &value);
+  wsv_header_t& GetItem(std::string &key);
+
+  res_header_it_t FindItem(std::string &key);
+
+  res_header_t conf;
 };
+
 
 #endif
