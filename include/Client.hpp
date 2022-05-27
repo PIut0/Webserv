@@ -2,24 +2,26 @@
 #define CLIENT_HPP
 
 #include "KQueue.hpp"
-#include "Socket.hpp"
+#include "FdInterface.hpp"
 #include "utils.hpp"
 
 class KQueue;
 
-class Client : public Socket
+class Client : public FdInterface
 {
-  public:
-  Client(KQueue &kq, int fd);
-  ~Client();
-
+ public:
   std::string req;
   std::string res;
   int has_body;
 
+  Client(KQueue &kq, int fd);
+  ~Client();
+
   int EventRead();
   int EventWrite();
-  void ParseReq();
+
+  FdInterfaceType ParseReq();
+  int OpenFile();
 };
 
 #endif

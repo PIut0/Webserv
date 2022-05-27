@@ -22,7 +22,6 @@ SRC				=	KQueue.cpp \
 						config/LocationBlock.cpp \
 
 
-
 SRC_DIR 	=	./src
 OBJ_DIR		=	./obj
 TEST_DIR	= ./test

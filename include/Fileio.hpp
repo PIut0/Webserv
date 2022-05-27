@@ -1,5 +1,5 @@
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#ifndef FILEIO_HPP
+#define FILEIO_HPP
 
 #include <sys/types.h>
 #include <sys/event.h>
@@ -22,14 +22,14 @@ class Client;
 class KQueue;
 class ServerBlock;
 
-class Server : public FdInterface
+class Fileio : public FdInterface
 {
  public:
-  struct sockaddr_in  server_addr;
-  ServerBlock         &server_block;
+  std::string data;
+  Client &client;
 
-  Server(KQueue &kq, ServerBlock &_sb);
-  ~Server();
+  Fileio(KQueue &kq, int fd, Client &_client);
+  ~Fileio();
 
   int EventRead();
   int EventWrite();

@@ -41,5 +41,5 @@ void KQueue::DeleteEvent(int ident, int16_t filter)
 
 void KQueue::AddServer(Server &server)
 {
-  AddEvent(server.socket_fd, EVFILT_READ, &server);
+  AddEvent(server.interface_fd, EVFILT_READ, &server);
 }
