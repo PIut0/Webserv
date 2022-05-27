@@ -15,7 +15,8 @@ SRC			=	main.cpp \
 				Server.cpp \
 				Client.cpp \
 				utils.cpp \
-				process.cpp
+				process.cpp \
+				Fileio.cpp
 
 
 SRC_DIR 	=	./src
