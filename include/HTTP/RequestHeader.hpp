@@ -27,6 +27,8 @@ class RequestHeader : public Header
   short         http_major;
   short         http_minor;
   size_t        pos;
+
+  std::string   body;
 };
 
 
