@@ -1,8 +1,9 @@
 #include "parsing.hpp"
 
-int HttpParseRequestLine(RequestHeader &req_h, char *value)
+int HttpParseRequestLine(RequestHeader &req_h)
 {
-  char  *ptr = value, *m;
+  // char  *ptr = value, *m;
+  size_t  pos = 0, host_start, host_end;
   u_char ch;
 
   enum {
@@ -21,7 +22,7 @@ int HttpParseRequestLine(RequestHeader &req_h, char *value)
   // parse_request_header
   while (state != wsb_done)
   {
-    ch = *ptr;
+    ch = req_h.buf[pos];
 
     switch (state)
     {
@@ -35,20 +36,19 @@ int HttpParseRequestLine(RequestHeader &req_h, char *value)
 
       case wsb_method:
         if (ch == ' ') {
-          m = value;
-          if (ptr - m == 3 && wsb_str_3cmp(m, 'G', 'E', 'T')) {
+          if (pos == 3 && wsb_str_3cmp(req_h.buf, 'G', 'E', 'T')) {
             req_h.method = HTTP_GET;
           }
 
-          else if (ptr - m == 3 && wsb_str_3cmp(m, 'P', 'U', 'T')) {
+          else if (pos == 3 && wsb_str_3cmp(req_h.buf, 'P', 'U', 'T')) {
             req_h.method = HTTP_POST;
           }
 
-          else if (ptr - m == 4 && wsb_str_4cmp(m, 'P', 'O', 'S', 'T')) {
+          else if (pos == 4 && wsb_str_4cmp(req_h.buf, 'P', 'O', 'S', 'T')) {
             req_h.method = HTTP_PUT;
           }
 
-          else if (ptr - m == 6 && wsb_str_6cmp(m, 'D', 'E', 'L', 'E', 'T', 'E')) {
+          else if (pos == 6 && wsb_str_6cmp(req_h.buf, 'D', 'E', 'L', 'E', 'T', 'E')) {
             req_h.method = HTTP_DELETE;
           }
 
@@ -64,7 +64,7 @@ int HttpParseRequestLine(RequestHeader &req_h, char *value)
 
       case wsb_before_uri:
         if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '/' ) {
-          req_h.host_start = ptr;
+          host_start = pos;
           state = wsb_in_uri;
           break;
         }
@@ -82,7 +82,8 @@ int HttpParseRequestLine(RequestHeader &req_h, char *value)
       case wsb_in_uri:
         switch (ch) {
           case ' ':
-            req_h.host_end = ptr;
+            host_end = pos;
+            req_h.host = req_h.buf.substr(host_start, host_end - host_start + 1);
             state = wsb_before_option;
             break;
           default:
@@ -92,13 +93,13 @@ int HttpParseRequestLine(RequestHeader &req_h, char *value)
         break;
 
       case wsb_before_option:
-        if (wsb_str_5cmp(ptr, 'H', 'T', 'T', 'P', '/') && \
-                         ptr[5] >= '0' && ptr[5] <= '9' && \
-                         ptr[6] == '.' && \
-                         ptr[7] >= '0' && ptr[7] <= '9' ) {
-          req_h.http_major = ptr[5] - '0';
-          req_h.http_minor = ptr[7] - '0';
-          ptr += 7; // 하드코딩..
+        if (wsv_str_cmp(req_h.buf, pos, 'H', 'T', 'T', 'P', '/') && \
+                         req_h.buf[pos + 5] >= '0' && req_h.buf[pos + 5] <= '9' && \
+                         req_h.buf[pos + 6] == '.' && \
+                         req_h.buf[pos + 7] >= '0' && req_h.buf[pos + 7] <= '9' ) {
+          req_h.http_major = req_h.buf[5] - '0';
+          req_h.http_minor = req_h.buf[7] - '0';
+          pos += 7; // 하드코딩..
           break;
         }
 
@@ -132,19 +133,19 @@ int HttpParseRequestLine(RequestHeader &req_h, char *value)
         return WSV_HTTP_PARSE_INVALID_REQUEST;
 
     }
-    ++ptr;
+    ++pos;
   }
-  req_h.pos = ptr;
+  req_h.pos = pos;
   return WSV_OK;
 }
 
 int HttpParseHeaderLine(RequestHeader &req_h)
 {
-  char          *ptr, *key_start, *key_end, *value_start, *value_end;
+  // char          *key_start, *key_end, *value_start, *value_end;
+  size_t        key_start, key_end, value_start, value_end;
   std::string   key, value;
   u_char        ch;
-
-
+  size_t        pos;
 
   enum {
     wsv_start = 0,
@@ -160,8 +161,8 @@ int HttpParseHeaderLine(RequestHeader &req_h)
 
   state = wsv_start;
 
-  for (ptr = req_h.pos ; *ptr ; ++ptr) {
-    ch = *ptr;
+  for (pos = req_h.pos ; req_h.buf[pos] ; ++pos) {
+    ch = req_h.buf[pos];
 
     switch (state)
     {
@@ -175,7 +176,7 @@ int HttpParseHeaderLine(RequestHeader &req_h)
         }
         // TODO 대문자 시작 체크 해야하나 ??
         if (isalpha(ch)) {
-          key_start = ptr;
+          key_start = pos;
           state = wsv_header_key;
         }
         break;
@@ -187,7 +188,7 @@ int HttpParseHeaderLine(RequestHeader &req_h)
         switch (ch)
         {
           case ':':
-            key_end = ptr - 1;
+            key_end = pos - 1;
             state = wsv_header_value_before;
             break;
 
@@ -206,7 +207,7 @@ int HttpParseHeaderLine(RequestHeader &req_h)
       // 공백 나오면 break;
         if (ch != ' ' && isprint(ch)) {
           state = wsv_header_value;
-          value_start = ptr;
+          value_start = pos;
           break;
         }
 
@@ -231,7 +232,7 @@ int HttpParseHeaderLine(RequestHeader &req_h)
         switch (ch)
         {
           case CR:
-            value_end = ptr - 1;
+            value_end = pos - 1;
             state = wsv_valide_key_newline;
             break;
 
@@ -276,8 +277,8 @@ int HttpParseHeaderLine(RequestHeader &req_h)
         {
           case LF:
             state = wsv_almost_done;
-            key = strndup(key_start, key_end - key_start + 1);
-            value = strndup(value_start, value_end - value_start + 1);
+            key = req_h.buf.substr(key_start, key_end - key_start + 1);
+            value = req_h.buf.substr(value_start, value_end - value_start + 1);
             req_h.SetItem(key, value);
             break;
 
@@ -297,7 +298,7 @@ int HttpParseHeaderLine(RequestHeader &req_h)
             break;
 
           default:
-            key_start = ptr;
+            key_start = pos;
             state = wsv_header_key;
             break;
         }

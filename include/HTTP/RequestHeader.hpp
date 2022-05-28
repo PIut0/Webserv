@@ -9,6 +9,7 @@ class RequestHeader : public Header
 {
  public:
   RequestHeader();
+  RequestHeader(std::string &data);
   ~RequestHeader();
 
   void            SetItem(std::string &key, std::string &value);
@@ -19,13 +20,15 @@ class RequestHeader : public Header
   void            Print();
 
   req_header_t  conf;
+  std::string   &buf;
 
   int           method;
-  char          *host_start;
-  char          *host_end;
+  std::string   host;
   short         http_major;
   short         http_minor;
-  char*         pos;
+  size_t        pos;
+
+  std::string   body;
 };
 
 
