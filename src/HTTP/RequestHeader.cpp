@@ -1,6 +1,7 @@
 #include "RequestHeader.hpp"
 #include <iostream>
-RequestHeader::RequestHeader() {}
+
+RequestHeader::RequestHeader(std::string &data) : buf(data) {}
 
 RequestHeader::~RequestHeader() {}
 
@@ -54,7 +55,7 @@ void RequestHeader::Print()
       break;
   }
   std::cout << std::endl;
-  std::cout << "[host] : " << strndup(this->host_start, this->host_end - this->host_start) << std::endl;
+  std::cout << "[host] : " << host << std::endl;
   std::cout << "[http version] : " << this->http_major << "." << this->http_minor << std::endl << std::endl;
   PrintItem();
 }

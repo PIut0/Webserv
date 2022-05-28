@@ -5,7 +5,7 @@
 #include "Header.hpp"
 #include "utils.hpp"
 
-int HttpParseRequestLine(RequestHeader &req_h, char *value);
+int HttpParseRequestLine(RequestHeader &req_h);
 int HttpParseHeaderLine(RequestHeader &req_h);
 
 #endif
