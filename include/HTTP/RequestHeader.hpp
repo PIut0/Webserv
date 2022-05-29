@@ -18,8 +18,12 @@ class RequestHeader : public Header
   wsv_header_t&   GetItem(std::string &key);
   req_header_it_t FindItem(std::string &key);
 
-  void            PrintItem();
-  void            Print();
+  int   HttpParseHeaderLine();
+  int   HttpParseRequestLine();
+
+  void  PrintRequestLine();
+  void  PrintHeaderLine();
+  void  Print();
 
   std::string   *buf;
   std::string   *body;

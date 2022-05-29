@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <map>
 
+#include "Color.hpp"
+
 #define  HTTP_UNKNOWN  0x00000001
 #define  HTTP_GET      0x00000002
 #define  HTTP_POST     0x00000004
