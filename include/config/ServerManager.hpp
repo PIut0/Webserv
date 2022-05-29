@@ -9,6 +9,7 @@
 #include "ServerBlock.hpp"
 #include "Defines.hpp"
 #include "System.hpp"
+#include "utils.hpp"
 
 class ServerBlock;
 
@@ -23,7 +24,8 @@ class ServerManager : public System
 
   std::vector<ServerBlock> serverBlock;
 
-  void InitServer(std::string path);
+  void        InitServer(const std::string &path);
+  std::string CheckLine(const std::string &line);
 
  private:
   ServerManager();

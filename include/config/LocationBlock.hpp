@@ -25,6 +25,10 @@ class LocationBlock : public System
   LocationBlock(const LocationBlock &origin);
   ~LocationBlock();
 
+  LocationBlock& operator=(const LocationBlock& rv);
+
+  void PrintBlock();
+
   std::string                 location_path;
   std::string                 root;
   int                         allow_methods;
@@ -34,8 +38,6 @@ class LocationBlock : public System
   std::vector<ErrorPage>      error_page;
   long                        request_max_body_size;
   std::string                 ret;
-
-  LocationBlock& operator=(const LocationBlock& rv);
 
 
   enum LocationAttribute {
@@ -53,21 +55,18 @@ class LocationBlock : public System
  private:
   LocationBlock();
 
-  void InitLocationBlock(std::vector<std::string>&);
-  void PrintBlock();
+  void InitLocationBlock(std::vector<std::string> &data);
 
-  LocationAttribute ParseRoot(const std::string&);
-  LocationAttribute ParseAllowMethod(const std::string&);
-  LocationAttribute ParseIndex(const std::string&);
-  LocationAttribute ParseAutoIndex(const std::string&);
-  LocationAttribute ParseCgiInfo(const std::string&);
-  LocationAttribute ParseReturn(const std::string&);
-  LocationAttribute ParseErrorPage(const std::string&);
-  LocationAttribute ParseRequestBodySize(const std::string&);
+  void ParseRoot(const std::string &contents);
+  void ParseAllowMethod(const std::string &contents);
+  void ParseIndex(const std::string &contents);
+  void ParseAutoIndex(const std::string &contents);
+  void ParseCgiInfo(const std::string &contents);
+  void ParseReturn(const std::string &contents);
+  void ParseErrorPage(const std::string &contents);
+  void ParseRequestBodySize(const std::string &contents);
 
-  LocationAttribute CheckValidate(const std::string&);
+  LocationAttribute CheckValidate(const std::string &command);
 };
-
-
 
 #endif

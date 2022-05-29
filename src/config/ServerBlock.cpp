@@ -21,32 +21,24 @@ ServerBlock& ServerBlock::operator=(const ServerBlock& rv)
   return *this;
 }
 
-ServerBlock::ServerAttribute ServerBlock::ParseListen(const std::string &data)
+void ServerBlock::ParseListen(const std::string &data)
 {
   std::vector<std::string> split_data = StringSplit(data, " ", 0);
   this->port = atoi(split_data[0].c_str());
   this->host = split_data[1];
-  return kListen;
 }
-ServerBlock::ServerAttribute ServerBlock::ParseServerName(const std::string &data)
+void ServerBlock::ParseServerName(const std::string &data)
 {
   this->server_name = data;
-  return kServerName;
 }
 
-ServerBlock::ServerAttribute ServerBlock::CheckValidate(const std::string &data)
+ServerBlock::ServerAttribute ServerBlock::CheckValidate(const std::string &command, const std::string &contents)
 {
-
-  int index = data.find(' ');
-  std::string command = data.substr(1, index - 1);
-  std::string contents = data.substr(index + 1, data.find(';') - index - 1);
-
-  if (data[0] != '\t')
-    return kError;
+  (void)contents;
   if (command == "server_name")
-    return ParseServerName(contents);
+    return kServerName;
   else if (command == "listen")
-    return ParseListen(contents);
+    return kListen;
   else if (command == "location")
     return kLocation;
   return kError;
@@ -54,43 +46,75 @@ ServerBlock::ServerAttribute ServerBlock::CheckValidate(const std::string &data)
 
 void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
 {
+  std::string command, contents;
+  std::string location_path = "";
   std::vector<std::string> element;
   ServerAttribute type;
-
-  std::string location_path = "";
+  size_t  index;
   u_short state = S_SERVER;
+
 
   for (size_t i = 0 ; i < data.size() ; i++) {
     switch (state)
     {
-    case S_SERVER:
-      if ((type = CheckValidate(data[i])) == kError)
-        ExitWithPerror("error");
-      if (type == kLocation) {
-        location_path = data[i].substr(10, data[i].find('{', 0) - 10);
-        state <<= 1;
-      } else {
-        if ((type = CheckValidate(data[i])) == kError)
-          ExitWithPerror("error");
-      }
-      break;
-    case S_LOCATION:
-      if (data[i].substr(0, 2) == LOCATION_BLOCK_CLOSE) {
-        this->location.push_back(LocationBlock(location_path, element));
-                CLEAR_VECTOR_COMPLETLY(element);
-        state >>= 1;
-      } else {
+      case S_SERVER:
+        index = data[i].find(' ');
+
+        command = data[i].substr(1, index - 1);
+        contents = data[i].substr(index + 1, data[i].find(';') - index - 1);
+
+        type = CheckValidate(command, contents);
+
+        switch (type)
+        {
+          case kLocation:
+            location_path = data[i].substr(10, data[i].find('{', 0) - 10);
+            state <<= 1;
+            break;
+
+          case kServerName:
+            ParseServerName(contents);
+            break;
+
+          case kListen:
+            ParseListen(contents);
+            break;
+
+          case kError:
+            ExitWithPerror("error in serverblock");
+
+          default:
+            break;
+        }
+
+        break;
+
+      case S_LOCATION:
+        if (data[i].substr(0, 2) == LOCATION_BLOCK_CLOSE) {
+          this->location.push_back(LocationBlock(location_path, element));
+                  CLEAR_VECTOR_COMPLETLY(element);
+          state >>= 1;
+          break;
+        }
+
         element.push_back(data[i]);
-      }
-    default:
-      break;
+
+        break;
+
+      default:
+        break;
     }
   }
 }
 
 void ServerBlock::PrintBlock()
 {
-  std::cout << "server_name : " << this->server_name << std::endl;
-  std::cout << "host : " << this->host << std::endl;
-  std::cout << "port : " << this->port << std::endl;
+  std::cout << COLOR_RED << "[ SERVER BLOCK START ]" << COLOR_DEFAULT << std::endl;
+  std::cout << SERVER_BLOCK_TAP << "server_name : " << this->server_name << std::endl;
+  std::cout << SERVER_BLOCK_TAP << "host : " << this->host << std::endl;
+  std::cout << SERVER_BLOCK_TAP << "port : " << this->port << std::endl;
+  for (size_t i = 0 ; i < this->location.size() ; ++i) {
+    this->location[i].PrintBlock();
+  }
+  std::cout << COLOR_RED << "[ SERVER BLOCK END ]" << COLOR_DEFAULT << std::endl;
 }

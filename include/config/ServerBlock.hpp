@@ -24,6 +24,8 @@ class ServerBlock : public System
 
   ServerBlock& operator=(const ServerBlock& rv);
 
+  void PrintBlock();
+
   std::vector<LocationBlock>  location;
   std::string                 server_name;
   std::string                 host;
@@ -39,13 +41,12 @@ class ServerBlock : public System
  private:
   ServerBlock();
 
-  void InitServerBlock(const std::vector<std::string>&);
+  void InitServerBlock(const std::vector<std::string>&data);
   void CheckEssentailCommands();
-  void PrintBlock();
 
-  ServerAttribute ParseListen(const std::string&);
-  ServerAttribute ParseServerName(const std::string&);
-  ServerAttribute CheckValidate(const std::string&);
+  void ParseListen(const std::string &data);
+  void ParseServerName(const std::string &data);
+  ServerAttribute CheckValidate(const std::string &command, const std::string &contents);
 };
 
 #endif
