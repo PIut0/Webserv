@@ -2,7 +2,7 @@
 
 Monitor::Monitor()
 {
-    this->logfile_.open("log.txt");
+    this->logfile_.open("./log/log.txt");
 }
 
 Monitor::~Monitor()
@@ -10,7 +10,6 @@ Monitor::~Monitor()
   this->logfile_.close();
 }
 
-// TODO 시간 출력 형식 바꾸기
 time_t Monitor::getTimeStamp() {
     struct timeval time_now;
     gettimeofday(&time_now, nullptr);
@@ -19,11 +18,11 @@ time_t Monitor::getTimeStamp() {
     return msecs_time;
 }
 
-// TODO log 출력 형식 맞추기 [hhmmssms] Scope Content (errno - errstr)
 void Monitor::Log(const std::string &data)
 {
   std::string time = std::to_string(this->getTimeStamp());
   std::string _log = time + " " + "Scope" + " " + data;
+  // TODO errnoo 사용 금지
   if (errno > 0) {
     _log += "(" + std::to_string(errno) + static_cast<std::string>(std::strerror(errno)) + ")";
   }
