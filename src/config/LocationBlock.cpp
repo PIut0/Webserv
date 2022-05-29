@@ -189,7 +189,7 @@ void LocationBlock::InitLocationBlock(std::vector<std::string> &data)
 
 void LocationBlock::PrintBlock()
 {
-  std::cout << LOCATION_BLOCK_TAP << COLOR_GREEN << "[ LOCATION BLOCK START ]" << COLOR_DEFAULT << std::endl;
+  std::cout << SERVER_BLOCK_TAP << COLOR_GREEN << "[ LOCATION BLOCK START ]" << COLOR_DEFAULT << std::endl;
   std::cout << LOCATION_BLOCK_TAP << "root : " << this->root << std::endl;
   std::cout << LOCATION_BLOCK_TAP << "allow_methods : " << (this->allow_methods & HTTP_GET) << (this->allow_methods & HTTP_POST) << (this->allow_methods & HTTP_PUT) << (this->allow_methods & HTTP_DELETE) << std::endl;
   for (size_t i = 0; i < this->index.size(); i++)
@@ -201,6 +201,6 @@ void LocationBlock::PrintBlock()
     std::cout << LOCATION_BLOCK_TAP << "error_page : " << this->error_page[i].code << " " << this->error_page[i].url << std::endl;
   std::cout << LOCATION_BLOCK_TAP << "request_max_body_size : " << this->request_max_body_size << std::endl;
   std::cout << LOCATION_BLOCK_TAP << "ret : " << this->ret << std::endl;
-  std::cout << LOCATION_BLOCK_TAP << COLOR_GREEN << "[ LOCATION BLOCK END ]" << COLOR_DEFAULT << std::endl;
+  std::cout << SERVER_BLOCK_TAP << COLOR_GREEN << "[ LOCATION BLOCK END ]" << COLOR_DEFAULT << std::endl;
 }
 
