@@ -3,6 +3,7 @@
 
 #include "Header.hpp"
 #include "AlreadyExistKey.hpp"
+#include "ParseError.hpp"
 
 
 class RequestHeader : public Header
@@ -18,9 +19,7 @@ class RequestHeader : public Header
   wsv_header_t&   GetItem(std::string &key);
   req_header_it_t FindItem(std::string &key);
 
-  int   HttpParseHeaderLine();
-  int   HttpParseRequestLine();
-
+  void  Parse();
   void  PrintRequestLine();
   void  PrintHeaderLine();
   void  Print();
@@ -37,6 +36,9 @@ class RequestHeader : public Header
 
  private:
   RequestHeader();
+
+  int   HttpParseHeaderLine();
+  int   HttpParseRequestLine();
 };
 
 
