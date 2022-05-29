@@ -64,34 +64,34 @@ void Process(FdInterface *target, struct kevent event)
   {
     switch (target->interface_type)
     {
-    case kFdServer:
-      Server_Event_Read(static_cast<Server *>(target));
-      break;
-    case kFdClient:
-      Client_Event_Read(static_cast<Client *>(target));
-      break;
-    case kFdFileio:
-      Fileio_Event_Read(static_cast<Fileio *>(target));
-      break;
-    default:
-      break;
+      case kFdServer:
+        Server_Event_Read(static_cast<Server *>(target));
+        break;
+      case kFdClient:
+        Client_Event_Read(static_cast<Client *>(target));
+        break;
+      case kFdFileio:
+        Fileio_Event_Read(static_cast<Fileio *>(target));
+        break;
+      default:
+        break;
     }
   }
   else if (event.filter == EVFILT_WRITE)
   {
     switch (target->interface_type)
     {
-    case kFdServer:
-      Server_Event_Write(static_cast<Server *>(target));
-      break;
-    case kFdClient:
-      Client_Event_Write(static_cast<Client *>(target));
-      break;
-    case kFdFileio:
-      Fileio_Event_Write(static_cast<Fileio *>(target));
-      break;
-    default:
-      break;
+      case kFdServer:
+        Server_Event_Write(static_cast<Server *>(target));
+        break;
+      case kFdClient:
+        Client_Event_Write(static_cast<Client *>(target));
+        break;
+      case kFdFileio:
+        Fileio_Event_Write(static_cast<Fileio *>(target));
+        break;
+      default:
+        break;
     }
   }
 }

@@ -22,10 +22,10 @@ class ServerManager : public System
 
   ServerManager& operator=(const ServerManager &rv);
 
-  std::vector<ServerBlock> serverBlock;
-
   void        InitServer(const std::string &path);
   std::string CheckLine(const std::string &line);
+
+  std::vector<ServerBlock> serverBlock;
 
  private:
   ServerManager();

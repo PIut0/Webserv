@@ -25,14 +25,14 @@ class ServerBlock;
 class Fileio : public FdInterface
 {
  public:
-  std::string data;
-  Client &client;
-
   Fileio(KQueue &kq, int fd, Client &_client);
   ~Fileio();
 
   int EventRead();
   int EventWrite();
+
+  std::string data;
+  Client &client;
 };
 
 #endif

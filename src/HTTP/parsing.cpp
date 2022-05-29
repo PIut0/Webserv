@@ -2,7 +2,6 @@
 
 int HttpParseRequestLine(RequestHeader &req_h)
 {
-  // char  *ptr = value, *m;
   size_t  pos = 0, host_start, host_end;
   u_char ch;
 
@@ -19,7 +18,6 @@ int HttpParseRequestLine(RequestHeader &req_h)
 
   state = wsb_start;
 
-  // parse_request_header
   while (state != wsb_done)
   {
     ch = (*req_h.buf)[pos];
@@ -86,6 +84,7 @@ int HttpParseRequestLine(RequestHeader &req_h)
             req_h.host = (*req_h.buf).substr(host_start, host_end - host_start + 1);
             state = wsb_before_option;
             break;
+
           default:
             break;
         }

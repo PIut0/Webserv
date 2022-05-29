@@ -11,8 +11,6 @@
 #include "Header.hpp"
 #include "LocationBlockStruct.hpp"
 
-#include <iostream> // DEBUG
-
 #define OFF     0
 #define ON      1
 

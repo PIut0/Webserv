@@ -21,20 +21,19 @@ ServerBlock& ServerBlock::operator=(const ServerBlock& rv)
   return *this;
 }
 
-void ServerBlock::ParseListen(const std::string &data)
+void ServerBlock::ParseListen(const std::string &contents)
 {
-  std::vector<std::string> split_data = StringSplit(data, " ", 0);
+  std::vector<std::string> split_data = StringSplit(contents, " ", 0);
   this->port = atoi(split_data[0].c_str());
   this->host = split_data[1];
 }
-void ServerBlock::ParseServerName(const std::string &data)
+void ServerBlock::ParseServerName(const std::string &contents)
 {
-  this->server_name = data;
+  this->server_name = contents;
 }
 
-ServerBlock::ServerAttribute ServerBlock::CheckValidate(const std::string &command, const std::string &contents)
+ServerBlock::ServerAttribute ServerBlock::CheckValidate(const std::string &command)
 {
-  (void)contents;
   if (command == "server_name")
     return kServerName;
   else if (command == "listen")
@@ -63,7 +62,7 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
         command = data[i].substr(1, index - 1);
         contents = data[i].substr(index + 1, data[i].find(';') - index - 1);
 
-        type = CheckValidate(command, contents);
+        type = CheckValidate(command);
 
         switch (type)
         {

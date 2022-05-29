@@ -8,7 +8,6 @@
 class RequestHeader : public Header
 {
  public:
-  RequestHeader();
   RequestHeader(std::string &data);
   RequestHeader(const RequestHeader &origin);
   ~RequestHeader();
@@ -33,6 +32,7 @@ class RequestHeader : public Header
   size_t        pos;
 
  private:
+  RequestHeader();
 };
 
 
