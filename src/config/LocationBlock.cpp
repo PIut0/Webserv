@@ -95,7 +95,6 @@ void LocationBlock::ParseRequestBodySize(const std::string &data)
 
 void LocationBlock::ParseErrorPage(const std::string &data)
 {
-  std::cout << "hrer" << std::endl;
   std::vector<std::string> split_data = StringSplit(data, " ", 0);
   ErrorPage error_page;
 
@@ -135,7 +134,6 @@ void LocationBlock::InitLocationBlock(std::vector<std::string> &data)
   std::string command, contents;
   size_t index;
   LocationAttribute type;
-  std::vector<std::string> element;
 
   for (size_t i = 0 ; i < data.size() ; i++) {
     index = data[i].find(' ');
