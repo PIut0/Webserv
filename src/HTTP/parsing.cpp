@@ -22,7 +22,7 @@ int HttpParseRequestLine(RequestHeader &req_h)
   // parse_request_header
   while (state != wsb_done)
   {
-    ch = req_h.buf[pos];
+    ch = (*req_h.buf)[pos];
 
     switch (state)
     {
@@ -36,19 +36,19 @@ int HttpParseRequestLine(RequestHeader &req_h)
 
       case wsb_method:
         if (ch == ' ') {
-          if (pos == 3 && wsb_str_3cmp(req_h.buf, 'G', 'E', 'T')) {
+          if (pos == 3 && wsb_str_3cmp((*req_h.buf), 'G', 'E', 'T')) {
             req_h.method = HTTP_GET;
           }
 
-          else if (pos == 3 && wsb_str_3cmp(req_h.buf, 'P', 'U', 'T')) {
+          else if (pos == 3 && wsb_str_3cmp((*req_h.buf), 'P', 'U', 'T')) {
             req_h.method = HTTP_POST;
           }
 
-          else if (pos == 4 && wsb_str_4cmp(req_h.buf, 'P', 'O', 'S', 'T')) {
+          else if (pos == 4 && wsb_str_4cmp((*req_h.buf), 'P', 'O', 'S', 'T')) {
             req_h.method = HTTP_PUT;
           }
 
-          else if (pos == 6 && wsb_str_6cmp(req_h.buf, 'D', 'E', 'L', 'E', 'T', 'E')) {
+          else if (pos == 6 && wsb_str_6cmp((*req_h.buf), 'D', 'E', 'L', 'E', 'T', 'E')) {
             req_h.method = HTTP_DELETE;
           }
 
@@ -83,7 +83,7 @@ int HttpParseRequestLine(RequestHeader &req_h)
         switch (ch) {
           case ' ':
             host_end = pos;
-            req_h.host = req_h.buf.substr(host_start, host_end - host_start + 1);
+            req_h.host = (*req_h.buf).substr(host_start, host_end - host_start + 1);
             state = wsb_before_option;
             break;
           default:
@@ -93,12 +93,12 @@ int HttpParseRequestLine(RequestHeader &req_h)
         break;
 
       case wsb_before_option:
-        if (wsv_str_cmp(req_h.buf, pos, 'H', 'T', 'T', 'P', '/') && \
-                         req_h.buf[pos + 5] >= '0' && req_h.buf[pos + 5] <= '9' && \
-                         req_h.buf[pos + 6] == '.' && \
-                         req_h.buf[pos + 7] >= '0' && req_h.buf[pos + 7] <= '9' ) {
-          req_h.http_major = req_h.buf[5] - '0';
-          req_h.http_minor = req_h.buf[7] - '0';
+        if (wsv_str_cmp((*req_h.buf), pos, 'H', 'T', 'T', 'P', '/') && \
+                         (*req_h.buf)[pos + 5] >= '0' && (*req_h.buf)[pos + 5] <= '9' && \
+                         (*req_h.buf)[pos + 6] == '.' && \
+                         (*req_h.buf)[pos + 7] >= '0' && (*req_h.buf)[pos + 7] <= '9' ) {
+          req_h.http_major = (*req_h.buf)[5] - '0';
+          req_h.http_minor = (*req_h.buf)[7] - '0';
           pos += 7; // 하드코딩..
           break;
         }
@@ -161,8 +161,8 @@ int HttpParseHeaderLine(RequestHeader &req_h)
 
   state = wsv_start;
 
-  for (pos = req_h.pos ; req_h.buf[pos] ; ++pos) {
-    ch = req_h.buf[pos];
+  for (pos = req_h.pos ; (*req_h.buf)[pos] ; ++pos) {
+    ch = (*req_h.buf)[pos];
 
     switch (state)
     {
@@ -277,8 +277,8 @@ int HttpParseHeaderLine(RequestHeader &req_h)
         {
           case LF:
             state = wsv_almost_done;
-            key = req_h.buf.substr(key_start, key_end - key_start + 1);
-            value = req_h.buf.substr(value_start, value_end - value_start + 1);
+            key = (*req_h.buf).substr(key_start, key_end - key_start + 1);
+            value = (*req_h.buf).substr(value_start, value_end - value_start + 1);
             req_h.SetItem(key, value);
             break;
 
