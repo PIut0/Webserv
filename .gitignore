@@ -1,5 +1,14 @@
 .vscode
 .DS*
+
+# object file ignore
 *.o
-log.txt
+obj/
+
+# excute file ignore
 webserv
+a.out
+
+# log ignore
+log/
+log.txt
