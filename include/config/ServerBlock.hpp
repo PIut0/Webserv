@@ -18,8 +18,11 @@ class LocationBlock;
 class ServerBlock : public System
 {
  public:
-  ServerBlock(const std::vector<std::string>&);
+  ServerBlock(const std::vector<std::string> &data);
+  ServerBlock(const ServerBlock &origin);
   ~ServerBlock();
+
+  ServerBlock& operator=(const ServerBlock& rv);
 
   std::vector<LocationBlock>  location;
   std::string                 server_name;

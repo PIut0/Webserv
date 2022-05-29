@@ -57,13 +57,12 @@ class Header
   Header();
   virtual ~Header();
 
+
   virtual void SetItem(std::string &key, std::string &value) = 0;
   virtual wsv_header_t& GetItem(std::string &key) = 0;
 
   void CheckValidateKey(std::string &key);
   void CheckValidateValue(std::string &value);
-
-  std::string *method;
 };
 
 #endif

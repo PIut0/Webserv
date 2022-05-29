@@ -1,9 +1,28 @@
 #include "RequestHeader.hpp"
 #include <iostream>
 
-RequestHeader::RequestHeader(std::string &data) : buf(data) {}
+RequestHeader::RequestHeader(std::string &data) : buf(new std::string(data)) {}
+
+RequestHeader::RequestHeader(const RequestHeader &origin)
+{
+  *this = origin;
+}
 
 RequestHeader::~RequestHeader() {}
+
+RequestHeader& RequestHeader::operator=(const RequestHeader &rv)
+{
+  this->conf = rv.conf;
+  this->method = rv.method;
+  this->host = rv.host;
+  this->http_major = rv.http_major;
+  this->http_minor = rv.http_minor;
+  this->pos = rv.pos;
+
+  this->buf = new std::string(*rv.buf);
+  this->body = new std::string(*rv.body);
+  return *this;
+}
 
 void RequestHeader::SetItem(std::string &key, std::string &value)
 {
