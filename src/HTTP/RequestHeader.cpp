@@ -1,5 +1,4 @@
 #include "RequestHeader.hpp"
-#include <iostream>
 
 RequestHeader::RequestHeader(std::string &data) : buf(new std::string(data)) {}
 
@@ -45,6 +44,18 @@ wsv_header_t& RequestHeader::GetItem(std::string &key)
   return *(FindItem(key)->second);
 }
 
+void RequestHeader::Parse()
+{
+  int ret = 0;
+
+  ret = HttpParseRequestLine();
+  if (ret)
+    throw ParseError();
+  ret = HttpParseHeaderLine();
+  if (ret)
+    throw ParseError();
+}
+
 int RequestHeader::HttpParseRequestLine()
 {
   size_t  pos = 0, host_start, host_end;
@@ -79,6 +90,7 @@ int RequestHeader::HttpParseRequestLine()
 
       case wsb_method:
         if (ch == ' ') {
+          std::cout << "pos : " << pos << std::endl;
           if (pos == 3 && wsb_str_3cmp((*this->buf), 'G', 'E', 'T')) {
             this->method = HTTP_GET;
           }

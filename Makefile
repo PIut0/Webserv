@@ -18,7 +18,6 @@ SRC				=	core/KQueue.cpp \
 						http/Header.cpp \
 						http/RequestHeader.cpp \
 						http/ResponseHeader.cpp \
-						http/parsing.cpp \
 						config/ServerBlock.cpp \
 						config/ServerManager.cpp \
 						config/LocationBlock.cpp \
