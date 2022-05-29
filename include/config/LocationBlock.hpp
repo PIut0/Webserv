@@ -21,7 +21,8 @@
 class LocationBlock : public System
 {
  public:
-  LocationBlock(std::string&, std::vector<std::string>&);
+  LocationBlock(std::string &location_path, std::vector<std::string> &data);
+  LocationBlock(const LocationBlock &origin);
   ~LocationBlock();
 
   std::string                 location_path;
@@ -33,6 +34,9 @@ class LocationBlock : public System
   std::vector<ErrorPage>      error_page;
   long                        request_max_body_size;
   std::string                 ret;
+
+  LocationBlock& operator=(const LocationBlock& rv);
+
 
   enum LocationAttribute {
     kError = -1,

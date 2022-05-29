@@ -1,5 +1,6 @@
 #include "LocationBlock.hpp"
 
+
 LocationBlock::LocationBlock(std::string &location_path, std::vector<std::string> &data)
 {
   this->location_path = location_path;
@@ -18,9 +19,28 @@ LocationBlock::LocationBlock(std::string &location_path, std::vector<std::string
   // PrintBlock();
 }
 
-LocationBlock::~LocationBlock()
+LocationBlock::LocationBlock(const LocationBlock &origin)
 {
+  *this = origin;
 }
+
+LocationBlock::~LocationBlock() {}
+
+
+LocationBlock& LocationBlock::operator=(const LocationBlock& rv)
+{
+  this->location_path = rv.location_path;
+  this->root = rv.root;
+  this->allow_methods = rv.allow_methods;
+  this->index = rv.index;
+  this->auto_index = rv.auto_index;
+  this->cgi_info = rv.cgi_info;
+  this->error_page = rv.error_page;
+  this->request_max_body_size = rv.request_max_body_size;
+  this->ret = rv.ret;
+  return *this;
+}
+
 
 LocationBlock::LocationAttribute LocationBlock::ParseRoot(const std::string &data)
 {

@@ -15,13 +15,18 @@ class ServerBlock;
 class ServerManager : public System
 {
  public:
-  ServerManager();
   ServerManager(std::string);
+  ServerManager(const ServerManager &origin);
   ~ServerManager();
+
+  ServerManager& operator=(const ServerManager &rv);
 
   std::vector<ServerBlock> serverBlock;
 
   void InitServer(std::string path);
+
+ private:
+  ServerManager();
 };
 
 #endif

@@ -3,11 +3,22 @@
 ServerBlock::ServerBlock(const std::vector<std::string> &data)
 {
   InitServerBlock(data);
-  // printBlock();
 }
 
-ServerBlock::~ServerBlock()
+ServerBlock::ServerBlock(const ServerBlock &origin)
 {
+  *this = origin;
+}
+
+ServerBlock::~ServerBlock() {}
+
+ServerBlock& ServerBlock::operator=(const ServerBlock& rv)
+{
+  this->location = rv.location;
+  this->server_name = rv.server_name;
+  this->host = rv.host;
+  this->port = rv.port;
+  return *this;
 }
 
 ServerBlock::ServerAttribute ServerBlock::ParseListen(const std::string &data)

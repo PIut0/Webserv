@@ -3,7 +3,18 @@
 
 ResponseHeader::ResponseHeader() {}
 
+ResponseHeader::ResponseHeader(const ResponseHeader &origin)
+{
+  *this = origin;
+}
+
 ResponseHeader::~ResponseHeader() {}
+
+ResponseHeader& ResponseHeader::operator=(const ResponseHeader &rv)
+{
+  this->conf = rv.conf;
+  return *this;
+}
 
 void ResponseHeader::SetItem(std::string &key, std::string &value)
 {

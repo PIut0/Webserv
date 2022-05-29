@@ -5,8 +5,19 @@ ServerManager::ServerManager(std::string path)
   InitServer(path);
 }
 
-ServerManager::~ServerManager()
+ServerManager::ServerManager(const ServerManager &origin)
 {
+  *this = origin;
+}
+
+
+
+ServerManager::~ServerManager() {}
+
+ServerManager& ServerManager::operator=(const ServerManager &rv)
+{
+  this->serverBlock = rv.serverBlock;
+  return *this;
 }
 
 void ServerManager::InitServer(std::string path)
