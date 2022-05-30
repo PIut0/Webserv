@@ -1,7 +1,7 @@
 #include "Client.hpp"
 #include "utils.hpp"
 
-Client::Client(KQueue &kq, int fd) : FdInterface(kq, kFdClient, fd), has_body(0)
+Client::Client(KQueue &kq, int fd) : FdInterface(kq, kFdClient, fd)
 {
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
   kq.AddEvent(interface_fd, EVFILT_READ, this);
@@ -19,52 +19,52 @@ int Client::EventRead()
   if (n <= 0)	// n == 0: 클라이언트에서 close & n == -1: 클라이언트 프로세스가 종료됨
     return n;
   buf[n] = '\0';
-  req += buf;
+  request_message += buf;
 
   return n;
 }
 
 int Client::EventWrite()
 {
-  int n = write(interface_fd, res.c_str(), res.size());
+  int n = write(interface_fd, response_message.c_str(), response_message.size());
   if (n <= 0)
     return n;
-  res = res.substr(n);
-  n = res.size();
+  response_message = response_message.substr(n);
+  n = response_message.size();
 
   return n;
 }
 
-int IsRequestEnd(const std::string &req)
+int IsRequestEnd(const std::string &request_message)
 {
-  return (req.find(CRLF) != std::string::npos);
+  return (request_message.find(CRLF) != std::string::npos);
 }
 
-// TODO : parse http req
+// TODO : parse http request_message
 FdInterfaceType Client::ParseReq()
 {
-  if (!IsRequestEnd(req))
+  if (!IsRequestEnd(request_message))
     return kFdNone;
 
-  std::string tmp = req.substr(req.find(CRLF) + 4);
-  req = req.substr(0, req.find(CRLF));
-
   // TODO : has body
-  //has_body = (req.find("Content-Length") != std::string::npos && !has_body) ? 1 : 0;
+  //has_body = (request_message.find("Content-Length") != std::string::npos && !has_body) ? 1 : 0;
 
-  if(req.find("Fileio") != std::string::npos) {
-    res = req;
-    req = tmp;
+  std::string tmp = request_message.substr(request_message.find(CRLF) + 4);
+  request_message = request_message.substr(0, request_message.find(CRLF));
+
+  if(request_message.find("Fileio") != std::string::npos) {
+    response_message = request_message;
+    request_message = tmp;
     return kFdFileio;
   }
-  else if(req.find("Cgi") != std::string::npos) {
-    res = req;
-    req = tmp;
+  else if(request_message.find("Cgi") != std::string::npos) {
+    response_message = request_message;
+    request_message = tmp;
     return kFdCgi;
   }
   else {
-    res = req;
-    req = tmp;
+    response_message = request_message;
+    request_message = tmp;
     return kFdClient;
   }
 }

@@ -1,7 +1,7 @@
 #include "Fileio.hpp"
 #include "utils.hpp"
 
-Fileio::Fileio(KQueue &kq, int fd, Client &_client) : FdInterface(kq, kFdFileio, fd), data(""), client(_client)
+Fileio::Fileio(KQueue &kq, int fd, Client *_client) : FdInterface(kq, kFdFileio, fd), data(""), client(_client)
 {
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
   kq.AddEvent(interface_fd, EVFILT_READ, this);
@@ -9,7 +9,6 @@ Fileio::Fileio(KQueue &kq, int fd, Client &_client) : FdInterface(kq, kFdFileio,
 
 Fileio::~Fileio()
 {
-  delete &client;
   close(interface_fd);
 }
 
@@ -34,7 +33,7 @@ int Fileio::EventRead()
 
 int Fileio::EventWrite()
 {
-  int n = write(client.interface_fd, data.c_str(), data.size());
+  int n = write(client->interface_fd, data.c_str(), data.size());
   if (n <= 0)
     return n;
   data = data.substr(n);
