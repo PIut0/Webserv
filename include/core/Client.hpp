@@ -4,6 +4,7 @@
 #include "KQueue.hpp"
 #include "FdInterface.hpp"
 #include "utils.hpp"
+#include "RequestHeader.hpp"
 
 class KQueue;
 
@@ -15,13 +16,13 @@ class Client : public FdInterface
 
   int EventRead();
   int EventWrite();
-  int OpenFile();
 
   FdInterfaceType ParseReq();
+  int OpenFile();
 
-  std::string req;
-  std::string res;
-  int has_body;
+  RequestHeader request;
+  std::string request_message;
+  std::string response_message;
 };
 
 #endif
