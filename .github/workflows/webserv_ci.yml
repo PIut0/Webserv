@@ -1,0 +1,31 @@
+name: Webserv Make & Run Test
+
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+
+jobs:
+  build:
+    runs-on: macos-10.15
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install
+      run: |
+        brew install ninja gcc
+        ninja --version
+        gcc --version
+        g++ --version
+    - name: Make
+      run: make
+    - name: TEST Parsing < Config >
+      run: |
+        make TEST=test_config.cpp
+        ./webserv config_example.config
+    - name: TEST Parsing < Request >
+      run: |
+        make TEST=test_http_header.cpp
+        ./webserv
+        
