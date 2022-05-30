@@ -1,6 +1,13 @@
 #include "RequestHeader.hpp"
 
-RequestHeader::RequestHeader(std::string &data) : buf(new std::string(data)) {}
+RequestHeader::RequestHeader() : pos_(0) {}
+
+RequestHeader::RequestHeader(const std::string &data) : pos_(0)
+{
+  ParseRequestLine(data);
+  ParseHeaderLine(data);
+  ParseBodyLine(data);
+}
 
 RequestHeader::RequestHeader(const RequestHeader &origin)
 {
@@ -16,11 +23,41 @@ RequestHeader& RequestHeader::operator=(const RequestHeader &rv)
   this->host = rv.host;
   this->http_major = rv.http_major;
   this->http_minor = rv.http_minor;
-  this->pos = rv.pos;
+  this->pos_ = rv.pos_;
 
-  this->buf = new std::string(*rv.buf);
-  this->body = new std::string(*rv.body);
   return *this;
+}
+
+void RequestHeader::SetMethod(const int &method)
+{
+  this->method = method;
+}
+
+void RequestHeader::SetHost(const std::string &host)
+{
+  this->host = host;
+}
+
+void RequestHeader::SetHttpVersion(const int &major, const int &minor)
+{
+  this->http_major = major;
+  this->http_minor = minor;
+}
+
+
+void RequestHeader::SetRequest(const std::string &request)
+{
+  ParseRequestLine(request);
+}
+
+void RequestHeader::SetItem(const std::string &line)
+{
+  size_t index = line.find(":");
+  std::string key = line.substr(0, index);
+  std::string value = line.substr(index + 2, line.length() - 1);
+  // std::string trim_value = trim(value);
+
+  SetItem(key, value);
 }
 
 void RequestHeader::SetItem(const std::string &key, const std::string &value)
@@ -34,6 +71,11 @@ void RequestHeader::SetItem(const std::string &key, const std::string &value)
   this->conf[key] = el;
 }
 
+void RequestHeader::SetBody(const std::string &body)
+{
+  this->body = body;
+}
+
 req_header_it_t RequestHeader::FindItem(const std::string &key)
 {
   return this->conf.find(key);
@@ -44,21 +86,10 @@ wsv_header_t& RequestHeader::GetItem(const std::string &key)
   return *(FindItem(key)->second);
 }
 
-void RequestHeader::Parse()
+// TODO return 에서 throw ParseError()로 바꾸기
+int RequestHeader::ParseRequestLine(const std::string &data)
 {
-  int ret = 0;
-
-  ret = ParseRequestLine();
-  if (ret)
-    throw ParseError();
-  ret = ParseHeaderLine();
-  if (ret)
-    throw ParseError();
-}
-
-int RequestHeader::ParseRequestLine()
-{
-  size_t  pos = 0, host_start, host_end;
+  size_t  pos, host_start, host_end;
   u_char ch;
 
   enum {
@@ -73,10 +104,11 @@ int RequestHeader::ParseRequestLine()
   } state;
 
   state = wsb_start;
+  pos = this->pos_;
 
   while (state != wsb_done)
   {
-    ch = (*this->buf)[pos];
+    ch = data[pos];
 
     switch (state)
     {
@@ -90,20 +122,19 @@ int RequestHeader::ParseRequestLine()
 
       case wsb_method:
         if (ch == ' ') {
-          std::cout << "pos : " << pos << std::endl;
-          if (pos == 3 && wsb_str_3cmp((*this->buf), 'G', 'E', 'T')) {
+          if (pos == 3 && wsb_str_3cmp(data, 'G', 'E', 'T')) {
             this->method = HTTP_GET;
           }
 
-          else if (pos == 3 && wsb_str_3cmp((*this->buf), 'P', 'U', 'T')) {
+          else if (pos == 3 && wsb_str_3cmp(data, 'P', 'U', 'T')) {
             this->method = HTTP_POST;
           }
 
-          else if (pos == 4 && wsb_str_4cmp((*this->buf), 'P', 'O', 'S', 'T')) {
+          else if (pos == 4 && wsb_str_4cmp(data, 'P', 'O', 'S', 'T')) {
             this->method = HTTP_PUT;
           }
 
-          else if (pos == 6 && wsb_str_6cmp((*this->buf), 'D', 'E', 'L', 'E', 'T', 'E')) {
+          else if (pos == 6 && wsb_str_6cmp(data, 'D', 'E', 'L', 'E', 'T', 'E')) {
             this->method = HTTP_DELETE;
           }
 
@@ -138,7 +169,7 @@ int RequestHeader::ParseRequestLine()
         switch (ch) {
           case ' ':
             host_end = pos;
-            this->host = (*this->buf).substr(host_start, host_end - host_start + 1);
+            this->host = data.substr(host_start, host_end - host_start);
             state = wsb_before_option;
             break;
 
@@ -149,12 +180,12 @@ int RequestHeader::ParseRequestLine()
         break;
 
       case wsb_before_option:
-        if (wsv_str_5cmp_p((*this->buf), pos, 'H', 'T', 'T', 'P', '/') && \
-                         (*this->buf)[pos + 5] >= '0' && (*this->buf)[pos + 5] <= '9' && \
-                         (*this->buf)[pos + 6] == '.' && \
-                         (*this->buf)[pos + 7] >= '0' && (*this->buf)[pos + 7] <= '9' ) {
-          this->http_major = (*this->buf)[5] - '0';
-          this->http_minor = (*this->buf)[7] - '0';
+        if (wsv_str_5cmp_p(data, pos, 'H', 'T', 'T', 'P', '/') && \
+                         data[pos + 5] >= '0' && data[pos + 5] <= '9' && \
+                         data[pos + 6] == '.' && \
+                         data[pos + 7] >= '0' && data[pos + 7] <= '9' ) {
+          this->http_major = data[pos + 5] - '0';
+          this->http_minor = data[pos + 7] - '0';
           pos += 7; // 하드코딩..
           break;
         }
@@ -177,6 +208,7 @@ int RequestHeader::ParseRequestLine()
         switch (ch) {
           case LF:
             state = wsb_done;
+            this->pos_ = pos + 1;
             break;
 
           default:
@@ -191,11 +223,11 @@ int RequestHeader::ParseRequestLine()
     }
     ++pos;
   }
-  this->pos = pos;
+  this->pos_ = pos;
   return WSV_OK;
 }
 
-int RequestHeader::ParseHeaderLine()
+int RequestHeader::ParseHeaderLine(const std::string &data)
 {
   // char          *key_start, *key_end, *value_start, *value_end;
   size_t        key_start, key_end, value_start, value_end;
@@ -217,8 +249,8 @@ int RequestHeader::ParseHeaderLine()
 
   state = wsv_start;
 
-  for (pos = this->pos ; (*this->buf)[pos] ; ++pos) {
-    ch = (*this->buf)[pos];
+  for (pos = this->pos_ ; data[pos] ; ++pos) {
+    ch = data[pos];
 
     switch (state)
     {
@@ -333,8 +365,8 @@ int RequestHeader::ParseHeaderLine()
         {
           case LF:
             state = wsv_almost_done;
-            key = (*this->buf).substr(key_start, key_end - key_start + 1);
-            value = (*this->buf).substr(value_start, value_end - value_start + 1);
+            key = data.substr(key_start, key_end - key_start + 1);
+            value = data.substr(value_start, value_end - value_start + 1);
             this->SetItem(key, value);
             break;
 
@@ -367,6 +399,7 @@ int RequestHeader::ParseHeaderLine()
         switch (ch)
         {
           case LF:
+            this->pos_ = pos + 1;
             return WSV_OK;
 
           default:
@@ -383,35 +416,80 @@ int RequestHeader::ParseHeaderLine()
   return WSV_HTTP_PARSE_INVALID_REQUEST;
 }
 
+int RequestHeader::ParseBodyLine(const std::string &data)
+{
+  if (this->pos_ == data.length()) {
+    this->body = "";
+    return WSV_OK;
+  }
+
+  if (wsv_str_4cmp_p(data, data.length() - 4, '\r', '\n', '\r', '\n')) {
+    this->body = data.substr(this->pos_, data.length() - this->pos_ - 4);
+    return WSV_OK;
+  }
+
+  return WSV_ERROR;
+}
+
+std::string RequestHeader::ToString()
+{
+  req_header_it_t it;
+  std::string ret;
+  ret += MethodToString() + " " + this->host + " " + HttpVersionToString() + CRLF;
+
+  for (it = this->conf.begin() ; it != conf.end() ; ++it) {
+    ret += it->second->key + ": " + it->second->value + CRLF;
+  }
+  ret += CRLF;
+  if (body.length() != 0) {
+    ret += body + CRLF;
+    ret += CRLF;
+  }
+  return ret;
+}
+
+std::string RequestHeader::MethodToString()
+{
+  switch (this->method)
+  {
+    case HTTP_UNKNOWN:
+      return "UNKNOWN";
+
+    case HTTP_GET:
+      return "GET";
+
+    case HTTP_POST:
+      return "POST";
+
+    case HTTP_PUT:
+      return "PUT";
+
+    case HTTP_DELETE:
+      return "DELETE";
+
+    default:
+      return "";
+  }
+}
+
+std::string RequestHeader::HttpVersionToString()
+{
+  std::string charset[10] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+  return "HTTP/" + charset[this->http_major] + "." + charset[this->http_minor];
+}
+
+void RequestHeader::Print()
+{
+  PrintRequestLine();
+  PrintHeaderLine();
+  PrintBodyLine();
+}
+
 void RequestHeader::PrintRequestLine()
 {
   std::cout << COLOR_RED << "[ REQUEST LINE ]" << COLOR_DEFAULT << std::endl;
   std::cout << "  [method] : ";
-  switch (this->method)
-  {
-    case HTTP_UNKNOWN:
-      std::cout << "UNKNOWN";
-      break;
 
-    case HTTP_GET:
-      std::cout << "GET";
-      break;
-
-    case HTTP_POST:
-      std::cout << "POST";
-      break;
-
-    case HTTP_PUT:
-      std::cout << "PUT";
-      break;
-
-    case HTTP_DELETE:
-      std::cout << "DELETE";
-      break;
-
-    default:
-      break;
-  }
   std::cout << std::endl;
   std::cout << "  [host] : " << host << std::endl;
   std::cout << "  [http version] : " << this->http_major << "." << this->http_minor << std::endl;
@@ -427,8 +505,9 @@ void RequestHeader::PrintHeaderLine()
   }
 }
 
-void RequestHeader::Print()
+void RequestHeader::PrintBodyLine()
 {
-  PrintRequestLine();
-  PrintHeaderLine();
+  std::cout << COLOR_BLUE << "[ HEADER LINE ]" << COLOR_DEFAULT << std::endl;
+  std::cout << body << std::endl;
 }
+
