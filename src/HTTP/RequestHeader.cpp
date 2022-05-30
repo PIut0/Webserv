@@ -23,7 +23,7 @@ RequestHeader& RequestHeader::operator=(const RequestHeader &rv)
   return *this;
 }
 
-void RequestHeader::SetItem(std::string &key, std::string &value)
+void RequestHeader::SetItem(const std::string &key, const std::string &value)
 {
   if (FindItem(key) != this->conf.end())
     throw AlreadyExistKey();
@@ -34,12 +34,12 @@ void RequestHeader::SetItem(std::string &key, std::string &value)
   this->conf[key] = el;
 }
 
-req_header_it_t RequestHeader::FindItem(std::string &key)
+req_header_it_t RequestHeader::FindItem(const std::string &key)
 {
   return this->conf.find(key);
 }
 
-wsv_header_t& RequestHeader::GetItem(std::string &key)
+wsv_header_t& RequestHeader::GetItem(const std::string &key)
 {
   return *(FindItem(key)->second);
 }
@@ -48,15 +48,15 @@ void RequestHeader::Parse()
 {
   int ret = 0;
 
-  ret = HttpParseRequestLine();
+  ret = ParseRequestLine();
   if (ret)
     throw ParseError();
-  ret = HttpParseHeaderLine();
+  ret = ParseHeaderLine();
   if (ret)
     throw ParseError();
 }
 
-int RequestHeader::HttpParseRequestLine()
+int RequestHeader::ParseRequestLine()
 {
   size_t  pos = 0, host_start, host_end;
   u_char ch;
@@ -149,7 +149,7 @@ int RequestHeader::HttpParseRequestLine()
         break;
 
       case wsb_before_option:
-        if (wsv_str_cmp((*this->buf), pos, 'H', 'T', 'T', 'P', '/') && \
+        if (wsv_str_5cmp_p((*this->buf), pos, 'H', 'T', 'T', 'P', '/') && \
                          (*this->buf)[pos + 5] >= '0' && (*this->buf)[pos + 5] <= '9' && \
                          (*this->buf)[pos + 6] == '.' && \
                          (*this->buf)[pos + 7] >= '0' && (*this->buf)[pos + 7] <= '9' ) {
@@ -195,7 +195,7 @@ int RequestHeader::HttpParseRequestLine()
   return WSV_OK;
 }
 
-int RequestHeader::HttpParseHeaderLine()
+int RequestHeader::ParseHeaderLine()
 {
   // char          *key_start, *key_end, *value_start, *value_end;
   size_t        key_start, key_end, value_start, value_end;
