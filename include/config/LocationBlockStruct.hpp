@@ -4,14 +4,14 @@
 #include <string>
 #include <vector>
 
-struct CgiInfo {
+typedef struct {
   std::string anjwl;
   std::string url;
-};
+} CgiInfo;
 
-struct ErrorPage {
+typedef struct {
   int         code;
   std::string url;
-};
+} ErrorPage;
 
 #endif

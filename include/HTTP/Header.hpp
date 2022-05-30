@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <map>
 
+#include "Color.hpp"
+
 #define  HTTP_UNKNOWN  0x00000001
 #define  HTTP_GET      0x00000002
 #define  HTTP_POST     0x00000004
@@ -41,7 +43,6 @@
 typedef struct {
   std::string key;
   std::string value;
-  // std::string lowcase_key;
 } wsv_header_t;
 
 
@@ -57,12 +58,11 @@ class Header
   Header();
   virtual ~Header();
 
+  void CheckValidateKey(std::string &key);
+  void CheckValidateValue(std::string &value);
 
   virtual void SetItem(std::string &key, std::string &value) = 0;
   virtual wsv_header_t& GetItem(std::string &key) = 0;
-
-  void CheckValidateKey(std::string &key);
-  void CheckValidateValue(std::string &value);
 };
 
 #endif

@@ -23,14 +23,14 @@ class KQueue
   KQueue();
   ~KQueue();
 
-  int           kq;
-  int           event_count;
-  struct kevent events[EVENT_SIZE];
-
   void Refresh();
   void AddEvent(int ident, int16_t filter, void *udata);
   void DeleteEvent(int ident, int16_t filter);
   void AddServer(Server &serv);
+
+  int           kq;
+  int           event_count;
+  struct kevent events[EVENT_SIZE];
 };
 
 #endif

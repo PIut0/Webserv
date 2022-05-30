@@ -21,12 +21,13 @@ class FdInterface
   FdInterface(KQueue &kq, FdInterfaceType type, int fd) : kq(kq), interface_type(type), interface_fd(fd) {};
   virtual ~FdInterface() {};
 
-  KQueue          &kq;
-  FdInterfaceType interface_type;
-  int             interface_fd;
 
   virtual int EventRead() = 0;
   virtual int EventWrite() = 0;
+
+  KQueue          &kq;
+  FdInterfaceType interface_type;
+  int             interface_fd;
 };
 
 #endif

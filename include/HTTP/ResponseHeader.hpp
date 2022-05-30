@@ -8,7 +8,6 @@ class HTTPResponseHeader;
 class ResponseHeader : public Header
 {
  public:
-  ResponseHeader();
   ResponseHeader(const ResponseHeader &origin);
   ~ResponseHeader();
 
@@ -19,6 +18,9 @@ class ResponseHeader : public Header
   res_header_it_t FindItem(std::string &key);
 
   res_header_t conf;
+
+ private:
+  ResponseHeader();
 };
 
 

@@ -13,13 +13,14 @@
 class Monitor
 {
  public:
-  time_t getTimeStamp();
+  ~Monitor();
+  Monitor();
+
   void Log(const std::string&);
   void Print(const std::string&, const std::string&);
   void Error();
 
-  ~Monitor();
-  Monitor();
+  time_t getTimeStamp();
 
  private:
   std::ofstream logfile_;

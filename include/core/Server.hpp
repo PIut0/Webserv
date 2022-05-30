@@ -25,14 +25,14 @@ class ServerBlock;
 class Server : public FdInterface
 {
  public:
-  struct sockaddr_in  server_addr;
-  ServerBlock         &server_block;
-
   Server(KQueue &kq, ServerBlock &_sb);
   ~Server();
 
   int EventRead();
   int EventWrite();
+
+  struct sockaddr_in  server_addr;
+  ServerBlock         &server_block;
 };
 
 #endif

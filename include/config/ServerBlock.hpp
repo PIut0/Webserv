@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <string>
-#include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <cstdlib>
@@ -14,7 +13,6 @@
 #include "Color.hpp"
 
 class LocationBlock;
-
 class ServerBlock : public System
 {
  public:
@@ -44,9 +42,9 @@ class ServerBlock : public System
   void InitServerBlock(const std::vector<std::string>&data);
   void CheckEssentailCommands();
 
-  void ParseListen(const std::string &data);
-  void ParseServerName(const std::string &data);
-  ServerAttribute CheckValidate(const std::string &command, const std::string &contents);
+  void ParseListen(const std::string &contents);
+  void ParseServerName(const std::string &contents);
+  ServerAttribute CheckValidate(const std::string &command);
 };
 
 #endif

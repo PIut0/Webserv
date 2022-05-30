@@ -10,18 +10,18 @@ class KQueue;
 class Client : public FdInterface
 {
  public:
-  std::string req;
-  std::string res;
-  int has_body;
-
   Client(KQueue &kq, int fd);
   ~Client();
 
   int EventRead();
   int EventWrite();
+  int OpenFile();
 
   FdInterfaceType ParseReq();
-  int OpenFile();
+
+  std::string req;
+  std::string res;
+  int has_body;
 };
 
 #endif
