@@ -10,6 +10,10 @@ class KQueue;
 
 class Client : public FdInterface
 {
+ private:
+  Client();
+  Client(const Client &);
+  Client &operator=(const Client &);
  public:
   Client(KQueue &kq, int fd);
   ~Client();
