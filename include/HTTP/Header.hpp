@@ -9,6 +9,8 @@
 #include "Color.hpp"
 #include "AlreadyExistKey.hpp"
 #include "ParseError.hpp"
+#include "Defines.hpp"
+#include "utils.hpp"
 
 #define  HTTP_UNKNOWN  0x00000001
 #define  HTTP_GET      0x00000002
@@ -38,8 +40,10 @@
   p[0] == c0 && p[1] == c1 && p[2] == c2 && p[3] == c3 && p[4] == c4 && p[5] == c5
 #define wsb_str_8cmp(p, c0, c1, c2, c3, c4, c5, c6, c7) \
   p[0] == c0 && p[1] == c1 && p[2] == c2 && p[3] == c3 && p[4] == c4 && p[5] == c5 && p[6] == c6 && p[7] == c7
-#define wsv_str_cmp(s, p, c0, c1, c2, c3, c4) \
+#define wsv_str_5cmp_p(s, p, c0, c1, c2, c3, c4) \
   s[p] == c0 && s[p + 1] == c1 && s[p + 2] == c2  && s[p + 3] == c3  && s[p + 4] == c4
+#define wsv_str_4cmp_p(s, p, c0, c1, c2, c3) \
+  s[p] == c0 && s[p + 1] == c1 && s[p + 2] == c2  && s[p + 3] == c3
 
 
 typedef struct {
@@ -63,8 +67,8 @@ class Header
   void CheckValidateKey(std::string &key);
   void CheckValidateValue(std::string &value);
 
-  virtual void SetItem(std::string &key, std::string &value) = 0;
-  virtual wsv_header_t& GetItem(std::string &key) = 0;
+  virtual void SetItem(const std::string &key, const std::string &value) = 0;
+  virtual wsv_header_t& GetItem(const std::string &key) = 0;
 };
 
 #endif

@@ -12,9 +12,9 @@ class RequestHeader : public Header
 
   RequestHeader& operator=(const RequestHeader &rv);
 
-  void            SetItem(std::string &key, std::string &value);
-  wsv_header_t&   GetItem(std::string &key);
-  req_header_it_t FindItem(std::string &key);
+  void            SetItem(const std::string &key, const std::string &value);
+  wsv_header_t&   GetItem(const std::string &key);
+  req_header_it_t FindItem(const std::string &key);
 
   void  Parse();
 

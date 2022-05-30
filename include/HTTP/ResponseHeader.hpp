@@ -8,36 +8,41 @@ class HTTPResponseHeader;
 class ResponseHeader : public Header
 {
  public:
-  ResponseHeader(const ResponseHeader &origin);
+  ResponseHeader();
+  ResponseHeader(const std::string &data);
+  // ResponseHeader(const ResponseHeader &origin);
   ~ResponseHeader();
 
   ResponseHeader& operator=(const ResponseHeader &rv);
 
-  void            SetItem(std::string &key, std::string &value);
-  wsv_header_t&   GetItem(std::string &key);
-  res_header_it_t FindItem(std::string &key);
-
-  void  Parse();
+  void            SetBody(const std::string &body);
+  void            SetItem(const std::string &key, const std::string &value);
+  void            SetItem(const std::string &line);
+  // void            SetItem(std::vector<std::pair<std::string, std::string> > &values);
+  wsv_header_t&   GetItem(const std::string &key);
+  res_header_it_t FindItem(const std::string &key);
 
   void  Print();
-  void  PrintRequestLine();
   void  PrintHeaderLine();
+  void  PrintBody();
 
+  std::string  ToString();
 
-  // before parse
-  std::string   *buf;
-
+  // response line
   // header line
+  std::string   status_code;
+  std::string   status_msg;
   res_header_t  conf;
-  // header line
+
   // body line
-  std::string   *body;
+  std::string   body;
 
  private:
-  ResponseHeader();
+  int   ParseHeaderLine(const std::string &data);
+  int   ParseBody(const std::string &data);
 
-  int ParseHeaderLine();
-  int ParseRequestLine();
+  // before parse
+  size_t             pos_;
 };
 
 
