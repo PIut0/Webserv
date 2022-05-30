@@ -2,6 +2,7 @@
 #define FDINTERFACE_HPP
 
 #include "KQueue.hpp"
+#include "System.hpp"
 #include "utils.hpp"
 
 class KQueue;
@@ -14,7 +15,7 @@ enum FdInterfaceType {
   kFdNone
 };
 
-class FdInterface
+class FdInterface : public System
 {
  public:
   FdInterface(KQueue &kq, FdInterfaceType type) : kq(kq), interface_type(type) {};
