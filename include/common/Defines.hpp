@@ -16,6 +16,9 @@
 #define SERVER_BLOCK_TAP      "\t"
 #define LOCATION_BLOCK_TAP    "\t\t"
 
+#define CRLF                  "\r\n"
+#define CRLF_RETURN           "\r\n\r\n"
+
 #define CLEAR_VECTOR(A)       (A).clear();
 #define SWAP_VECTOR(A)        std::vector<std::string>().swap(A);
 #define CLEAR_VECTOR_COMPLETLY(A) {CLEAR_VECTOR(A)}; {SWAP_VECTOR(A)}
