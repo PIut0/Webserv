@@ -2,9 +2,6 @@
 #define REQUESTHEADER_HPP
 
 #include "Header.hpp"
-#include "AlreadyExistKey.hpp"
-#include "ParseError.hpp"
-
 
 class RequestHeader : public Header
 {
@@ -20,25 +17,30 @@ class RequestHeader : public Header
   req_header_it_t FindItem(std::string &key);
 
   void  Parse();
+
+  void  Print();
   void  PrintRequestLine();
   void  PrintHeaderLine();
-  void  Print();
 
+  // before parse
   std::string   *buf;
-  std::string   *body;
 
-  req_header_t  conf;
+  // request line
   int           method;
   std::string   host;
   short         http_major;
   short         http_minor;
   size_t        pos;
+  // header line
+  req_header_t  conf;
+  // body line
+  std::string   *body;
 
  private:
   RequestHeader();
 
-  int   HttpParseHeaderLine();
-  int   HttpParseRequestLine();
+  int   ParseHeaderLine();
+  int   ParseRequestLine();
 };
 
 

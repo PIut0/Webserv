@@ -18,8 +18,13 @@ ResponseHeader& ResponseHeader::operator=(const ResponseHeader &rv)
 
 void ResponseHeader::SetItem(std::string &key, std::string &value)
 {
-  (void)key;
-  (void)value;
+  if (FindItem(key) != this->conf.end())
+    throw AlreadyExistKey();
+
+  wsv_header_t *el = new wsv_header_t();
+  el->key = key;
+  el->value = value;
+  this->conf.push_back(el);
 }
 
 res_header_it_t ResponseHeader::FindItem(std::string &key)

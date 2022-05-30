@@ -48,15 +48,15 @@ void RequestHeader::Parse()
 {
   int ret = 0;
 
-  ret = HttpParseRequestLine();
+  ret = ParseRequestLine();
   if (ret)
     throw ParseError();
-  ret = HttpParseHeaderLine();
+  ret = ParseHeaderLine();
   if (ret)
     throw ParseError();
 }
 
-int RequestHeader::HttpParseRequestLine()
+int RequestHeader::ParseRequestLine()
 {
   size_t  pos = 0, host_start, host_end;
   u_char ch;
@@ -195,7 +195,7 @@ int RequestHeader::HttpParseRequestLine()
   return WSV_OK;
 }
 
-int RequestHeader::HttpParseHeaderLine()
+int RequestHeader::ParseHeaderLine()
 {
   // char          *key_start, *key_end, *value_start, *value_end;
   size_t        key_start, key_end, value_start, value_end;

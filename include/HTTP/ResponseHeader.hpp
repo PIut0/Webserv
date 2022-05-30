@@ -17,10 +17,27 @@ class ResponseHeader : public Header
   wsv_header_t&   GetItem(std::string &key);
   res_header_it_t FindItem(std::string &key);
 
-  res_header_t conf;
+  void  Parse();
+
+  void  Print();
+  void  PrintRequestLine();
+  void  PrintHeaderLine();
+
+
+  // before parse
+  std::string   *buf;
+
+  // header line
+  res_header_t  conf;
+  // header line
+  // body line
+  std::string   *body;
 
  private:
   ResponseHeader();
+
+  int ParseHeaderLine();
+  int ParseRequestLine();
 };
 
 

@@ -7,6 +7,8 @@
 #include <map>
 
 #include "Color.hpp"
+#include "AlreadyExistKey.hpp"
+#include "ParseError.hpp"
 
 #define  HTTP_UNKNOWN  0x00000001
 #define  HTTP_GET      0x00000002
