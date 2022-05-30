@@ -24,6 +24,10 @@ class ServerBlock;
 
 class Fileio : public FdInterface
 {
+ private:
+  Fileio();
+  Fileio(const Fileio &);
+  Fileio &operator=(const Fileio &);
  public:
   Fileio(KQueue &kq, int fd, Client *_client);
   ~Fileio();

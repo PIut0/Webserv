@@ -24,6 +24,10 @@ class ServerBlock;
 
 class Server : public FdInterface
 {
+ private:
+  Server();
+  Server(const Server &);
+  Server &operator=(const Server &);
  public:
   Server(KQueue &kq, ServerBlock &_sb);
   ~Server();
