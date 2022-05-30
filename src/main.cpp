@@ -3,6 +3,7 @@
 #include "KQueue.hpp"
 #include "Server.hpp"
 #include "Fileio.hpp"
+#include "process.hpp"
 
 int main(int argc, char** argv) {
   ServerManager serverManager(CheckArg(argc, argv));
@@ -13,25 +14,11 @@ int main(int argc, char** argv) {
     kq.AddServer(*(servers[i]));
   }
 
-  int status;
-
   while (1) {
     kq.Refresh();
     for (int i = 0; i < kq.event_count; i++) {
-      Fileio *socket_class = static_cast<Fileio *>(kq.events[i].udata);
-      if (kq.events[i].filter == EVFILT_READ){
-        if ((status = socket_class->EventRead()) <= 0
-          && !static_cast<Fileio *>(socket_class)->client.has_body) {
-          delete socket_class;
-          std::cout << "fd: " << kq.events[i].ident << ": delete client" << std::endl;
-          close(socket_class->interface_fd);
-        }
-      }
-      else if (kq.events[i].filter == EVFILT_WRITE) {
-        if ((socket_class->EventWrite()) <= 0) {
-          kq.DeleteEvent(kq.events[i].ident, kq.events[i].filter);
-        }
-      }
+      FdInterface *target = static_cast<FdInterface *>(kq.events[i].udata);
+      Process(target, kq.events[i]);
     }
   }
   return (0);
