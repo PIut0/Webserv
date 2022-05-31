@@ -49,6 +49,7 @@ FdInterfaceType Client::ParseReq()
 
   std::string tmp = request_message.substr(request_message.find(CRLF) + 4);
   request_message = request_message.substr(0, request_message.find(CRLF));
+  std::cout << "request_message: " << request_message << std::endl;
 
   if (request == nullptr)
     request = new RequestHeader(request_message);
@@ -69,9 +70,11 @@ FdInterfaceType Client::ParseReq()
   else if(request_message.find("cgi") != std::string::npos) { // TODO : CGI Check
     return kFdCgi;
   }
-  else {
+  else if(request != nullptr) {
     return kFdFileio;
   }
+  else
+    return kFdNone;
 }
 
 const std::string Client::GetFilePath() const
