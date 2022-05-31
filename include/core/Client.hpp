@@ -22,9 +22,9 @@ class Client : public FdInterface
   int EventWrite();
 
   FdInterfaceType ParseReq();
-  int OpenFile();
+  const std::string GetFilePath() const;
 
-  RequestHeader request;
+  RequestHeader *request;
   std::string request_message;
   std::string response_message;
 };

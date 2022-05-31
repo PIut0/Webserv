@@ -4,6 +4,7 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Fileio.hpp"
+#include "NotFoundError.hpp"
 
 void Process(FdInterface *target, struct kevent event);
 
