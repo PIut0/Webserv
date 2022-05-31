@@ -65,6 +65,7 @@ void LocationBlock::ParseAllowMethod(const std::string &data)
 void LocationBlock::ParseIndex(const std::string &data)
 {
    // "index index.html index.htm"
+  this->index.erase(this->index.begin()); // TODO 나중에 index 제거 로직으로 바꾸기
   std::vector<std::string> split_data = StringSplit(data, " ", 0);
   for (size_t i = 0 ; i < split_data.size() ; i++) {
     this->index.push_back(split_data[i]);

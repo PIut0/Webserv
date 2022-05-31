@@ -22,7 +22,8 @@ class ServerBlock : public System
 
   ServerBlock& operator=(const ServerBlock& rv);
 
-  void PrintBlock();
+  void  PrintBlock();
+  int   GetLocationBlockByPath(const std::string &path);
 
   std::vector<LocationBlock>  location;
   std::string                 server_name;
