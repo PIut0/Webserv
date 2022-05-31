@@ -1,8 +1,10 @@
 #include "Client.hpp"
 #include "utils.hpp"
+#include "NotFoundError.hpp"
 
 Client::Client(KQueue &kq, int fd) : FdInterface(kq, kFdClient, fd)
 {
+  request = nullptr;
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
   kq.AddEvent(interface_fd, EVFILT_READ, this);
 }
@@ -40,42 +42,41 @@ int IsRequestEnd(const std::string &request_message)
   return (request_message.find(CRLF) != std::string::npos);
 }
 
-// TODO : parse http request_message
 FdInterfaceType Client::ParseReq()
 {
   if (!IsRequestEnd(request_message))
     return kFdNone;
 
-  // TODO : has body
-  //has_body = (request_message.find("Content-Length") != std::string::npos && !has_body) ? 1 : 0;
-
   std::string tmp = request_message.substr(request_message.find(CRLF) + 4);
   request_message = request_message.substr(0, request_message.find(CRLF));
 
-  if(request_message.find("Fileio") != std::string::npos) {
-    response_message = request_message;
-    request_message = tmp;
-    return kFdFileio;
-  }
-  else if(request_message.find("Cgi") != std::string::npos) {
-    response_message = request_message;
-    request_message = tmp;
+  if (request == nullptr)
+    request = new RequestHeader(request_message);
+  else if(request->FindItem("Transfer-Encoding")->first != ""
+    && request->FindItem("Transfer-Encoding")->second->value == "chunked")
+    // chunked
+    // TODO : RequestHeader class need parse chunked body
+    request->SetBody(request_message);
+  else
+    request->SetBody(request_message);
+
+  request_message = tmp;
+
+  if (request->FindItem("Content-Length")->first != ""
+    && atoi(request->GetItem("Content-Length").value.c_str()) > 0
+    && request->body.size() <= 0)
+    return kFdClient;
+  else if(request_message.find("cgi") != std::string::npos) { // TODO : CGI Check
     return kFdCgi;
   }
   else {
-    response_message = request_message;
-    request_message = tmp;
-    return kFdClient;
+    return kFdFileio;
   }
 }
 
-int Client::OpenFile()
+const std::string Client::GetFilePath() const
 {
-  //std::string &path = request_path
-  std::string path("html/index.html");
-  int fd = open(path.c_str(), O_RDONLY);
-  if (fd < 0)
-    return fd;  // TODO : Error exception
-
-  return fd;
+  std::string path = "." + request->host;
+  //std::string path("html/index.html");
+  return path;
 }

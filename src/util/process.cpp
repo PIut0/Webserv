@@ -23,7 +23,7 @@ void Client_Event_Read(Client *client)
       client->kq.AddEvent(client->interface_fd, EVFILT_WRITE, client);
       break;
     case kFdFileio:
-      new Fileio(client->kq, client->OpenFile(), client);
+      new Fileio(client->kq, client->GetFilePath(), client);
       break;
     case kFdCgi:
       break;
