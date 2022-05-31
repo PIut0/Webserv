@@ -28,7 +28,11 @@ jobs:
       run: |
         make TEST=test_http_header.cpp
         ./webserv
-    - name: TEST Class < ResponseHeader>
+    - name: TEST Class < ResponseHeader >
       run: |
         make TEST=test_response_class.cpp
+        ./webserv
+    - name: TEST Class < RequestHeader >
+      run: |
+        make TEST=test_request_class.cpp
         ./webserv
