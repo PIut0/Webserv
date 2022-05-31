@@ -20,6 +20,7 @@ class RequestHeader : public Header
   void            SetItem(const std::string &line);
   void            SetItem(const std::string &key, const std::string &value);
   void            SetBody(const std::string &body);
+  int             SetChunked(const std::string &chunked);
 
   wsv_header_t&   GetItem(const std::string &key);
   req_header_it_t FindItem(const std::string &key);
