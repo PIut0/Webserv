@@ -44,14 +44,13 @@ void Fileio_Event_Read(Fileio *fileio)
 {
   if (fileio->EventRead() <= 0)
   {
-    fileio->kq.DeleteEvent(fileio->interface_fd, EVFILT_READ);
     fileio->kq.AddEvent(fileio->client->interface_fd, EVFILT_WRITE, fileio);
+    fileio->kq.DeleteEvent(fileio->interface_fd, EVFILT_READ);
   }
 }
 
 void Fileio_Event_Write(Fileio *fileio)
 {
-  sleep(1);
   if ( fileio->EventWrite() <= 0) {
     fileio->kq.DeleteEvent(fileio->client->interface_fd, EVFILT_WRITE);
     delete fileio;
