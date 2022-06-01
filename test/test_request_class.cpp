@@ -6,7 +6,8 @@ int main()
   const std::string dummy = "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\r\nHost: code.tutsplus.com\r\nUser-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-us,en;q=0.5\r\nAccept-Encoding: gzip,deflate\r\nAccept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\nKeep-Alive: 300\r\nConnection: keep-alive\r\nCookie: PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120\r\nPragma: no-cache\r\nCache-Control: no-cache\r\n\r\n";
 
   { // constructor with string
-    RequestHeader requestHeader(dummy);
+    RequestHeader requestHeader;
+    requestHeader.Parse(dummy);
     if (dummy.length() == requestHeader.ToString().length()) {
       std::cout << "TRUE" << std::endl;
     }
@@ -60,7 +61,8 @@ int main()
     }
   }
   {
-    RequestHeader requestHeader(dummy);
+    RequestHeader requestHeader;
+    requestHeader.Parse(dummy);
 
     const std::string dummy1 = "5\r\nhello\r\n\r\n";
     const std::string dummy2 = "5\r\nworld\r\n\r\n";
@@ -90,7 +92,8 @@ int main()
       "PATH_INFO=../",
       "CONTENT_LENGTH=5"
     };
-    RequestHeader requestHeader(dummy);
+    RequestHeader requestHeader;
+    requestHeader.Parse(dummy);
     requestHeader.SetItem("Content-Length", "5");
     requestHeader.SetBody("Hello");
     char ** ret = requestHeader.ToCgi(CGI_PHP);
@@ -98,6 +101,15 @@ int main()
       if (dummy1[i] != ret[i]) exit(1);
     }
     std::cout << "TRUE" << std::endl;
+  }
+  { // 생성자 테스트
+    const std::string dummy1 = "GET /html/default.html HTTP/1.1\r\nHost: 127.0.0.1:8176\r\nConnection: keep-alive\r\nCache-Control: max-age=0\r\nsec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"100\", \"Whale\";v=\"3\"\r\nsec-ch-ua-mobile: ?0\r\nsec-ch-ua-platform: \"macOS\"\r\nUpgrade-Insecure-Requests: 1\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.151 Whale/3.14.134.62 Safari/537.36\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nSec-Fetch-Site: none\r\nSec-Fetch-Mode: navigate\r\nSec-Fetch-User: ?1\r\nSec-Fetch-Dest: document\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7\r\n\r\n";
+    const std::string dummy2 = "GET /html/index.html HTTP/1.1\r\n\r\n";
+
+    RequestHeader requestHeader1;
+    requestHeader1.Parse(dummy1);
+    RequestHeader requestHeader2;
+    requestHeader2.Parse(dummy2);
   }
   return 0;
 }

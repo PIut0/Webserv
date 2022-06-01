@@ -64,7 +64,8 @@ FdInterfaceType Client::ParseHeader(std::string &request_message)
 {
   std::string tmp = request_message.substr(request_message.find(CRLF) + 4);
   request_message = request_message.substr(0, request_message.find(CRLF));
-  request = new RequestHeader(request_message);
+  request = new RequestHeader();
+  request->Parse(request_message);
   request_message = tmp;
 
   int status = CheckRequest();
