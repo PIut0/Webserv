@@ -1,17 +1,18 @@
 #include "RequestHeader.hpp"
+#include <vector>
 
 int main()
 {
   const std::string dummy = "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\r\nHost: code.tutsplus.com\r\nUser-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-us,en;q=0.5\r\nAccept-Encoding: gzip,deflate\r\nAccept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\nKeep-Alive: 300\r\nConnection: keep-alive\r\nCookie: PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120\r\nPragma: no-cache\r\nCache-Control: no-cache\r\n\r\n";
 
   { // constructor with string
-    RequestHeader RequestHeader(dummy);
-    if (dummy.length() == RequestHeader.ToString().length()) {
+    RequestHeader requestHeader(dummy);
+    if (dummy.length() == requestHeader.ToString().length()) {
       std::cout << "TRUE" << std::endl;
     }
     else {
       std::cout << "Dummy length : " << dummy.length() << std::endl;
-      std::cout << "Parser length : " << RequestHeader.ToString().length() << std::endl;
+      std::cout << "Parser length : " << requestHeader.ToString().length() << std::endl;
       exit(1);
     }
   }
@@ -57,6 +58,31 @@ int main()
       std::cout << "Parser length : " << requestHeader.ToString().length() << std::endl;
       exit(1);
     }
+  }
+  {
+    RequestHeader requestHeader(dummy);
+
+    const std::string dummy1 = "5\r\nhello\r\n\r\n";
+    const std::string dummy2 = "5\r\nworld\r\n\r\n";
+    // const std::string dummy1 = "5\r\nhello\r\n\r\n";
+
+    std::vector<std::string> dummy;
+    dummy.push_back(dummy1);
+    dummy.push_back(dummy2);
+    for (size_t i = 0 ; i < dummy.size() ; ++i) {
+      int ret = requestHeader.SetChunked(dummy[i]);
+      if (ret == 0) break;
+      if (ret > 0) continue;
+      if (ret < 0) exit(1);
+    }
+    if (requestHeader.body == "helloworld") {
+      std::cout << "TRUE" << std::endl;
+    } else {
+      std::cout << requestHeader.body << std::endl;
+      std::cout << "helloworld" << std::endl;
+      exit(1);
+    }
+
   }
   return 0;
 }
