@@ -81,15 +81,14 @@ FdInterfaceType Client::ParseHeader(std::string &request_message)
   if (status) {
     response_message = "HTTP/1.1 400 Bad Request\r\n\r\n";
     response->SetItem("Status", StatusCode(status));
-    // TODO : Error Page 연결
-    if (GetLocationBlock()->error_page[0].code == status)
-      request->SetHost(GetLocationBlock()->error_page[0].url);
+    if (GetLocationBlock()->error_page.find(status) == GetLocationBlock()->error_page.end())
+      request->SetHost(GetLocationBlock()->error_page[status]);
     else
       request->SetHost("/html/404.html");
     return kFdFileio;
   }
 
-  if (request->FindItem("Content-Length")->first != ""
+  if (request->FindItem("Content-Length") != request->conf.end()
     && atoi(request->GetItem("Content-Length").value.c_str()) > 0
     && request->body.size() <= 0)
     return kFdNone;
