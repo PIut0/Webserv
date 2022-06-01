@@ -263,22 +263,6 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
   throw ParseError();
 }
 
-std::string ResponseHeader::ToString()
-{
-  std::string ret = "";
-
-  ret += "Status: " + this->status_code + " " + this->status_msg + CRLF;
-  for (size_t i = 0 ; i < conf.size() ; ++i) {
-    ret += conf[i]->key + ": " + conf[i]->value + CRLF;
-  }
-  ret += CRLF;
-  if (this->body.length() != 0) {
-    ret += body + CRLF;
-    ret += CRLF;
-  }
-  return ret;
-}
-
 int ResponseHeader::ParseBody(const std::string &data)
 {
   if (this->pos_ == data.length()) {
@@ -292,6 +276,22 @@ int ResponseHeader::ParseBody(const std::string &data)
   }
 
   return WSV_ERROR;
+}
+
+std::string ResponseHeader::ToString()
+{
+  std::string ret = "";
+
+  ret += "HTTP/1.1 " + this->status_code + " " + this->status_msg + CRLF;
+  for (size_t i = 0 ; i < conf.size() ; ++i) {
+    ret += conf[i]->key + ": " + conf[i]->value + CRLF;
+  }
+  ret += CRLF;
+  if (this->body.length() != 0) {
+    ret += body + CRLF;
+    ret += CRLF;
+  }
+  return ret;
 }
 
 void ResponseHeader::Print()
