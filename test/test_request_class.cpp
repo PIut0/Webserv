@@ -99,5 +99,16 @@ int main()
     }
     std::cout << "TRUE" << std::endl;
   }
+  { // 생성자 테스트
+    const std::string dummy1 = "GET /html/default.html HTTP/1.1\r\nHost: 127.0.0.1:8176\r\nConnection: keep-alive\r\nCache-Control: max-age=0\r\nsec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"100\", \"Whale\";v=\"3\"\r\nsec-ch-ua-mobile: ?0\r\nsec-ch-ua-platform: \"macOS\"\r\nUpgrade-Insecure-Requests: 1\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.151 Whale/3.14.134.62 Safari/537.36\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nSec-Fetch-Site: none\r\nSec-Fetch-Mode: navigate\r\nSec-Fetch-User: ?1\r\nSec-Fetch-Dest: document\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7\r\n\r\n";
+    const std::string dummy2 = "GET /html/index.html HTTP/1.1\r\n\r\n";
+
+    RequestHeader requestHeader1(dummy1);
+    RequestHeader requestHeader2(dummy2);
+    RequestHeader *h1 = new RequestHeader(dummy2);
+    RequestHeader *h2 = new RequestHeader(dummy2);
+    (void)h1;
+    (void)h2;
+  }
   return 0;
 }
