@@ -105,7 +105,12 @@ req_header_it_t RequestHeader::FindItem(const std::string &key)
 
 wsv_header_t& RequestHeader::GetItem(const std::string &key)
 {
-  return *(FindItem(key)->second);
+  req_header_it_t it = FindItem(key);
+  if (it == this->conf.end()) {
+    this->SetItem(key, "");
+    return GetItem(key);
+  }
+  return *(it->second);
 }
 
 // TODO return 에서 throw ParseError()로 바꾸기
@@ -498,6 +503,48 @@ std::string RequestHeader::HttpVersionToString()
 {
   std::string charset[10] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
   return "HTTP/" + charset[this->http_major] + "." + charset[this->http_minor];
+}
+
+char** RequestHeader::ToCgi(const int &type) {
+  const std::string php[4] = {
+    "REQUEST_METHOD",
+    "SERVER_PROTOCOL",
+    "PATH_INFO",
+    "CONTENT_LENGTH"
+  };
+
+  const std::string bla[2] = {
+    "REQUEST_METHOD",
+    "SERVER_PROTOCOL",
+  };
+
+  // const std::string* cgiHeader[2] = {
+  //   php,
+  //   bla,
+  // };
+
+  (void)type;
+  std::string tmp;
+  char **ret;
+  int n, i;
+
+  n = 4 + 1;
+  ret = (char **)malloc(sizeof(char *) * n);
+  for (i = 0 ; i < n - 1 ; ++i) {
+    if (php[i] == "REQUEST_METHOD") {
+      tmp = "REQUEST_METHOD=" + MethodToString();
+    } else if (php[i] == "SERVER_PROTOCOL") {
+      tmp = "SERVER_PROTOCOL=" + HttpVersionToString();
+    } else if (php[i] == "PATH_INFO") {
+      tmp = "PATH_INFO=../";
+    } else if (php[i] == "CONTENT_LENGTH") {
+      std::string value = GetItem("Content-Length").value;
+      tmp = "CONTENT_LENGTH=" + (value == "" ? "0" : value);
+    }
+    ret[i] = strdup(tmp.c_str());
+  }
+  ret[i] = NULL;
+  return ret;
 }
 
 void RequestHeader::Print()

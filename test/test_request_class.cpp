@@ -82,7 +82,22 @@ int main()
       std::cout << "helloworld" << std::endl;
       exit(1);
     }
-
+  }
+  {
+    const std::string dummy1[4] = {
+      "REQUEST_METHOD=GET",
+      "SERVER_PROTOCOL=HTTP/1.1",
+      "PATH_INFO=../",
+      "CONTENT_LENGTH=5"
+    };
+    RequestHeader requestHeader(dummy);
+    requestHeader.SetItem("Content-Length", "5");
+    requestHeader.SetBody("Hello");
+    char ** ret = requestHeader.ToCgi(CGI_PHP);
+    for (int i = 0 ; ret[i] ; ++i) {
+      if (dummy1[i] != ret[i]) exit(1);
+    }
+    std::cout << "TRUE" << std::endl;
   }
   return 0;
 }
