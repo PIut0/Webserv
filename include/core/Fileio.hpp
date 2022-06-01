@@ -15,6 +15,7 @@
 #include "Client.hpp"
 #include "utils.hpp"
 #include "ServerBlock.hpp"
+#include "NotFoundError.hpp"
 
 #define PORT 8080
 
@@ -24,15 +25,19 @@ class ServerBlock;
 
 class Fileio : public FdInterface
 {
+ private:
+  Fileio();
+  Fileio(const Fileio &);
+  Fileio &operator=(const Fileio &);
  public:
-  Fileio(KQueue &kq, int fd, Client &_client);
+  Fileio(KQueue &kq, const std::string &path, Client *_client);
   ~Fileio();
 
   int EventRead();
   int EventWrite();
 
   std::string data;
-  Client &client;
+  Client *client;
 };
 
 #endif

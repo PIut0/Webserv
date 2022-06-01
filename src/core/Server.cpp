@@ -3,8 +3,10 @@
 
 Server::Server(KQueue &kq, ServerBlock &_sb) : FdInterface(kq, kFdServer), server_block(_sb)
 {
+  int option = 1;
   if ((interface_fd = socket(PF_INET, SOCK_STREAM, 0)) == -1)
     ExitWithPerror("socket");
+  setsockopt(interface_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 
   memset(&server_addr, 0, sizeof(server_addr));
   server_addr.sin_family = AF_INET;
@@ -30,7 +32,7 @@ int Server::EventRead()
   int client_interface_fd;
   if ((client_interface_fd = accept(interface_fd, NULL, NULL)) == -1)
     ExitWithPerror("server_event_read");
-  new Client(kq, client_interface_fd);
+  new Client(kq, client_interface_fd, this);
 
   return 1;
 }

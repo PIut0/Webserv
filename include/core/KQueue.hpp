@@ -19,6 +19,9 @@ class Server;
 
 class KQueue
 {
+ private:
+  KQueue(const KQueue &);
+  KQueue &operator=(const KQueue &);
  public:
   KQueue();
   ~KQueue();
