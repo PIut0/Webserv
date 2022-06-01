@@ -2,16 +2,9 @@
 
 ResponseHeader::ResponseHeader()
 {
+  this->pos_ = 0;
   this->status_code = "";
   this->status_msg  = "";
-}
-
-ResponseHeader::ResponseHeader(const std::string &data)
-{
-  this->pos_ = 0;
-
-  ParseHeaderLine(data);
-  ParseBody(data);
 }
 
 ResponseHeader::~ResponseHeader() {}
@@ -69,6 +62,12 @@ res_header_it_t ResponseHeader::FindItem(const std::string &key)
 wsv_header_t& ResponseHeader::GetItem(const std::string &key)
 {
   return *(*FindItem(key));
+}
+
+void ResponseHeader::Parse(const std::string &data)
+{
+  ParseHeaderLine(data);
+  ParseBody(data);
 }
 
 int ResponseHeader::ParseHeaderLine(const std::string &data)
