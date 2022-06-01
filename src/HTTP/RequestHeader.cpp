@@ -286,6 +286,11 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
           state = wsv_invalid_key;
         }
 
+        if (ch == CR) {
+          state = wsv_done;
+          break;
+        }
+
         if (ch == ' ') {
           break;
         }
