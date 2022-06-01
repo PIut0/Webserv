@@ -52,6 +52,9 @@ LocationBlock *Client::GetLocationBlock()
 
 int Client::CheckRequest()
 {
+  if (request->HttpVersionToString() != "HTTP/1.1")
+    return 505;
+
   if (!request->method || request->host.size() <= 0 || request->host[0] != '/')
     return 400;
 
