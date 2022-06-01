@@ -2,13 +2,6 @@
 
 RequestHeader::RequestHeader() : pos_(0) {}
 
-RequestHeader::RequestHeader(const std::string &data) : pos_(0)
-{
-  ParseRequestLine(data);
-  ParseHeaderLine(data);
-  ParseBodyLine(data);
-}
-
 RequestHeader::RequestHeader(const RequestHeader &origin)
 {
   *this = origin;
@@ -112,7 +105,12 @@ wsv_header_t& RequestHeader::GetItem(const std::string &key)
   }
   return *(it->second);
 }
-
+void  RequestHeader::Parse(const std::string &data)
+{
+  ParseRequestLine(data);
+  ParseHeaderLine(data);
+  ParseBodyLine(data);
+}
 // TODO return 에서 throw ParseError()로 바꾸기
 int RequestHeader::ParseRequestLine(const std::string &data)
 {

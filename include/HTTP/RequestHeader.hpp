@@ -11,7 +11,6 @@ class RequestHeader : public Header
 {
  public:
   RequestHeader();
-  RequestHeader(const std::string &data);
   RequestHeader(const RequestHeader &origin);
   ~RequestHeader();
 
@@ -28,6 +27,8 @@ class RequestHeader : public Header
 
   wsv_header_t&   GetItem(const std::string &key);
   req_header_it_t FindItem(const std::string &key);
+
+  void  Parse(const std::string &data);
 
   void  Print();
   void  PrintRequestLine();
