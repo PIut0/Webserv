@@ -92,6 +92,9 @@ FdInterfaceType Client::ParseHeader(std::string &request_message)
     && atoi(request->GetItem("Content-Length").value.c_str()) > 0
     && request->body.size() <= 0)
     return kFdNone;
+  else if(request->FindItem("Transfer-Encoding") != request->conf.end()
+    && request->GetItem("Transfer-Encoding").value == "chunked")
+    return kFdNone;
   else if(CheckCgi()) {
     return kFdCgi;
   }
