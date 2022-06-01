@@ -50,8 +50,31 @@ LocationBlock *Client::GetLocationBlock()
   return &(server->server_block.location[server->server_block.GetLocationBlockByPath(request->host)]);
 }
 
+int Client::CheckCgi()
+{
+  // TODO : CGI 처리를 해야하는지 확인하는 부분
+  return 0;
+}
+
 int Client::CheckRequest()
 {
+  //std::cout << request_message << std::endl;
+  std::string req = request_message.substr(0, request_message.find(D_CRLF) + 4);
+  request_message = request_message.substr(request_message.find(D_CRLF) + 4);
+  try {
+    response = new ResponseHeader();
+    request = new RequestHeader();
+    request->Parse(req);
+  } catch(const HttpParseInvalidBody& e) {
+    return 400;
+  } catch(const HttpParseInvalidMethod& e) {
+    return 405;
+  } catch(const HttpParseInvalidRequest& e) {
+    return 400;
+  } catch(const HttpParseInvalidResponse& e) {
+    return 0;
+  }
+
   if (request->HttpVersionToString() != "HTTP/1.1")
     return 505;
 
@@ -65,24 +88,13 @@ int Client::CheckRequest()
   return 0;
 }
 
-int Client::CheckCgi()
+FdInterfaceType Client::ParseHeader()
 {
-  // TODO : CGI 처리를 해야하는지 확인하는 부분
-  return 0;
-}
-
-FdInterfaceType Client::ParseHeader(std::string &request_message)
-{
-  std::string tmp = request_message.substr(request_message.find(D_CRLF) + 4);
-  request_message = request_message.substr(0, request_message.find(D_CRLF));
-  response = new ResponseHeader();
-  request = new RequestHeader();
-  request->Parse(request_message);
-  request_message = tmp;
-
   int status = CheckRequest();
+
   if (status) {
     response->SetItem("Status", StatusCode(status));
+    std::cout << "test" << std::endl;
     if (GetLocationBlock()->error_page.find(status) != GetLocationBlock()->error_page.end())
       request->SetHost(GetLocationBlock()->error_page[status]);
     else // TODO : Default Error Page 생성 및 설정
@@ -102,14 +114,13 @@ FdInterfaceType Client::ParseHeader(std::string &request_message)
     return kFdNone;
 }
 
-FdInterfaceType Client::ParseBody(std::string &request_message)
+FdInterfaceType Client::ParseBody()
 {
-  std::string tmp = request_message.substr(request_message.find(D_CRLF) + 4);
-  request_message = request_message.substr(0, request_message.find(D_CRLF));
+  std::string req = request_message.substr(0, request_message.find(D_CRLF));
+  request_message = request_message.substr(request_message.find(D_CRLF) + 4);
 
   if (request->GetItem("Transfer-Encoding").value == "chunked") {
-    int status = request->SetChunked(request_message);
-    request_message = tmp;
+    int status = request->SetChunked(req);
     if (status > 0)
       return kFdNone;
     else if (status == 0 && CheckCgi())
@@ -120,8 +131,7 @@ FdInterfaceType Client::ParseBody(std::string &request_message)
       return kFdNone;
   }
   else {
-    request->SetBody(request_message);
-    request_message = tmp;
+    request->SetBody(req);
     if (CheckCgi())
       return kFdCgi;
     else if (request->host != "")
@@ -137,9 +147,9 @@ FdInterfaceType Client::ParseReq()
     return kFdNone;
 
   if (request == nullptr)
-    return ParseHeader(request_message);
+    return ParseHeader();
   else
-    return ParseBody(request_message);
+    return ParseBody();
 }
 
 const std::string Client::GetFilePath() const

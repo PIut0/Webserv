@@ -28,10 +28,10 @@ class Client : public FdInterface
   int EventWrite();
 
   LocationBlock *GetLocationBlock();
-  int CheckRequest();
   int CheckCgi();
-  FdInterfaceType ParseHeader(std::string &request_message);
-  FdInterfaceType ParseBody(std::string &request_message);
+  int CheckRequest();
+  FdInterfaceType ParseHeader();
+  FdInterfaceType ParseBody();
   FdInterfaceType ParseReq();
   const std::string GetFilePath() const;
 

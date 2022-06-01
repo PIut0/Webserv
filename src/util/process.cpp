@@ -25,6 +25,7 @@ void Client_Event_Read(Client *client)
     case kFdFileio:
       new Fileio(client->kq, client->GetFilePath(), client);
       client->request = nullptr;
+      client->response = nullptr;
       break;
     case kFdCgi:
       break;
