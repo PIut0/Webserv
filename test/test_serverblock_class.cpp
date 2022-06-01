@@ -7,7 +7,7 @@ int main(int argc, char **argv)
     // const std::string error_page = "404 ./tests/test1/error404.html";
 		// const std::string error_page = "405 ./tests/test1/error405.html";
 		const std::string allow_methods = "GET DELETE";
-		const std::string root = "./tests/test1/";
+		const std::string root = "./";
 		const std::string index = "index.html index2.html";
 		const std::string auto_index = "off";
 		// const std::string cgi_info = ".bla ./tests/tester_bin/cgi_tester";

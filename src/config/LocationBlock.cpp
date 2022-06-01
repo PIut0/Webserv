@@ -9,11 +9,7 @@ LocationBlock::LocationBlock(std::string &location_path, std::vector<std::string
   this->index.push_back("index.html");
   this->auto_index = OFF;
   this->request_max_body_size = DEFAULT_REQUEST_MAX_BODY_SIZE;
-
-  ErrorPage defaultErrorPage;
-  defaultErrorPage.code = 0;
-  defaultErrorPage.url = "error.html";
-  this->error_page.push_back(defaultErrorPage);
+  this->error_page[0] = "error.html";
 
   InitLocationBlock(data);
 }
@@ -83,10 +79,7 @@ void LocationBlock::ParseAutoIndex(const std::string &data)
 void LocationBlock::ParseCgiInfo(const std::string &data)
 {
   std::vector<std::string> split_data = StringSplit(data, " ", 0);
-  CgiInfo cgi_info;
-  cgi_info.anjwl = split_data[0];
-  cgi_info.url = split_data[1];
-  this->cgi_info.push_back(cgi_info);
+  this->cgi_info[split_data[0]] = split_data[1];
 }
 
 void LocationBlock::ParseRequestBodySize(const std::string &data)
@@ -97,11 +90,7 @@ void LocationBlock::ParseRequestBodySize(const std::string &data)
 void LocationBlock::ParseErrorPage(const std::string &data)
 {
   std::vector<std::string> split_data = StringSplit(data, " ", 0);
-  ErrorPage error_page;
-
-  error_page.code = atoi(split_data[0].c_str());
-  error_page.url = split_data[1];
-  this->error_page.push_back(error_page);
+  this->error_page[atoi(split_data[0].c_str())] = split_data[1];
 }
 
 void LocationBlock::ParseReturn(const std::string &data)
@@ -196,10 +185,10 @@ void LocationBlock::PrintBlock()
   for (size_t i = 0; i < this->index.size(); i++)
     std::cout << LOCATION_BLOCK_TAP << "index : " << this->index[i] << std::endl;
   std::cout << LOCATION_BLOCK_TAP << "auto_index : " << (this->auto_index == ON ? "ON" : "OFF") << std::endl;
-  for (size_t i = 0; i < this->cgi_info.size(); i++)
-    std::cout << LOCATION_BLOCK_TAP << "cgiInfo : " << this->cgi_info[i].url << " " << this->cgi_info[i].anjwl << std::endl;
-  for (size_t i = 0; i < this->error_page.size(); i++)
-    std::cout << LOCATION_BLOCK_TAP << "error_page : " << this->error_page[i].code << " " << this->error_page[i].url << std::endl;
+  for (cgiinfo_it_t it = this->cgi_info.begin(); it != this->cgi_info.end(); ++it)
+    std::cout << LOCATION_BLOCK_TAP << "cgiInfo : " << it->first << " " << it->second << std::endl;
+  for (error_page_it_t it = this->error_page.begin(); it != this->error_page.end(); ++it)
+    std::cout << LOCATION_BLOCK_TAP << "error_page : " << it->first << " " << it->second << std::endl;
   std::cout << LOCATION_BLOCK_TAP << "request_max_body_size : " << this->request_max_body_size << std::endl;
   std::cout << LOCATION_BLOCK_TAP << "ret : " << this->ret << std::endl;
   std::cout << SERVER_BLOCK_TAP << COLOR_GREEN << "[ LOCATION BLOCK END ]" << COLOR_DEFAULT << std::endl;
