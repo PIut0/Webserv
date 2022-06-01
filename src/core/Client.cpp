@@ -79,28 +79,22 @@ FdInterfaceType Client::ParseHeader(std::string &request_message)
 
   int status = CheckRequest();
   if (status) {
-    response_message = "HTTP/1.1 400 Bad Request\r\n\r\n";
     response->SetItem("Status", StatusCode(status));
-    if (GetLocationBlock()->error_page.find(status) == GetLocationBlock()->error_page.end())
+    if (GetLocationBlock()->error_page.find(status) != GetLocationBlock()->error_page.end())
       request->SetHost(GetLocationBlock()->error_page[status]);
-    else
+    else // TODO : Default Error Page 생성 및 설정
       request->SetHost("/html/404.html");
     return kFdFileio;
   }
 
-  if (request->FindItem("Content-Length") != request->conf.end()
-    && atoi(request->GetItem("Content-Length").value.c_str()) > 0
-    && request->body.size() <= 0)
+  if (atoi(request->GetItem("Content-Length").value.c_str()) > 0 && request->body.size() <= 0)
     return kFdNone;
-  else if(request->FindItem("Transfer-Encoding") != request->conf.end()
-    && request->GetItem("Transfer-Encoding").value == "chunked")
+  else if(request->GetItem("Transfer-Encoding").value == "chunked")
     return kFdNone;
-  else if(CheckCgi()) {
+  else if(CheckCgi())
     return kFdCgi;
-  }
-  else if(request->host != "") {
+  else if(request->host != "")
     return kFdFileio;
-  }
   else
     return kFdNone;
 }
@@ -110,8 +104,7 @@ FdInterfaceType Client::ParseBody(std::string &request_message)
   std::string tmp = request_message.substr(request_message.find(D_CRLF) + 4);
   request_message = request_message.substr(0, request_message.find(D_CRLF));
 
-  if (request->FindItem("Transfer-Encoding")->first != ""
-    && request->FindItem("Transfer-Encoding")->second->value == "chunked") {
+  if (request->GetItem("Transfer-Encoding").value == "chunked") {
     int status = request->SetChunked(request_message);
     request_message = tmp;
     if (status > 0)
