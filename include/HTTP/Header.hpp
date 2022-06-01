@@ -51,7 +51,6 @@ typedef struct {
   std::string value;
 } wsv_header_t;
 
-
 typedef std::map<std::string, wsv_header_t *> req_header_t;
 typedef std::map<std::string, wsv_header_t *>::iterator req_header_it_t;
 

@@ -3,6 +3,10 @@
 
 #include "Header.hpp"
 
+#define CGI_PHP 0
+#define CGI_BLA 1
+#define CGI_HEADER_SIZE 2
+
 class RequestHeader : public Header
 {
  public:
@@ -33,6 +37,8 @@ class RequestHeader : public Header
   std::string ToString();
   std::string MethodToString();
   std::string HttpVersionToString();
+
+  char** ToCgi(const int &type);
 
   // request line
   int           method;
