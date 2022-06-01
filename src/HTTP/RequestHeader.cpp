@@ -47,7 +47,7 @@ void RequestHeader::SetHttpVersion(const int &major, const int &minor)
 
 void RequestHeader::SetRequest(const std::string &request)
 {
-  ParseRequestLine(request);
+  ParseRequestLine(request + CRLF + CRLF);
 }
 
 void RequestHeader::SetItem(const std::string &line)
