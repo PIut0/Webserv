@@ -17,7 +17,6 @@ int main(int argc, char **argv)
     if (locationBlock.index[0] + " " + locationBlock.index[1] != index) exit(1);
     if (locationBlock.auto_index != (auto_index == "off" ? false : true )) exit(1);
     std::cout << "OK" << std::endl;
-    locationBlock.PrintBlock();
   }
   {
     const std::string dummy1 = "/directory/nop/l";
