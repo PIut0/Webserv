@@ -21,6 +21,29 @@ ServerBlock& ServerBlock::operator=(const ServerBlock& rv)
   return *this;
 }
 
+int ServerBlock::GetLocationBlockByPath(const std::string &path)
+{
+  std::string part;
+  std::string line;
+  int idx;
+  size_t max_length;
+
+  max_length = 0;
+  idx = -1;
+  line = path[path.length() -1] == '/' ? path.substr(0, path.length() - 1) : path;
+  for (size_t i = 0 ; i < this->location.size() ; ++i) {
+    if (this->location[i].location_path == path) {
+      return i;
+    }
+    part = path.substr(0, this->location[i].location_path.length());
+    if (part == this->location[i].location_path && max_length < part.length()) {
+      max_length = part.length();
+      idx = i;
+    }
+  }
+  return idx;
+}
+
 void ServerBlock::ParseListen(const std::string &contents)
 {
   std::vector<std::string> split_data = StringSplit(contents, " ", 0);
@@ -67,7 +90,7 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
         switch (type)
         {
           case kLocation:
-            location_path = data[i].substr(10, data[i].find('{', 0) - 10);
+            location_path = data[i].substr(10, data[i].find('{', 0) - 11);
             state <<= 1;
             break;
 
