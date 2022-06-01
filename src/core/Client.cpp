@@ -42,6 +42,18 @@ int IsCRLF(const std::string &request_message)
   return (request_message.find(CRLF) != std::string::npos);
 }
 
+int Client::CheckRequest()
+{
+  if (!request->method || request->host.size() <= 0 || request->host[0] != '/')
+    return 400;
+
+  LocationBlock location_block = server->server_block.location[server->server_block.GetLocationBlockByPath(request->host)];
+  if (!(location_block.allow_methods & request->method))
+    return 405;
+
+  return 200;
+}
+
 int Client::CheckCgi()
 {
   // TODO : CGI 처리를 해야하는지 확인하는 부분
@@ -55,10 +67,18 @@ FdInterfaceType Client::ParseHeader(std::string &request_message)
   request = new RequestHeader(request_message);
   request_message = tmp;
 
+  int status = CheckRequest();
+  if (status > 200) {
+    response_message = "HTTP/1.1 400 Bad Request\r\n\r\n";
+    delete request;
+    request = nullptr;
+    return kFdClient;
+  }
+
   if (request->FindItem("Content-Length")->first != ""
     && atoi(request->GetItem("Content-Length").value.c_str()) > 0
     && request->body.size() <= 0)
-    return kFdClient;
+    return kFdNone;
   else if(CheckCgi()) {
     return kFdCgi;
   }
@@ -79,7 +99,7 @@ FdInterfaceType Client::ParseBody(std::string &request_message)
     int status = request->SetChunked(request_message);
     request_message = tmp;
     if (status > 0)
-      return kFdClient;
+      return kFdNone;
     else if (status == 0 && CheckCgi())
       return kFdCgi;
     else if (status == 0 && request->host != "")
@@ -104,6 +124,7 @@ FdInterfaceType Client::ParseReq()
   if (!IsCRLF(request_message))
     return kFdNone;
 
+  std::cout << "request_message: " << request_message << std::endl;
   if (request == nullptr)
     return ParseHeader(request_message);
   else
@@ -113,6 +134,12 @@ FdInterfaceType Client::ParseReq()
 const std::string Client::GetFilePath() const
 {
   // TODO : 파일 경로를 반환하는 부분
-  std::string path = "." + request->host;
+  //std::string path = "." + request->host;
+  int location_index = server->server_block.GetLocationBlockByPath(request->host);
+
+  if (location_index == -1)
+    throw NotFoundError();
+  std::string path = server->server_block.location[location_index].root
+    + request->host.substr(request->host.find(server->server_block.location[location_index].location_path) + server->server_block.location[location_index].location_path.size());
   return path;
 }

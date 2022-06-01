@@ -7,6 +7,7 @@
 #include "RequestHeader.hpp"
 #include "Server.hpp"
 
+class Server;
 class KQueue;
 
 class Client : public FdInterface
@@ -22,6 +23,7 @@ class Client : public FdInterface
   int EventRead();
   int EventWrite();
 
+  int CheckRequest();
   int CheckCgi();
   FdInterfaceType ParseHeader(std::string &request_message);
   FdInterfaceType ParseBody(std::string &request_message);
