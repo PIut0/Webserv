@@ -12,6 +12,8 @@ class Server;
 class KQueue;
 class LocationBlock;
 
+#define D_CRLF "\r\n\r\n"
+
 class Client : public FdInterface
 {
  private:

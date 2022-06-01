@@ -40,7 +40,7 @@ int Client::EventWrite()
 
 int IsCRLF(const std::string &request_message)
 {
-  return (request_message.find(CRLF) != std::string::npos);
+  return (request_message.find(D_CRLF) != std::string::npos);
 }
 
 LocationBlock *Client::GetLocationBlock()
@@ -70,8 +70,8 @@ int Client::CheckCgi()
 
 FdInterfaceType Client::ParseHeader(std::string &request_message)
 {
-  std::string tmp = request_message.substr(request_message.find(CRLF) + 4);
-  request_message = request_message.substr(0, request_message.find(CRLF));
+  std::string tmp = request_message.substr(request_message.find(D_CRLF) + 4);
+  request_message = request_message.substr(0, request_message.find(D_CRLF));
   response = new ResponseHeader();
   request = new RequestHeader();
   request->Parse(request_message);
@@ -105,8 +105,8 @@ FdInterfaceType Client::ParseHeader(std::string &request_message)
 
 FdInterfaceType Client::ParseBody(std::string &request_message)
 {
-  std::string tmp = request_message.substr(request_message.find(CRLF) + 4);
-  request_message = request_message.substr(0, request_message.find(CRLF));
+  std::string tmp = request_message.substr(request_message.find(D_CRLF) + 4);
+  request_message = request_message.substr(0, request_message.find(D_CRLF));
 
   if (request->FindItem("Transfer-Encoding")->first != ""
     && request->FindItem("Transfer-Encoding")->second->value == "chunked") {
@@ -138,7 +138,6 @@ FdInterfaceType Client::ParseReq()
   if (!IsCRLF(request_message))
     return kFdNone;
 
-  std::cout << "request_message: " << request_message << std::endl;
   if (request == nullptr)
     return ParseHeader(request_message);
   else
