@@ -83,10 +83,7 @@ void LocationBlock::ParseAutoIndex(const std::string &data)
 void LocationBlock::ParseCgiInfo(const std::string &data)
 {
   std::vector<std::string> split_data = StringSplit(data, " ", 0);
-  CgiInfo cgi_info;
-  cgi_info.anjwl = split_data[0];
-  cgi_info.url = split_data[1];
-  this->cgi_info.push_back(cgi_info);
+  this->cgi_info[split_data[0]] = split_data[1];
 }
 
 void LocationBlock::ParseRequestBodySize(const std::string &data)
@@ -196,8 +193,8 @@ void LocationBlock::PrintBlock()
   for (size_t i = 0; i < this->index.size(); i++)
     std::cout << LOCATION_BLOCK_TAP << "index : " << this->index[i] << std::endl;
   std::cout << LOCATION_BLOCK_TAP << "auto_index : " << (this->auto_index == ON ? "ON" : "OFF") << std::endl;
-  for (size_t i = 0; i < this->cgi_info.size(); i++)
-    std::cout << LOCATION_BLOCK_TAP << "cgiInfo : " << this->cgi_info[i].url << " " << this->cgi_info[i].anjwl << std::endl;
+  for (cgiinfo_it_t it = this->cgi_info.begin(); it != this->cgi_info.end(); ++it)
+    std::cout << LOCATION_BLOCK_TAP << "cgiInfo : " << it->first << " " << it->second << std::endl;
   for (size_t i = 0; i < this->error_page.size(); i++)
     std::cout << LOCATION_BLOCK_TAP << "error_page : " << this->error_page[i].code << " " << this->error_page[i].url << std::endl;
   std::cout << LOCATION_BLOCK_TAP << "request_max_body_size : " << this->request_max_body_size << std::endl;

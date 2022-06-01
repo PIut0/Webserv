@@ -16,6 +16,9 @@
 
 #define DEFAULT_REQUEST_MAX_BODY_SIZE 1024
 
+typedef std::map<std::string, std::string>            cgiinfo_t;
+typedef std::map<std::string, std::string>::iterator  cgiinfo_it_t;
+
 class LocationBlock : public System
 {
  public:
@@ -32,7 +35,7 @@ class LocationBlock : public System
   int                         allow_methods;
   std::vector<std::string>    index;
   bool                        auto_index;
-  std::vector<CgiInfo>        cgi_info;
+  cgiinfo_t                   cgi_info;
   std::vector<ErrorPage>      error_page;
   long                        request_max_body_size;
   std::string                 ret;
