@@ -5,10 +5,12 @@
 #include "FdInterface.hpp"
 #include "utils.hpp"
 #include "RequestHeader.hpp"
+#include "ResponseHeader.hpp"
 #include "Server.hpp"
 
 class Server;
 class KQueue;
+class LocationBlock;
 
 class Client : public FdInterface
 {
@@ -23,6 +25,7 @@ class Client : public FdInterface
   int EventRead();
   int EventWrite();
 
+  LocationBlock *GetLocationBlock();
   int CheckRequest();
   int CheckCgi();
   FdInterfaceType ParseHeader(std::string &request_message);
@@ -32,6 +35,7 @@ class Client : public FdInterface
 
   Server *server;
   RequestHeader *request;
+  ResponseHeader *response;
   std::string request_message;
   std::string response_message;
 };

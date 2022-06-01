@@ -5,6 +5,7 @@
 Client::Client(KQueue &kq, int fd, Server *server) : FdInterface(kq, kFdClient, fd), server(server)
 {
   request = nullptr;
+  response = nullptr;
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
   kq.AddEvent(interface_fd, EVFILT_READ, this);
 }
@@ -42,16 +43,23 @@ int IsCRLF(const std::string &request_message)
   return (request_message.find(CRLF) != std::string::npos);
 }
 
+LocationBlock *Client::GetLocationBlock()
+{
+  if (request == nullptr)
+    return nullptr;
+  return &(server->server_block.location[server->server_block.GetLocationBlockByPath(request->host)]);
+}
+
 int Client::CheckRequest()
 {
   if (!request->method || request->host.size() <= 0 || request->host[0] != '/')
     return 400;
 
-  LocationBlock location_block = server->server_block.location[server->server_block.GetLocationBlockByPath(request->host)];
-  if (!(location_block.allow_methods & request->method))
+  LocationBlock *location_block = GetLocationBlock();
+  if (!(location_block->allow_methods & request->method))
     return 405;
 
-  return 200;
+  return 0;
 }
 
 int Client::CheckCgi()
@@ -64,16 +72,21 @@ FdInterfaceType Client::ParseHeader(std::string &request_message)
 {
   std::string tmp = request_message.substr(request_message.find(CRLF) + 4);
   request_message = request_message.substr(0, request_message.find(CRLF));
+  response = new ResponseHeader();
   request = new RequestHeader();
   request->Parse(request_message);
   request_message = tmp;
 
   int status = CheckRequest();
-  if (status > 200) {
+  if (status) {
     response_message = "HTTP/1.1 400 Bad Request\r\n\r\n";
-    delete request;
-    request = nullptr;
-    return kFdClient;
+    response->SetItem("Status", StatusCode(status));
+    // TODO : Error Page 연결
+    if (GetLocationBlock()->error_page[0].code == status)
+      request->SetHost(GetLocationBlock()->error_page[0].url);
+    else
+      request->SetHost("/html/404.html");
+    return kFdFileio;
   }
 
   if (request->FindItem("Content-Length")->first != ""
@@ -135,7 +148,7 @@ FdInterfaceType Client::ParseReq()
 const std::string Client::GetFilePath() const
 {
   // TODO : 파일 경로를 반환하는 부분
-  //std::string path = "." + request->host;
+  // 디렉토리일 경우 인덱스를 찾고, 없을경우 오토인덱스 처리
   int location_index = server->server_block.GetLocationBlockByPath(request->host);
 
   if (location_index == -1)

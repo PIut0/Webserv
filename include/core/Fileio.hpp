@@ -37,6 +37,8 @@ class Fileio : public FdInterface
   int EventWrite();
 
   std::string data;
+  RequestHeader *request;
+  ResponseHeader *response;
   Client *client;
 };
 
