@@ -47,6 +47,8 @@ LocationBlock *Client::GetLocationBlock()
 {
   if (request == nullptr)
     return nullptr;
+  if (server->server_block.GetLocationBlockByPath(request->host) < 0)
+    return nullptr;
   return &(server->server_block.location[server->server_block.GetLocationBlockByPath(request->host)]);
 }
 
@@ -94,9 +96,6 @@ FdInterfaceType Client::ParseHeader()
 
   if (status) {
     response->SetItem("Status", StatusCode(status));
-    std::cout << "test" << std::endl;
-    if (request->host == "")
-      request->SetHost("/");
     return kFdFileio;
   }
 
@@ -158,7 +157,8 @@ const std::string Client::GetFilePath()
 
   if (response->status_code != "") {
     int status = atoi(response->status_code.c_str());
-    if (GetLocationBlock()->error_page.find(status) != GetLocationBlock()->error_page.end())
+
+    if (GetLocationBlock() && GetLocationBlock()->error_page.find(status) != GetLocationBlock()->error_page.end())
       request->SetHost(GetLocationBlock()->error_page[status]);
     else // TODO : Default Error Page 생성 및 설정
       request->SetHost("./html/404.html");
