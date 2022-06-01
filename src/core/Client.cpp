@@ -37,49 +37,82 @@ int Client::EventWrite()
   return n;
 }
 
-int IsRequestEnd(const std::string &request_message)
+int IsCRLF(const std::string &request_message)
 {
   return (request_message.find(CRLF) != std::string::npos);
 }
 
-FdInterfaceType Client::ParseReq()
+int Client::CheckCgi()
 {
-  if (!IsRequestEnd(request_message))
-    return kFdNone;
+  // TODO : CGI 처리를 해야하는지 확인하는 부분
+  return 0;
+}
 
+FdInterfaceType Client::ParseHeader(std::string &request_message)
+{
   std::string tmp = request_message.substr(request_message.find(CRLF) + 4);
   request_message = request_message.substr(0, request_message.find(CRLF));
-  std::cout << "request_message: " << request_message << std::endl;
-
-  if (request == nullptr)
-    request = new RequestHeader(request_message);
-  else if(request->FindItem("Transfer-Encoding")->first != ""
-    && request->FindItem("Transfer-Encoding")->second->value == "chunked")
-    // chunked
-    // TODO : RequestHeader class need parse chunked body
-    request->SetBody(request_message);
-  else
-    request->SetBody(request_message);
-
+  request = new RequestHeader(request_message);
   request_message = tmp;
 
   if (request->FindItem("Content-Length")->first != ""
     && atoi(request->GetItem("Content-Length").value.c_str()) > 0
     && request->body.size() <= 0)
     return kFdClient;
-  else if(request_message.find("cgi") != std::string::npos) { // TODO : CGI Check
+  else if(CheckCgi()) {
     return kFdCgi;
   }
-  else if(request != nullptr) {
+  else if(request->host != "") {
     return kFdFileio;
   }
   else
     return kFdNone;
 }
 
+FdInterfaceType Client::ParseBody(std::string &request_message)
+{
+  std::string tmp = request_message.substr(request_message.find(CRLF) + 4);
+  request_message = request_message.substr(0, request_message.find(CRLF));
+
+  if (request->FindItem("Transfer-Encoding")->first != ""
+    && request->FindItem("Transfer-Encoding")->second->value == "chunked") {
+    int status = request->SetChunked(request_message);
+    request_message = tmp;
+    if (status > 0)
+      return kFdClient;
+    else if (status == 0 && CheckCgi())
+      return kFdCgi;
+    else if (status == 0 && request->host != "")
+      return kFdFileio;
+    else
+      return kFdNone;
+  }
+  else {
+    request->SetBody(request_message);
+    request_message = tmp;
+    if (CheckCgi())
+      return kFdCgi;
+    else if (request->host != "")
+      return kFdFileio;
+    else
+      return kFdNone;
+  }
+}
+
+FdInterfaceType Client::ParseReq()
+{
+  if (!IsCRLF(request_message))
+    return kFdNone;
+
+  if (request == nullptr)
+    return ParseHeader(request_message);
+  else
+    return ParseBody(request_message);
+}
+
 const std::string Client::GetFilePath() const
 {
+  // TODO : 파일 경로를 반환하는 부분
   std::string path = "." + request->host;
-  //std::string path("html/index.html");
   return path;
 }

@@ -21,6 +21,9 @@ class Client : public FdInterface
   int EventRead();
   int EventWrite();
 
+  int CheckCgi();
+  FdInterfaceType ParseHeader(std::string &request_message);
+  FdInterfaceType ParseBody(std::string &request_message);
   FdInterfaceType ParseReq();
   const std::string GetFilePath() const;
 
