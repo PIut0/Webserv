@@ -57,6 +57,13 @@ std::string& trim(std::string& s)
 	return ltrim(rtrim(s));
 }
 
+std::string itos(int i)
+{
+  std::stringstream ss;
+  ss << i;
+  return ss.str();
+}
+
 std::string StatusCode(const int &code)
 {
   switch (code)
