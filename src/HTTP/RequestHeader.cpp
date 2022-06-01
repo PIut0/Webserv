@@ -141,7 +141,7 @@ int RequestHeader::ParseRequestLine(const std::string &data)
     {
       case wsb_start:
         if ((ch < 'A' || ch > 'Z') && ch != '_' && ch != '-') {
-          return WSV_HTTP_PARSE_INVALID_METHOD;
+          throw HttpParseInvalidMethod();
         }
 
         state = wsb_method;
@@ -166,7 +166,7 @@ int RequestHeader::ParseRequestLine(const std::string &data)
           }
 
           else {
-            return WSV_HTTP_PARSE_INVALID_METHOD;
+            throw HttpParseInvalidMethod();
           }
 
           state = wsb_before_uri;
@@ -187,7 +187,7 @@ int RequestHeader::ParseRequestLine(const std::string &data)
             break;
 
           default:
-            return WSV_HTTP_PARSE_INVALID_REQUEST;
+            throw HttpParseInvalidRequest();
         }
 
         break;
@@ -226,7 +226,7 @@ int RequestHeader::ParseRequestLine(const std::string &data)
             break;
 
           default:
-            return WSV_HTTP_PARSE_INVALID_REQUEST;
+            throw HttpParseInvalidRequest();
         }
 
         break;
@@ -239,13 +239,13 @@ int RequestHeader::ParseRequestLine(const std::string &data)
             break;
 
           default:
-            return WSV_HTTP_PARSE_INVALID_REQUEST;
+            throw HttpParseInvalidRequest();
         }
 
         break;
 
       default:
-        return WSV_HTTP_PARSE_INVALID_REQUEST;
+        throw HttpParseInvalidRequest();
 
     }
     ++pos;
@@ -440,7 +440,7 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
     }
   }
 
-  return WSV_HTTP_PARSE_INVALID_REQUEST;
+  throw HttpParseInvalidRequest();
 }
 
 int RequestHeader::ParseBodyLine(const std::string &data)
@@ -455,7 +455,7 @@ int RequestHeader::ParseBodyLine(const std::string &data)
     return WSV_OK;
   }
 
-  return WSV_ERROR;
+  throw HttpParseInvalidBody();
 }
 
 std::string RequestHeader::ToString()

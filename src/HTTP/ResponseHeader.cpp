@@ -22,11 +22,6 @@ ResponseHeader& ResponseHeader::operator=(const ResponseHeader &rv)
   return *this;
 }
 
-// void ResponseHeader::SetItem(std::vector<std::pair<std::string, std::string> > &values)
-// {
-
-// }
-
 void ResponseHeader::SetBody(const std::string &body)
 {
   this->body = body;
@@ -260,7 +255,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
         break;
     }
   }
-  throw ParseError();
+  throw HttpParseInvalidResponse();
 }
 
 int ResponseHeader::ParseBody(const std::string &data)
@@ -275,7 +270,7 @@ int ResponseHeader::ParseBody(const std::string &data)
     return WSV_OK;
   }
 
-  return WSV_ERROR;
+  throw HttpParseInvalidBody();
 }
 
 std::string ResponseHeader::ToString()

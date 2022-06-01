@@ -6,9 +6,9 @@
 #include <algorithm>
 #include <map>
 
+#include "System.hpp"
 #include "Color.hpp"
 #include "AlreadyExistKey.hpp"
-#include "ParseError.hpp"
 #include "Defines.hpp"
 #include "utils.hpp"
 
@@ -57,7 +57,7 @@ typedef std::map<std::string, wsv_header_t *>::iterator req_header_it_t;
 typedef std::vector<wsv_header_t *> res_header_t;
 typedef std::vector<wsv_header_t *>::iterator res_header_it_t;
 
-class Header
+class Header : public System
 {
  public:
   Header();

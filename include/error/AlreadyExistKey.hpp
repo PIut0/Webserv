@@ -6,7 +6,7 @@
 class AlreadyExistKey : public std::exception
 {
 	const char * what () const throw () {
-    return "hi";
+    return "AlreadyExistKey";
   };
 };
 

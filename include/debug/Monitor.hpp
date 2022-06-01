@@ -9,6 +9,10 @@
 #include "Color.hpp"
 #include "utils.hpp"
 
+#include "HttpParseInvalidBody.hpp"
+#include "HttpParseInvalidMethod.hpp"
+#include "HttpParseInvalidRequest.hpp"
+#include "HttpParseInvalidResponse.hpp"
 
 class Monitor
 {
