@@ -7,14 +7,18 @@ Fileio::Fileio(KQueue &kq, const std::string &path, Client *client) : FdInterfac
   target_fd = client->interface_fd;
   request = client->request;
   response = client->response;
-  interface_fd = open(path.c_str(), O_RDONLY);
+  location = client->GetLocationBlock();
   try {
+    interface_fd = open(path.c_str(), O_RDONLY);
     if (interface_fd < 0)
       throw NotFoundError();
   }
   catch (NotFoundError &e) {
     response->SetItem("Status", StatusCode(404));
-    return;
+    if (location->error_page[404] != "")
+      interface_fd = open(location->error_page[404].c_str(), O_RDONLY);
+    else // TODO : Default Error Page
+      interface_fd = open("./html/404.html", O_RDONLY);
   }
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
   kq.AddEvent(interface_fd, EVFILT_READ, this);

@@ -41,6 +41,7 @@ class Fileio : public FdInterface
   std::string data;
   RequestHeader *request;
   ResponseHeader *response;
+  LocationBlock *location;
 };
 
 #endif
