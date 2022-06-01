@@ -33,7 +33,7 @@ class Client : public FdInterface
   FdInterfaceType ParseHeader();
   FdInterfaceType ParseBody();
   FdInterfaceType ParseReq();
-  const std::string GetFilePath() const;
+  const std::string GetFilePath();
 
   Server *server;
   RequestHeader *request;

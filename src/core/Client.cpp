@@ -95,10 +95,8 @@ FdInterfaceType Client::ParseHeader()
   if (status) {
     response->SetItem("Status", StatusCode(status));
     std::cout << "test" << std::endl;
-    if (GetLocationBlock()->error_page.find(status) != GetLocationBlock()->error_page.end())
-      request->SetHost(GetLocationBlock()->error_page[status]);
-    else // TODO : Default Error Page 생성 및 설정
-      request->SetHost("/html/404.html");
+    if (request->host == "")
+      request->SetHost("/");
     return kFdFileio;
   }
 
@@ -152,15 +150,29 @@ FdInterfaceType Client::ParseReq()
     return ParseBody();
 }
 
-const std::string Client::GetFilePath() const
+const std::string Client::GetFilePath()
 {
   // TODO : 파일 경로를 반환하는 부분
   // 디렉토리일 경우 인덱스를 찾고, 없을경우 오토인덱스 처리
-  int location_index = server->server_block.GetLocationBlockByPath(request->host);
+  std::string path;
 
-  if (location_index == -1)
-    throw NotFoundError();
-  std::string path = server->server_block.location[location_index].root
-    + request->host.substr(request->host.find(server->server_block.location[location_index].location_path) + server->server_block.location[location_index].location_path.size());
+  if (response->status_code != "") {
+    int status = atoi(response->status_code.c_str());
+    if (GetLocationBlock()->error_page.find(status) != GetLocationBlock()->error_page.end())
+      request->SetHost(GetLocationBlock()->error_page[status]);
+    else // TODO : Default Error Page 생성 및 설정
+      request->SetHost("./html/404.html");
+    path = request->host;
+  }
+
+  else {
+    int location_index = server->server_block.GetLocationBlockByPath(request->host);
+
+    if (location_index == -1)
+      throw NotFoundError();
+    path = GetLocationBlock()->root
+      + request->host.substr(request->host.find(GetLocationBlock()->location_path) + GetLocationBlock()->location_path.size());
+  }
+
   return path;
 }
