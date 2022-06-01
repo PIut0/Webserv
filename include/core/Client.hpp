@@ -5,6 +5,7 @@
 #include "FdInterface.hpp"
 #include "utils.hpp"
 #include "RequestHeader.hpp"
+#include "Server.hpp"
 
 class KQueue;
 
@@ -15,7 +16,7 @@ class Client : public FdInterface
   Client(const Client &);
   Client &operator=(const Client &);
  public:
-  Client(KQueue &kq, int fd);
+  Client(KQueue &kq, int fd, Server *server);
   ~Client();
 
   int EventRead();
@@ -27,6 +28,7 @@ class Client : public FdInterface
   FdInterfaceType ParseReq();
   const std::string GetFilePath() const;
 
+  Server *server;
   RequestHeader *request;
   std::string request_message;
   std::string response_message;

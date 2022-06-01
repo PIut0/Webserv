@@ -2,7 +2,7 @@
 #include "utils.hpp"
 #include "NotFoundError.hpp"
 
-Client::Client(KQueue &kq, int fd) : FdInterface(kq, kFdClient, fd)
+Client::Client(KQueue &kq, int fd, Server *server) : FdInterface(kq, kFdClient, fd), server(server)
 {
   request = nullptr;
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
