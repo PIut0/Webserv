@@ -9,7 +9,6 @@ class ResponseHeader : public Header
 {
  public:
   ResponseHeader();
-  ResponseHeader(const std::string &data);
   ResponseHeader(const ResponseHeader &origin);
   ~ResponseHeader();
 
@@ -21,6 +20,8 @@ class ResponseHeader : public Header
   // void            SetItem(std::vector<std::pair<std::string, std::string> > &values);
   wsv_header_t&   GetItem(const std::string &key);
   res_header_it_t FindItem(const std::string &key);
+
+  void  Parse(const std::string &data);
 
   void  Print();
   void  PrintHeaderLine();

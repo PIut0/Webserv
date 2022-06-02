@@ -5,7 +5,8 @@ int main()
   const std::string dummy = "Status: 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n\r\nHELLO\r\n\r\n";
   const std::string dummyr = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n\r\nHELLO\r\n\r\n";
   { // constructor with string
-    ResponseHeader responseHeader(dummy);
+    ResponseHeader responseHeader;
+    responseHeader.Parse(dummy);
     if (dummyr == responseHeader.ToString()) {
       std::cout << "TRUE" << std::endl;
     }
