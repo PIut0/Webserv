@@ -16,6 +16,7 @@ std::string& trim(std::string& s);
 std::string itos(int i);
 
 std::string StatusCode(const int &code);
+std::string DefaultErrorPage(const int &code);
 
 #endif
 

@@ -29,11 +29,12 @@ int Client::EventRead()
 
 int Client::EventWrite()
 {
-  int n = write(interface_fd, response_message.c_str(), response_message.size());
+  std::string res = response->ToString();
+  int n = write(interface_fd, res.c_str(), res.size());
   if (n <= 0)
     return n;
-  response_message = response_message.substr(n);
-  n = response_message.size();
+  res = res.substr(n);
+  n = res.size();
 
   return n;
 }
@@ -96,7 +97,12 @@ FdInterfaceType Client::ParseHeader()
 
   if (status) {
     response->SetItem("Status", StatusCode(status));
-    return kFdFileio;
+    if (GetLocationBlock() && GetLocationBlock()->error_page.find(status) != GetLocationBlock()->error_page.end())
+      return kFdFileio;
+    else {
+      response->body = DefaultErrorPage(status);
+      return kFdClient;
+    }
   }
 
   if (atoi(request->GetItem("Content-Length").value.c_str()) > 0 && request->body.size() <= 0)
@@ -151,17 +157,11 @@ FdInterfaceType Client::ParseReq()
 
 const std::string Client::GetFilePath()
 {
-  // TODO : 파일 경로를 반환하는 부분
-  // 디렉토리일 경우 인덱스를 찾고, 없을경우 오토인덱스 처리
   std::string path;
 
   if (response->status_code != "") {
     int status = atoi(response->status_code.c_str());
-
-    if (GetLocationBlock() && GetLocationBlock()->error_page.find(status) != GetLocationBlock()->error_page.end())
-      request->SetHost(GetLocationBlock()->error_page[status]);
-    else // TODO : Default Error Page 생성 및 설정
-      request->SetHost("./html/404.html");
+    request->SetHost(GetLocationBlock()->error_page[status]);
     path = request->host;
   }
 
@@ -175,4 +175,16 @@ const std::string Client::GetFilePath()
   }
 
   return path;
+}
+
+void Client::SetResponseMessage()
+{
+  if (response->status_code == "")
+    response->SetItem("Status", StatusCode(200));
+  response->SetItem("Content-Length", itos(response->body.size()));
+  response->SetItem("Content-Type", "text/html");
+  if (request->FindItem("Connection")->first == "Connection")
+    response->SetItem("Connection", request->FindItem("Connection")->second->value);
+  else
+    response->SetItem("Connection", "keep-alive");
 }

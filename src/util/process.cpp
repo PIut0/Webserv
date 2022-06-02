@@ -20,6 +20,7 @@ void Client_Event_Read(Client *client)
   switch(client->ParseReq())
   {
     case kFdClient:
+      client->SetResponseMessage();
       client->kq.AddEvent(client->interface_fd, EVFILT_WRITE, client);
       break;
     case kFdFileio:

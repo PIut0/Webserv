@@ -34,12 +34,12 @@ class Client : public FdInterface
   FdInterfaceType ParseBody();
   FdInterfaceType ParseReq();
   const std::string GetFilePath();
+  void SetResponseMessage();
 
   Server *server;
   RequestHeader *request;
   ResponseHeader *response;
   std::string request_message;
-  std::string response_message;
 };
 
 #endif
