@@ -1,0 +1,18 @@
+GET / HTTP/1.1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+Accept-Encoding: gzip, deflate, br
+Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Cache-Control: no-cache
+Connection: keep-alive
+Host: localhost:8080
+Pragma: no-cache
+Sec-Fetch-Dest: document
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Site: none
+Sec-Fetch-User: ?1
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.151 Whale/3.14.134.62 Safari/537.36
+sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="100", "Whale";v="3"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "macOS"
+
