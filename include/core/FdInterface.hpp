@@ -10,7 +10,7 @@ class KQueue;
 enum FdInterfaceType {
   kFdServer,
   kFdClient,
-  kFdFileio,
+  kFdGetMethod,
   kFdCgi,
   kFdNone
 };

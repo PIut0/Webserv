@@ -69,6 +69,15 @@ int ft_stoi(const std::string &s)
   return atoi(s.c_str());
 }
 
+int IsEOF(int fd)
+{
+  char buf[1];
+  int n = read(fd, buf, sizeof(buf));
+  if (n > 0)
+    lseek(fd, -1, SEEK_CUR);
+  return n;
+}
+
 std::string StatusCode(const int &code)
 {
   switch (code)

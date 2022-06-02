@@ -10,7 +10,8 @@ MAIN			= main.cpp
 SRC				=	core/KQueue.cpp \
 						core/Server.cpp \
 						core/Client.cpp \
-						core/Fileio.cpp \
+						core/Method.cpp \
+						core/GetMethod.cpp \
 						util/utils.cpp \
 						util/process.cpp \
 						debug/System.cpp \

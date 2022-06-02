@@ -98,7 +98,7 @@ FdInterfaceType Client::ParseHeader()
   if (status) {
     response->SetItem("Status", StatusCode(status));
     if (GetLocationBlock() && GetLocationBlock()->error_page.find(status) != GetLocationBlock()->error_page.end())
-      return kFdFileio;
+      return kFdGetMethod;
     else {
       response->body = DefaultErrorPage(status);
       return kFdClient;
@@ -112,7 +112,7 @@ FdInterfaceType Client::ParseHeader()
   else if(CheckCgi())
     return kFdCgi;
   else if(request->host != "")
-    return kFdFileio;
+    return kFdGetMethod;
   else
     return kFdNone;
 }
@@ -129,7 +129,7 @@ FdInterfaceType Client::ParseBody()
     else if (status == 0 && CheckCgi())
       return kFdCgi;
     else if (status == 0 && request->host != "")
-      return kFdFileio;
+      return kFdGetMethod;
     else
       return kFdNone;
   }
@@ -138,7 +138,7 @@ FdInterfaceType Client::ParseBody()
     if (CheckCgi())
       return kFdCgi;
     else if (request->host != "")
-      return kFdFileio;
+      return kFdGetMethod;
     else
       return kFdNone;
   }

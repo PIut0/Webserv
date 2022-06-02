@@ -23,8 +23,8 @@ void Client_Event_Read(Client *client)
       client->SetResponseMessage();
       client->kq.AddEvent(client->interface_fd, EVFILT_WRITE, client);
       break;
-    case kFdFileio:
-      new Fileio(client->kq, client->GetFilePath(), client);
+    case kFdGetMethod:
+      new GetMethod(client->kq, client->GetFilePath(), client);
       client->request = nullptr;
       client->response = nullptr;
       break;
@@ -43,21 +43,21 @@ void Client_Event_Write(Client *client)
   return ;
 }
 
-void Fileio_Event_Read(Fileio *fileio)
+void GetMethod_Event_Read(GetMethod *getmethod)
 {
-  if (fileio->EventRead() <= 0)
+  if (getmethod->EventRead() <= 0)
   {
-    fileio->SetResponseMessage();
-    fileio->kq.AddEvent(fileio->target_fd, EVFILT_WRITE, fileio);
-    fileio->kq.DeleteEvent(fileio->interface_fd, EVFILT_READ);
+    getmethod->SetResponseMessage();
+    getmethod->kq.AddEvent(getmethod->target_fd, EVFILT_WRITE, getmethod);
+    getmethod->kq.DeleteEvent(getmethod->interface_fd, EVFILT_READ);
   }
 }
 
-void Fileio_Event_Write(Fileio *fileio)
+void GetMethod_Event_Write(GetMethod *getmethod)
 {
-  if ( fileio->EventWrite() <= 0) {
-    fileio->kq.DeleteEvent(fileio->target_fd, EVFILT_WRITE);
-    delete fileio;
+  if ( getmethod->EventWrite() <= 0) {
+    getmethod->kq.DeleteEvent(getmethod->target_fd, EVFILT_WRITE);
+    delete getmethod;
   }
   return ;
 }
@@ -74,8 +74,8 @@ void Process(FdInterface *target, struct kevent event)
     case kFdClient:
       Client_Event_Read(static_cast<Client *>(target));
       break;
-    case kFdFileio:
-      Fileio_Event_Read(static_cast<Fileio *>(target));
+    case kFdGetMethod:
+      GetMethod_Event_Read(static_cast<GetMethod *>(target));
       break;
     default:
       break;
@@ -91,8 +91,8 @@ void Process(FdInterface *target, struct kevent event)
     case kFdClient:
       Client_Event_Write(static_cast<Client *>(target));
       break;
-    case kFdFileio:
-      Fileio_Event_Write(static_cast<Fileio *>(target));
+    case kFdGetMethod:
+      GetMethod_Event_Write(static_cast<GetMethod *>(target));
       break;
     default:
       break;
