@@ -39,7 +39,11 @@ void Client_Event_Read(Client *client)
 void Client_Event_Write(Client *client)
 {
   if (client->EventWrite() <= 0)
+  {
     client->kq.DeleteEvent(client->interface_fd, EVFILT_WRITE);
+    if(client->request->GetItem("Connection").value == "close")
+      delete client;
+  }
   return ;
 }
 
@@ -57,6 +61,8 @@ void GetMethod_Event_Write(GetMethod *getmethod)
 {
   if ( getmethod->EventWrite() <= 0) {
     getmethod->kq.DeleteEvent(getmethod->target_fd, EVFILT_WRITE);
+    if (getmethod->request->GetItem("Connection").value == "close")
+      delete getmethod->client;
     delete getmethod;
   }
   return ;
