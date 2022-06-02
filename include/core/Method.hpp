@@ -1,5 +1,5 @@
-#ifndef FILEIO_HPP
-#define FILEIO_HPP
+#ifndef METHOD_HPP
+#define METHOD_HPP
 
 #include <sys/types.h>
 #include <sys/event.h>
@@ -23,15 +23,15 @@ class Client;
 class KQueue;
 class ServerBlock;
 
-class Fileio : public FdInterface
+class Method : public FdInterface
 {
  private:
-  Fileio();
-  Fileio(const Fileio &);
-  Fileio &operator=(const Fileio &);
+  Method();
+  Method(const Method &);
+  Method &operator=(const Method &);
  public:
-  Fileio(KQueue &kq, const std::string &path, Client *client);
-  ~Fileio();
+  Method(KQueue &kq, Client *client, FdInterfaceType type);
+  virtual ~Method();
 
   int EventRead();
   int EventWrite();
