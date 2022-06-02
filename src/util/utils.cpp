@@ -57,11 +57,16 @@ std::string& trim(std::string& s)
 	return ltrim(rtrim(s));
 }
 
-std::string itos(int i)
+std::string ft_itos(int i)
 {
   std::stringstream ss;
   ss << i;
   return ss.str();
+}
+
+int ft_stoi(const std::string &s)
+{
+  return atoi(s.c_str());
 }
 
 std::string StatusCode(const int &code)

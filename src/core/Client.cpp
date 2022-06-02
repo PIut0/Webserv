@@ -181,7 +181,7 @@ void Client::SetResponseMessage()
 {
   if (response->status_code == "")
     response->SetItem("Status", StatusCode(200));
-  response->SetItem("Content-Length", itos(response->body.size()));
+  response->SetItem("Content-Length", ft_itos(response->body.size()));
   response->SetItem("Content-Type", "text/html");
   if (request->FindItem("Connection")->first == "Connection")
     response->SetItem("Connection", request->FindItem("Connection")->second->value);

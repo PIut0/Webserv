@@ -13,7 +13,8 @@ std::vector<std::string> StringSplit(const std::string &data, const std::string 
 std::string& ltrim(std::string& s);
 std::string& rtrim(std::string& s);
 std::string& trim(std::string& s);
-std::string itos(int i);
+std::string ft_itos(int i);
+int ft_stoi(const std::string &s);
 
 std::string StatusCode(const int &code);
 std::string DefaultErrorPage(const int &code);
