@@ -14,6 +14,10 @@
 #include "HttpParseInvalidRequest.hpp"
 #include "HttpParseInvalidResponse.hpp"
 
+#include "NotFoundError.hpp"
+#include "ForbiddenError.hpp"
+#include "InternalServerError.hpp"
+
 class Monitor
 {
  public:

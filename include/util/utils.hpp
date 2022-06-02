@@ -21,6 +21,7 @@ int IsEOF(int fd);
 
 std::string StatusCode(const int &code);
 std::string DefaultErrorPage(const int &code);
+std::string GetAutoindexPage(std::string &target_path, std::vector<std::string> &files);
 
 #endif
 

@@ -1,15 +1,6 @@
 #ifndef GETMETHOD_HPP
 #define GETMETHOD_HPP
 
-#include <sys/types.h>
-#include <sys/event.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <string>
-#include <unistd.h>
-#include <fcntl.h>
-
 #include "Method.hpp"
 
 #define PORT 8080
@@ -27,6 +18,9 @@ class GetMethod : public Method
  public:
   GetMethod(KQueue &kq, const std::string &path, Client *client);
   ~GetMethod();
+
+  std::string target_path;
+  std::vector<std::string> file_list;
 };
 
 #endif

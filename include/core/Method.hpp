@@ -9,13 +9,14 @@
 #include <string>
 #include <unistd.h>
 #include <fcntl.h>
+#include <dirent.h>
+#include <vector>
 
 #include "KQueue.hpp"
 #include "FdInterface.hpp"
 #include "Client.hpp"
 #include "utils.hpp"
 #include "ServerBlock.hpp"
-#include "NotFoundError.hpp"
 
 #define PORT 8080
 
