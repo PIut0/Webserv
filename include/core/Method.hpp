@@ -40,6 +40,7 @@ class Method : public FdInterface
 
   int target_fd;
   std::string data;
+  Client *client;
   RequestHeader *request;
   ResponseHeader *response;
   LocationBlock *location;
