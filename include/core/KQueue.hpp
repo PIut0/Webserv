@@ -31,6 +31,7 @@ class KQueue
   void DeleteEvent(int ident, int16_t filter);
   void AddServer(Server &serv);
 
+  struct timespec timeout;
   int           kq;
   int           event_count;
   struct kevent events[EVENT_SIZE];

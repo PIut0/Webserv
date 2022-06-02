@@ -2,17 +2,15 @@
 #include "ServerManager.hpp"
 #include "KQueue.hpp"
 #include "Server.hpp"
-#include "GetMethod.hpp"
 #include "process.hpp"
 
 int main(int argc, char** argv) {
   ServerManager serverManager(CheckArg(argc, argv));
   std::vector<Server *> servers;
   KQueue kq;
-  for(size_t i = 0 ; i < serverManager.serverBlock.size() ; i++) {
+  for(size_t i = 0 ; i < serverManager.serverBlock.size() ; i++)
     servers.push_back(new Server(kq, serverManager.serverBlock[i]));
-    kq.AddServer(*(servers[i]));
-  }
+
 
   while (1) {
     kq.Refresh();
