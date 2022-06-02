@@ -7,18 +7,24 @@
 #include <stdlib.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <errno.h>
 #include <iostream>
 
-#define PORT 8176
 #define IPADDR "127.0.0.1"
-#define BUFF_SIZE 1024
+#define BUFF_SIZE 10000
 
 int main(int argc, char **argv)
 {
   static char buff[BUFF_SIZE];
 
-  int port = argc > 1 ? atoi(argv[1]) : PORT ;
+  if (argc != 3)
+  {
+    std::cout << "Usage: ./client <port> <path>" << std::endl;
+    return 0;
+  }
+
+  int port = atoi(argv[1]);
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd == -1)
   {
@@ -26,6 +32,7 @@ int main(int argc, char **argv)
     exit(errno);
   }
   printf("port: %d\n", port);
+  printf("path: %s\n", argv[2]);
 
   struct sockaddr_in addr;
 
@@ -42,29 +49,13 @@ int main(int argc, char **argv)
   }
   std::cout << "client socket fd : " << sockfd << std::endl;
 
-  while (1)
-  {
-    std::cout << "input message : ";
-    std::cin.getline(buff, BUFF_SIZE);
-    if (strncmp(buff, "quit", 4) == 0)
-    {
-      std::cout << "client quit" << std::endl;
-      break;
-    }
-    else if(strncmp(buff, "!", 1) == 0)
-    {
-      buff[0] = '\r';
-      buff[1] = '\n';
-      buff[2] = '\r';
-      buff[3] = '\n';
-      buff[4] = '\0';
-    }
-    if (write(sockfd, buff, strlen(buff)) == -1)
-      return -1;
-    memset(buff, 0, BUFF_SIZE);
-  }
-  write(sockfd, "\r\n\r\n", 4);
+  int file_fd = open(argv[2], O_RDONLY);
+  read(file_fd, buff, BUFF_SIZE);
 
+  write(sockfd, buff, strlen(buff));
+
+  sleep(1);
+  memset(buff, 0, BUFF_SIZE);
   read(sockfd, buff, BUFF_SIZE);
   printf("recive: %s\n", buff);
   close(sockfd);
