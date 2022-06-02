@@ -15,10 +15,15 @@ Fileio::Fileio(KQueue &kq, const std::string &path, Client *client) : FdInterfac
   }
   catch (NotFoundError &e) {
     response->SetItem("Status", StatusCode(404));
-    if (location->error_page[404] != "")
-      interface_fd = open(location->error_page[404].c_str(), O_RDONLY);
-    else // TODO : Default Error Page
-      interface_fd = open("./html/404.html", O_RDONLY);
+  }
+  if (response->status_code != "") {
+    if (location->error_page[ft_stoi(response->status_code)] != "")
+      interface_fd = open(location->error_page[ft_stoi(response->status_code)].c_str(), O_RDONLY);
+    else {
+      data = DefaultErrorPage(ft_stoi(response->status_code));
+      SetResponseMessage();
+      kq.AddEvent(target_fd, EVFILT_WRITE, this);
+    }
   }
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
   kq.AddEvent(interface_fd, EVFILT_READ, this);
@@ -65,7 +70,7 @@ void Fileio::SetResponseMessage()
   if (response->status_code == "")
     response->SetItem("Status", StatusCode(200));
   response->SetBody(data);
-  response->SetItem("Content-Length", itos(response->body.size()));
+  response->SetItem("Content-Length", ft_itos(response->body.size()));
   response->SetItem("Content-Type", "text/html");
   if (request->FindItem("Connection")->first == "Connection")
     response->SetItem("Connection", request->FindItem("Connection")->second->value);
