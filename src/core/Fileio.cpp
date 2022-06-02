@@ -1,17 +1,24 @@
 #include "Fileio.hpp"
 #include "utils.hpp"
 
-Fileio::Fileio(KQueue &kq, const std::string &path, Client *_client) : FdInterface(kq, kFdFileio), data(""), client(_client)
+Fileio::Fileio(KQueue &kq, const std::string &path, Client *client) : FdInterface(kq, kFdFileio), data("")
 {
   std::cout << "file: " << path << std::endl;
-  interface_fd = open(path.c_str(), O_RDONLY);
+  target_fd = client->interface_fd;
+  request = client->request;
+  response = client->response;
+  location = client->GetLocationBlock();
   try {
+    interface_fd = open(path.c_str(), O_RDONLY);
     if (interface_fd < 0)
       throw NotFoundError();
   }
   catch (NotFoundError &e) {
-    std::cout << "NotFoundError" << std::endl;
-    return;
+    response->SetItem("Status", StatusCode(404));
+    if (location->error_page[404] != "")
+      interface_fd = open(location->error_page[404].c_str(), O_RDONLY);
+    else // TODO : Default Error Page
+      interface_fd = open("./html/404.html", O_RDONLY);
   }
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
   kq.AddEvent(interface_fd, EVFILT_READ, this);
@@ -43,11 +50,25 @@ int Fileio::EventRead()
 
 int Fileio::EventWrite()
 {
-  int n = write(client->interface_fd, data.c_str(), data.size());
+  std::string res = response->ToString();
+  int n = write(target_fd, res.c_str(), res.size());
   if (n <= 0)
     return n;
-  data = data.substr(n);
-  n = data.size();
+  res = res.substr(n);
+  n = res.size();
 
   return n;
+}
+
+void Fileio::SetResponseMessage()
+{
+  if (response->status_code == "")
+    response->SetItem("Status", StatusCode(200));
+  response->SetItem("Content-Length", itos(data.size()));
+  response->SetItem("Content-Type", "text/html");
+  if (request->FindItem("Connection")->first == "Connection")
+    response->SetItem("Connection", request->FindItem("Connection")->second->value);
+  else
+    response->SetItem("Connection", "keep-alive");
+  response->SetBody(data);
 }

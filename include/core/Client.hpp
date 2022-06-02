@@ -5,10 +5,14 @@
 #include "FdInterface.hpp"
 #include "utils.hpp"
 #include "RequestHeader.hpp"
+#include "ResponseHeader.hpp"
 #include "Server.hpp"
 
 class Server;
 class KQueue;
+class LocationBlock;
+
+#define D_CRLF "\r\n\r\n"
 
 class Client : public FdInterface
 {
@@ -23,15 +27,17 @@ class Client : public FdInterface
   int EventRead();
   int EventWrite();
 
-  int CheckRequest();
+  LocationBlock *GetLocationBlock();
   int CheckCgi();
-  FdInterfaceType ParseHeader(std::string &request_message);
-  FdInterfaceType ParseBody(std::string &request_message);
+  int CheckRequest();
+  FdInterfaceType ParseHeader();
+  FdInterfaceType ParseBody();
   FdInterfaceType ParseReq();
-  const std::string GetFilePath() const;
+  const std::string GetFilePath();
 
   Server *server;
   RequestHeader *request;
+  ResponseHeader *response;
   std::string request_message;
   std::string response_message;
 };

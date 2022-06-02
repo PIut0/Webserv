@@ -30,14 +30,18 @@ class Fileio : public FdInterface
   Fileio(const Fileio &);
   Fileio &operator=(const Fileio &);
  public:
-  Fileio(KQueue &kq, const std::string &path, Client *_client);
+  Fileio(KQueue &kq, const std::string &path, Client *client);
   ~Fileio();
 
   int EventRead();
   int EventWrite();
+  void SetResponseMessage();
 
+  int target_fd;
   std::string data;
-  Client *client;
+  RequestHeader *request;
+  ResponseHeader *response;
+  LocationBlock *location;
 };
 
 #endif

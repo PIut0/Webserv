@@ -5,6 +5,7 @@
 Client::Client(KQueue &kq, int fd, Server *server) : FdInterface(kq, kFdClient, fd), server(server)
 {
   request = nullptr;
+  response = nullptr;
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
   kq.AddEvent(interface_fd, EVFILT_READ, this);
 }
@@ -39,19 +40,16 @@ int Client::EventWrite()
 
 int IsCRLF(const std::string &request_message)
 {
-  return (request_message.find(CRLF) != std::string::npos);
+  return (request_message.find(D_CRLF) != std::string::npos);
 }
 
-int Client::CheckRequest()
+LocationBlock *Client::GetLocationBlock()
 {
-  if (!request->method || request->host.size() <= 0 || request->host[0] != '/')
-    return 400;
-
-  LocationBlock location_block = server->server_block.location[server->server_block.GetLocationBlockByPath(request->host)];
-  if (!(location_block.allow_methods & request->method))
-    return 405;
-
-  return 200;
+  if (request == nullptr)
+    return nullptr;
+  if (server->server_block.GetLocationBlockByPath(request->host) < 0)
+    return nullptr;
+  return &(server->server_block.location[server->server_block.GetLocationBlockByPath(request->host)]);
 }
 
 int Client::CheckCgi()
@@ -60,45 +58,66 @@ int Client::CheckCgi()
   return 0;
 }
 
-FdInterfaceType Client::ParseHeader(std::string &request_message)
+int Client::CheckRequest()
 {
-  std::string tmp = request_message.substr(request_message.find(CRLF) + 4);
-  request_message = request_message.substr(0, request_message.find(CRLF));
-  request = new RequestHeader();
-  request->Parse(request_message);
-  request_message = tmp;
+  //std::cout << request_message << std::endl;
+  std::string req = request_message.substr(0, request_message.find(D_CRLF) + 4);
+  request_message = request_message.substr(request_message.find(D_CRLF) + 4);
+  try {
+    response = new ResponseHeader();
+    request = new RequestHeader();
+    request->Parse(req);
+  } catch(const HttpParseInvalidBody& e) {
+    return 400;
+  } catch(const HttpParseInvalidMethod& e) {
+    return 405;
+  } catch(const HttpParseInvalidRequest& e) {
+    return 400;
+  } catch(const HttpParseInvalidResponse& e) {
+    return 0;
+  }
 
+  if (request->HttpVersionToString() != "HTTP/1.1")
+    return 505;
+
+  if (!request->method || request->host.size() <= 0 || request->host[0] != '/')
+    return 400;
+
+  LocationBlock *location_block = GetLocationBlock();
+  if (!(location_block->allow_methods & request->method))
+    return 405;
+
+  return 0;
+}
+
+FdInterfaceType Client::ParseHeader()
+{
   int status = CheckRequest();
-  if (status > 200) {
-    response_message = "HTTP/1.1 400 Bad Request\r\n\r\n";
-    delete request;
-    request = nullptr;
-    return kFdClient;
-  }
 
-  if (request->FindItem("Content-Length")->first != ""
-    && atoi(request->GetItem("Content-Length").value.c_str()) > 0
-    && request->body.size() <= 0)
-    return kFdNone;
-  else if(CheckCgi()) {
-    return kFdCgi;
-  }
-  else if(request->host != "") {
+  if (status) {
+    response->SetItem("Status", StatusCode(status));
     return kFdFileio;
   }
+
+  if (atoi(request->GetItem("Content-Length").value.c_str()) > 0 && request->body.size() <= 0)
+    return kFdNone;
+  else if(request->GetItem("Transfer-Encoding").value == "chunked")
+    return kFdNone;
+  else if(CheckCgi())
+    return kFdCgi;
+  else if(request->host != "")
+    return kFdFileio;
   else
     return kFdNone;
 }
 
-FdInterfaceType Client::ParseBody(std::string &request_message)
+FdInterfaceType Client::ParseBody()
 {
-  std::string tmp = request_message.substr(request_message.find(CRLF) + 4);
-  request_message = request_message.substr(0, request_message.find(CRLF));
+  std::string req = request_message.substr(0, request_message.find(D_CRLF));
+  request_message = request_message.substr(request_message.find(D_CRLF) + 4);
 
-  if (request->FindItem("Transfer-Encoding")->first != ""
-    && request->FindItem("Transfer-Encoding")->second->value == "chunked") {
-    int status = request->SetChunked(request_message);
-    request_message = tmp;
+  if (request->GetItem("Transfer-Encoding").value == "chunked") {
+    int status = request->SetChunked(req);
     if (status > 0)
       return kFdNone;
     else if (status == 0 && CheckCgi())
@@ -109,8 +128,7 @@ FdInterfaceType Client::ParseBody(std::string &request_message)
       return kFdNone;
   }
   else {
-    request->SetBody(request_message);
-    request_message = tmp;
+    request->SetBody(req);
     if (CheckCgi())
       return kFdCgi;
     else if (request->host != "")
@@ -125,22 +143,36 @@ FdInterfaceType Client::ParseReq()
   if (!IsCRLF(request_message))
     return kFdNone;
 
-  std::cout << "request_message: " << request_message << std::endl;
   if (request == nullptr)
-    return ParseHeader(request_message);
+    return ParseHeader();
   else
-    return ParseBody(request_message);
+    return ParseBody();
 }
 
-const std::string Client::GetFilePath() const
+const std::string Client::GetFilePath()
 {
   // TODO : 파일 경로를 반환하는 부분
-  //std::string path = "." + request->host;
-  int location_index = server->server_block.GetLocationBlockByPath(request->host);
+  // 디렉토리일 경우 인덱스를 찾고, 없을경우 오토인덱스 처리
+  std::string path;
 
-  if (location_index == -1)
-    throw NotFoundError();
-  std::string path = server->server_block.location[location_index].root
-    + request->host.substr(request->host.find(server->server_block.location[location_index].location_path) + server->server_block.location[location_index].location_path.size());
+  if (response->status_code != "") {
+    int status = atoi(response->status_code.c_str());
+
+    if (GetLocationBlock() && GetLocationBlock()->error_page.find(status) != GetLocationBlock()->error_page.end())
+      request->SetHost(GetLocationBlock()->error_page[status]);
+    else // TODO : Default Error Page 생성 및 설정
+      request->SetHost("./html/404.html");
+    path = request->host;
+  }
+
+  else {
+    int location_index = server->server_block.GetLocationBlockByPath(request->host);
+
+    if (location_index == -1)
+      throw NotFoundError();
+    path = GetLocationBlock()->root
+      + request->host.substr(request->host.find(GetLocationBlock()->location_path) + GetLocationBlock()->location_path.size());
+  }
+
   return path;
 }

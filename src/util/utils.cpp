@@ -56,3 +56,31 @@ std::string& trim(std::string& s)
 {
 	return ltrim(rtrim(s));
 }
+
+std::string itos(int i)
+{
+  std::stringstream ss;
+  ss << i;
+  return ss.str();
+}
+
+std::string StatusCode(const int &code)
+{
+  switch (code)
+  {
+    case 200:
+      return "200 OK";
+    case 400:
+      return "400 Bad Request";
+    case 404:
+      return "404 Not Found";
+    case 405:
+      return "405 Method Not Allowed";
+    case 500:
+      return "500 Internal Server Error";
+    case 505:
+      return "505 HTTP Version Not Supported";
+    default:
+      return "500 Internal Server Error";
+  }
+}

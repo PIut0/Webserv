@@ -25,6 +25,7 @@ void Client_Event_Read(Client *client)
     case kFdFileio:
       new Fileio(client->kq, client->GetFilePath(), client);
       client->request = nullptr;
+      client->response = nullptr;
       break;
     case kFdCgi:
       break;
@@ -45,7 +46,8 @@ void Fileio_Event_Read(Fileio *fileio)
 {
   if (fileio->EventRead() <= 0)
   {
-    fileio->kq.AddEvent(fileio->client->interface_fd, EVFILT_WRITE, fileio);
+    fileio->SetResponseMessage();
+    fileio->kq.AddEvent(fileio->target_fd, EVFILT_WRITE, fileio);
     fileio->kq.DeleteEvent(fileio->interface_fd, EVFILT_READ);
   }
 }
@@ -53,7 +55,7 @@ void Fileio_Event_Read(Fileio *fileio)
 void Fileio_Event_Write(Fileio *fileio)
 {
   if ( fileio->EventWrite() <= 0) {
-    fileio->kq.DeleteEvent(fileio->client->interface_fd, EVFILT_WRITE);
+    fileio->kq.DeleteEvent(fileio->target_fd, EVFILT_WRITE);
     delete fileio;
   }
   return ;
