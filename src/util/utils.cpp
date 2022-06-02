@@ -107,3 +107,15 @@ std::string DefaultErrorPage(const int &code)
      << "<hr /><center>Init6_Nginx</center></body></html>";
   return ss.str();
 }
+
+std::string GetAutoindexPage(std::string &target_path, std::vector<std::string> &files)
+{
+  std::stringstream ss;
+  ss << "<html><head><title>Index of " << target_path << "</title></head>"
+     << "<body><h1>Index of " << target_path << "</h1><hr /><pre>";
+  for (size_t i=0; i<files.size(); i++)
+    ss << "<a href=\"" << files[i] << "\">" << files[i] << "</a>\n";
+
+  ss << "</pre><hr /><center>Init6_Nginx</center></body></html>";
+  return ss.str();
+}

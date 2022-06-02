@@ -9,6 +9,8 @@
 #include <string>
 #include <unistd.h>
 #include <fcntl.h>
+#include <dirent.h>
+#include <vector>
 
 #include "KQueue.hpp"
 #include "FdInterface.hpp"
