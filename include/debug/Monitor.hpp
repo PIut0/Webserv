@@ -14,6 +14,9 @@
 #include "HttpParseInvalidRequest.hpp"
 #include "HttpParseInvalidResponse.hpp"
 
+#include "NotFoundError.hpp"
+#include "ForbiddenError.hpp"
+
 class Monitor
 {
  public:

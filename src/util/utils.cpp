@@ -86,6 +86,8 @@ std::string StatusCode(const int &code)
       return "200 OK";
     case 400:
       return "400 Bad Request";
+    case 403:
+      return "403 Forbidden";
     case 404:
       return "404 Not Found";
     case 405:

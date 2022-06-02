@@ -61,12 +61,16 @@ GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Meth
       }
     }
 
+    if (access(target_path.c_str(), R_OK) != 0)
+      throw ForbiddenError();
+
     interface_fd = open(target_path.c_str(), O_RDONLY);
     if (interface_fd < 0)
       throw NotFoundError();
-  }
-  catch (NotFoundError &e) {
+  } catch (NotFoundError &e) {
     response->SetItem("Status", StatusCode(404));
+  } catch (ForbiddenError &e) {
+    response->SetItem("Status", StatusCode(403));
   }
   if (response->status_code != "") {
     if (location->error_page[ft_stoi(response->status_code)] != "")

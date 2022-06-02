@@ -17,7 +17,6 @@
 #include "Client.hpp"
 #include "utils.hpp"
 #include "ServerBlock.hpp"
-#include "NotFoundError.hpp"
 
 #define PORT 8080
 
