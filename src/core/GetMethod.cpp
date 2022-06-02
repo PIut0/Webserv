@@ -66,12 +66,15 @@ GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Meth
 
     interface_fd = open(target_path.c_str(), O_RDONLY);
     if (interface_fd < 0)
-      throw NotFoundError();
+      throw InternalServerError();
   } catch (NotFoundError &e) {
     response->SetItem("Status", StatusCode(404));
   } catch (ForbiddenError &e) {
     response->SetItem("Status", StatusCode(403));
+  } catch (InternalServerError &e) {
+    response->SetItem("Status", StatusCode(500));
   }
+
   if (response->status_code != "") {
     if (location->error_page[ft_stoi(response->status_code)] != "")
       interface_fd = open(location->error_page[ft_stoi(response->status_code)].c_str(), O_RDONLY);

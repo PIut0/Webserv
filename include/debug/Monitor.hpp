@@ -16,6 +16,7 @@
 
 #include "NotFoundError.hpp"
 #include "ForbiddenError.hpp"
+#include "InternalServerError.hpp"
 
 class Monitor
 {
