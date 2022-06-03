@@ -33,15 +33,10 @@ void ResponseHeader::SetItem(const std::string &line)
 void ResponseHeader::SetItem(const std::string &key, const std::string &value)
 {
   if (key == "Status") {
-    if (this->status_code != "") throw AlreadyExistKey();
-
     this->status_code = value.substr(0, 3);
     this->status_msg = value.substr(4);
     return ;
   }
-
-  if (FindItem(key) != this->conf.end())
-    throw AlreadyExistKey();
 
   wsv_header_t *el = new wsv_header_t();
   el->key = key;
