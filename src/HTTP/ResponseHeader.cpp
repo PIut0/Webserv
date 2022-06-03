@@ -117,7 +117,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
             state = wsv_header_value_before;
             break;
 
-          case LF:
+          case CR:
             state = wsv_invalid_key_newline;
             break;
 
@@ -141,7 +141,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
           case ' ':
             break;
 
-          case LF:
+          case CR:
             state = wsv_invalid_key_newline;
             break;
 
