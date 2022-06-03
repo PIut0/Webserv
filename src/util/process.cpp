@@ -21,6 +21,7 @@ void Client_Event_Read(Client *client)
   {
     case kFdClient:
       client->SetResponseMessage();
+      client->kq.DisableEvent(client->interface_fd, EVFILT_READ, client);
       client->kq.AddEvent(client->interface_fd, EVFILT_WRITE, client);
       break;
     case kFdGetMethod:
@@ -40,6 +41,7 @@ void Client_Event_Write(Client *client)
 {
   if (client->EventWrite() <= 0)
   {
+    client->kq.EnableEvent(client->interface_fd, EVFILT_READ, client);
     client->kq.DeleteEvent(client->interface_fd, EVFILT_WRITE);
     if(client->request->GetItem("Connection").value == "close")
       delete client;
@@ -52,8 +54,8 @@ void GetMethod_Event_Read(GetMethod *getmethod)
   if (getmethod->EventRead() <= 0)
   {
     getmethod->SetResponseMessage();
-    getmethod->kq.AddEvent(getmethod->target_fd, EVFILT_WRITE, getmethod);
     getmethod->kq.DeleteEvent(getmethod->interface_fd, EVFILT_READ);
+    getmethod->kq.AddEvent(getmethod->target_fd, EVFILT_WRITE, getmethod);
   }
 }
 
