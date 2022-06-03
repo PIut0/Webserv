@@ -117,7 +117,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
             state = wsv_header_value_before;
             break;
 
-          case CR:
+          case LF:
             state = wsv_invalid_key_newline;
             break;
 
@@ -141,7 +141,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
           case ' ':
             break;
 
-          case CR:
+          case LF:
             state = wsv_invalid_key_newline;
             break;
 
@@ -240,7 +240,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
             return WSV_OK;
 
           default:
-            break;
+           break;
         }
 
         break;
@@ -261,10 +261,10 @@ int ResponseHeader::ParseBody(const std::string &data)
 
   if (wsv_str_4cmp_p(data, data.length() - 4, '\r', '\n', '\r', '\n')) {
     this->body = data.substr(this->pos_, data.length() - this->pos_ - 4);
-    return WSV_OK;
+  } else {
+    this->body = data.substr(this->pos_, data.length() - this->pos_);
   }
-
-  throw HttpParseInvalidBody();
+  return WSV_OK;
 }
 
 std::string ResponseHeader::ToString()
@@ -277,8 +277,7 @@ std::string ResponseHeader::ToString()
   }
   ret += CRLF;
   if (this->body.length() != 0) {
-    ret += body + CRLF;
-    ret += CRLF;
+    ret += body ;
   }
   return ret;
 }
