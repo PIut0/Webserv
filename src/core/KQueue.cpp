@@ -22,7 +22,7 @@ void KQueue::ErrorIgnore(const char *err)
 
 void KQueue::Refresh()
 {
-  event_count = kevent(kq, NULL, 0, events, EVENT_SIZE, &timeout);
+  event_count = kevent(kq, NULL, 0, events, EVENT_SIZE, NULL);
   if (event_count == -1)
     ErrorIgnore("refresh");
 }
