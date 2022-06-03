@@ -5,7 +5,7 @@ LocationBlock::LocationBlock(std::string &location_path, std::vector<std::string
 {
   this->location_path = location_path;
   this->allow_methods = HTTP_GET | HTTP_POST | HTTP_PUT | HTTP_DELETE;
-  this->root = "../html";
+  this->root = "./"; // 기본값은 현재 디렉토리
   this->index.push_back("index.html");
   this->auto_index = OFF;
   this->request_max_body_size = DEFAULT_REQUEST_MAX_BODY_SIZE;
