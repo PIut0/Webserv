@@ -84,6 +84,12 @@ std::string StatusCode(const int &code)
   {
     case 200:
       return "200 OK";
+    case 300:
+      return "300 Multiple Choices";
+    case 301:
+      return "301 Moved Permanently";
+    case 302:
+      return "302 Found";
     case 400:
       return "400 Bad Request";
     case 403:

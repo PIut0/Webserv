@@ -3,9 +3,9 @@
 
 Server::Server(KQueue &kq, ServerBlock &_sb) : FdInterface(kq, kFdServer), server_block(_sb)
 {
-  int option = 1;
   if ((interface_fd = socket(PF_INET, SOCK_STREAM, 0)) == -1)
     ExitWithPerror("socket");
+  int option = 1;
   setsockopt(interface_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 
   memset(&server_addr, 0, sizeof(server_addr));
@@ -20,6 +20,7 @@ Server::Server(KQueue &kq, ServerBlock &_sb) : FdInterface(kq, kFdServer), serve
     ExitWithPerror("listen");
 
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
+  kq.AddServer(*this);
 }
 
 Server::~Server()
