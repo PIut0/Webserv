@@ -277,7 +277,8 @@ std::string ResponseHeader::ToString()
   }
   ret += CRLF;
   if (this->body.length() != 0) {
-    ret += body ;
+    ret += body + CRLF;
+    ret += CRLF;
   }
   return ret;
 }
