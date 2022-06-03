@@ -18,8 +18,6 @@
 
 typedef std::map<std::string, std::string>            cgiinfo_t;
 typedef std::map<std::string, std::string>::iterator  cgiinfo_it_t;
-typedef std::map<int, std::string>                    error_page_t;
-typedef std::map<int, std::string>::iterator          error_page_it_t;
 
 class LocationBlock : public System
 {
@@ -38,7 +36,7 @@ class LocationBlock : public System
   std::vector<std::string>    index;
   bool                        auto_index;
   cgiinfo_t                   cgi_info;
-  error_page_t                error_page;
+  std::string                 error_page;
   long                        request_max_body_size;
   std::string                 ret;
 

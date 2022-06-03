@@ -11,7 +11,7 @@ void SetResponseErrorPage(ResponseHeader *response, const int code)
   if (!response)
     return ;
   response->SetItem("Status", StatusCode(code));
-  response->SetItem("Content-Type", "text/html");
+  //response->SetItem("Content-Type", "text/html");
 }
 
 std::vector<std::string> GetFileList(const std::string &path)
@@ -86,10 +86,10 @@ GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Meth
   }
 
   if (response->status_code != "") {
-    if (location->error_page[ft_stoi(response->status_code)] != "")
-      interface_fd = open(location->error_page[ft_stoi(response->status_code)].c_str(), O_RDONLY);
+    if (location->error_page != "")
+      interface_fd = open(location->error_page.c_str(), O_RDONLY);
     else {
-      data = DefaultErrorPage(ft_stoi(response->status_code));
+      data = "";
       SetResponseMessage();
       kq.AddEvent(target_fd, EVFILT_WRITE, this);
       return ;

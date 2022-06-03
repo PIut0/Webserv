@@ -9,9 +9,4 @@ typedef struct {
   std::string url;
 } CgiInfo;
 
-typedef struct {
-  int         code;
-  std::string url;
-} ErrorPage;
-
 #endif

@@ -43,9 +43,10 @@ void Method::SetResponseMessage()
   if (response->status_code == "")
     response->SetItem("Status", StatusCode(200));
 
-  if (data.size() > 0) {
-    response->SetBody(data);
-    response->SetItem("Content-Length", ft_itos(response->body.size()));
+  response->SetBody(data);
+  response->SetItem("Content-Length", ft_itos(response->body.size()));
+
+  if (response->body.size() > 0) {
     if (response->FindItem("Content-Type") == response->conf.end()) {
       if (request && request->host.size() && request->host.find_last_of(".") != std::string::npos)
         response->SetItem("Content-Type", MimeType(request->host.substr(request->host.find_last_of(".") + 1)));

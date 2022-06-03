@@ -109,10 +109,10 @@ FdInterfaceType Client::ParseHeader()
 
   if (status) {
     response->SetItem("Status", StatusCode(status));
-    if (loc && loc->error_page.find(status) != loc->error_page.end())
+    if (loc && loc->error_page != "")
       return kFdGetMethod;
     else {
-      response->body = DefaultErrorPage(status);
+      response->body = "";
       return kFdClient;
     }
   }
@@ -172,8 +172,7 @@ const std::string Client::GetFilePath()
   std::string path;
 
   if (response->status_code != "") {
-    int status = atoi(response->status_code.c_str());
-    request->SetHost(GetLocationBlock()->error_page[status]);
+    request->SetHost(GetLocationBlock()->error_page);
     path = request->host;
   }
 
@@ -193,9 +192,19 @@ void Client::SetResponseMessage()
 {
   if (response->status_code == "")
     response->SetItem("Status", StatusCode(200));
+
   response->SetItem("Content-Length", ft_itos(response->body.size()));
-  response->SetItem("Content-Type", "text/html");
-  if (request->FindItem("Connection")->first == "Connection")
+
+  if (response->body.size() > 0) {
+    if (response->FindItem("Content-Type") == response->conf.end()) {
+      if (request && request->host.size() && request->host.find_last_of(".") != std::string::npos)
+        response->SetItem("Content-Type", MimeType(request->host.substr(request->host.find_last_of(".") + 1)));
+      else
+        response->SetItem("Content-Type", "application/octet-stream");
+    }
+  }
+
+  if (request && request->FindItem("Connection")->first == "Connection")
     response->SetItem("Connection", request->FindItem("Connection")->second->value);
   else
     response->SetItem("Connection", "keep-alive");
