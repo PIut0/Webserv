@@ -93,10 +93,23 @@ int Client::CheckRequest()
 FdInterfaceType Client::ParseHeader()
 {
   int status = CheckRequest();
+  LocationBlock *loc = GetLocationBlock();
+
+  if (status == 0 && loc->ret != "") {
+    std::cout << "ret: " << loc->ret << std::endl;
+    status = ft_stoi(loc->ret.substr(0, 3));
+
+    if (loc->ret.size() > 4) {
+      std::string red = loc->ret.substr(4);
+      red = rtrim(ltrim(red));
+      if (red.size() > 0)
+        response->SetItem("Location", red);
+    }
+  }
 
   if (status) {
     response->SetItem("Status", StatusCode(status));
-    if (GetLocationBlock() && GetLocationBlock()->error_page.find(status) != GetLocationBlock()->error_page.end())
+    if (loc && loc->error_page.find(status) != loc->error_page.end())
       return kFdGetMethod;
     else {
       response->body = DefaultErrorPage(status);
