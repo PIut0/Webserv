@@ -240,7 +240,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
             return WSV_OK;
 
           default:
-           break;
+            break;
         }
 
         break;
