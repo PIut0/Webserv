@@ -3,6 +3,7 @@
 #include "KQueue.hpp"
 #include "Server.hpp"
 #include "process.hpp"
+#include "utils.hpp"
 
 int main(int argc, char** argv) {
   ServerManager serverManager(CheckArg(argc, argv));
@@ -10,7 +11,7 @@ int main(int argc, char** argv) {
   KQueue kq;
   for(size_t i = 0 ; i < serverManager.serverBlock.size() ; i++)
     servers.push_back(new Server(kq, serverManager.serverBlock[i]));
-
+  SetMime();
 
   while (1) {
     kq.Refresh();

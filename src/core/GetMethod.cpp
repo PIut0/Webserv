@@ -6,6 +6,14 @@ int IsDir(const std::string &path)
   return (path.back() == '/');
 }
 
+void SetResponseErrorPage(ResponseHeader *response, const int code)
+{
+  if (!response)
+    return ;
+  response->SetItem("Status", StatusCode(code));
+  response->SetItem("Content-Type", "text/html");
+}
+
 std::vector<std::string> GetFileList(const std::string &path)
 {
   std::vector<std::string> res;
@@ -52,6 +60,7 @@ GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Meth
       if (IsDir(target_path)) {
         if (location->auto_index) {
           data = GetAutoindexPage(target_path, file_list);
+          response->SetItem("Content-Type", "text/html");
           SetResponseMessage();
           kq.AddEvent(target_fd, EVFILT_WRITE, this);
           return ;
@@ -64,15 +73,16 @@ GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Meth
     if (access(target_path.c_str(), R_OK) != 0)
       throw ForbiddenError();
 
-    interface_fd = open(target_path.c_str(), O_RDONLY);
+    request->SetHost(target_path);
+    interface_fd = open(request->host.c_str(), O_RDONLY);
     if (interface_fd < 0)
       throw InternalServerError();
   } catch (NotFoundError &e) {
-    response->SetItem("Status", StatusCode(404));
+    SetResponseErrorPage(response, 404);
   } catch (ForbiddenError &e) {
-    response->SetItem("Status", StatusCode(403));
+    SetResponseErrorPage(response, 403);
   } catch (InternalServerError &e) {
-    response->SetItem("Status", StatusCode(500));
+    SetResponseErrorPage(response, 500);
   }
 
   if (response->status_code != "") {
