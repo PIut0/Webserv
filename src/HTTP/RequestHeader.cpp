@@ -224,7 +224,7 @@ int RequestHeader::ParseRequestLine(const std::string &data)
             break;
 
           default:
-            throw HttpParseInvalidRequest();
+            throw HttpParseInvalidVersion();
         }
 
         break;
