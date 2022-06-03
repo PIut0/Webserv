@@ -4,8 +4,8 @@
 Method::Method(KQueue &kq, Client *client, FdInterfaceType type) : FdInterface(kq, type), data(""), client(client)
 {
   target_fd = client->interface_fd;
-  request = client->request;
-  response = client->response;
+  request = (client->request) ? client->request : new RequestHeader();
+  response = (client->response) ? client->response : new ResponseHeader();
   location = client->GetLocationBlock();
 }
 
@@ -42,10 +42,20 @@ void Method::SetResponseMessage()
 {
   if (response->status_code == "")
     response->SetItem("Status", StatusCode(200));
+
   response->SetBody(data);
   response->SetItem("Content-Length", ft_itos(response->body.size()));
-  response->SetItem("Content-Type", "text/html");
-  if (request->FindItem("Connection")->first == "Connection")
+
+  if (response->body.size() > 0) {
+    if (response->FindItem("Content-Type") == response->conf.end()) {
+      if (request && request->host.size() && request->host.find_last_of(".") != std::string::npos)
+        response->SetItem("Content-Type", MimeType(request->host.substr(request->host.find_last_of(".") + 1)));
+      else
+        response->SetItem("Content-Type", "application/octet-stream");
+    }
+  }
+
+  if (request && request->FindItem("Connection")->first == "Connection")
     response->SetItem("Connection", request->FindItem("Connection")->second->value);
   else
     response->SetItem("Connection", "keep-alive");

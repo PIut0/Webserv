@@ -13,6 +13,7 @@ SRC				=	core/KQueue.cpp \
 						core/Method.cpp \
 						core/GetMethod.cpp \
 						util/utils.cpp \
+						util/mimes.cpp \
 						util/process.cpp \
 						debug/System.cpp \
 						debug/Monitor.cpp \
