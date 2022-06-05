@@ -4,8 +4,10 @@
 // TODO ToCgi에 path 넣어주기
 // TODO ident 값으로 비교하기
 // TODO signal issue 등록하기
-Cgi::Cgi(KQueue &kq, Client *client, FdInterfaceType type, const std::string &path) : FdInterface(kq, type)
+Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : FdInterface(kq, kFdCgi), client(client)
 {
+  target_fd = client->interface_fd;
+
   pipe(this->fromCgi);
   pipe(this->toCgi);
 
@@ -33,6 +35,24 @@ Cgi::Cgi(KQueue &kq, Client *client, FdInterfaceType type, const std::string &pa
     fcntl(fromCgi[FD_READ], F_SETFL, O_NONBLOCK);
     kq.AddEvent(fromCgi[FD_READ], EVFILT_READ, this);
   }
+}
+
+int Cgi::EventRead()
+{
+
+  return 0;
+}
+
+int Cgi::EventWrite()
+{
+
+  return 0;
+}
+
+int Cgi::EventWriteToCgi()
+{
+
+  return 0;
 }
 
 Cgi::~Cgi() {}

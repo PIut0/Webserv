@@ -30,6 +30,9 @@ void Client_Event_Read(Client *client)
       client->response = nullptr;
       break;
     case kFdCgi:
+      new Cgi(client->kq, client->GetFilePath(), client);
+      client->request = nullptr;
+      client->response = nullptr;
       break;
     default:
       break;
@@ -70,6 +73,24 @@ void GetMethod_Event_Write(GetMethod *getmethod)
   return ;
 }
 
+void Cgi_Event_Read(Cgi *cgi)
+{
+
+}
+
+void Cgi_Event_Write(Cgi *cgi, const uintptr_t &ident)
+{
+  if (ident == cgi->target_fd) {
+    if (cgi->EventWrite() <= 0) {
+      // cgi response to client
+    }
+  } else {
+    if (cgi->EventWriteToCgi() <= 0) {
+      // request to cgi process
+    }
+  }
+}
+
 void Process(FdInterface *target, struct kevent event)
 {
   if (event.filter == EVFILT_READ)
@@ -84,6 +105,9 @@ void Process(FdInterface *target, struct kevent event)
       break;
     case kFdGetMethod:
       GetMethod_Event_Read(static_cast<GetMethod *>(target));
+      break;
+    case kFdCgi:
+      Cgi_Event_Read(static_cast<Cgi *>(target));
       break;
     default:
       break;
@@ -101,6 +125,9 @@ void Process(FdInterface *target, struct kevent event)
       break;
     case kFdGetMethod:
       GetMethod_Event_Write(static_cast<GetMethod *>(target));
+      break;
+    case kFdCgi:
+      Cgi_Event_Write(static_cast<Cgi *>(target), event.ident);
       break;
     default:
       break;
