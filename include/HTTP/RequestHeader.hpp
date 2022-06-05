@@ -39,7 +39,7 @@ class RequestHeader : public Header
   std::string MethodToString();
   std::string HttpVersionToString();
 
-  char** ToCgi(const int &type);
+  char** ToCgi(const std::string &path);
 
   // request line
   int           method;
