@@ -18,6 +18,7 @@
 #include "NotFoundError.hpp"
 #include "ForbiddenError.hpp"
 #include "InternalServerError.hpp"
+#include "FdDupFailed.hpp"
 
 class Monitor
 {
