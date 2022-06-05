@@ -75,7 +75,12 @@ void GetMethod_Event_Write(GetMethod *getmethod)
 
 void Cgi_Event_Read(Cgi *cgi)
 {
-
+  if (cgi->EventRead() <= 0)
+  {
+    cgi->SetResponseMessage();
+    cgi->kq.DeleteEvent(cgi->fromCgi[FD_READ], EVFILT_READ);
+    cgi->kq.AddEvent(cgi->target_fd, EVFILT_WRITE, cgi);
+  }
 }
 
 void Cgi_Event_Write(Cgi *cgi, const uintptr_t &ident)
