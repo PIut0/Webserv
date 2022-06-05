@@ -3,13 +3,16 @@
 Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : FdInterface(kq, kFdCgi), client(client)
 {
   target_fd = client->interface_fd;
+  request = (client->request) ? client->request : new RequestHeader();
+  response = (client->response) ? client->response : new ResponseHeader();
+  location = client->GetLocationBlock();
 
   pipe(this->fromCgi);
   pipe(this->toCgi);
 
   pid_t pid = fork();
   if (pid == PS_CHILD) {
-    if (dup2(fromCgi[FD_WRITE], STDOUT_FILENO)== -1)
+    if (dup2(fromCgi[FD_WRITE], STDOUT_FILENO) == -1)
       throw FdDupFailed(); // TODO signal 처리
 
     if (dup2(toCgi[FD_READ], STDIN_FILENO) == -1)
@@ -17,14 +20,15 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : FdInterface(kq, 
 
     close(fromCgi[FD_READ]);
     close(toCgi[FD_READ]);
-    char **env = client->request->ToCgi(CGI_PHP);
+
+    char **env = this->request->ToCgi(path);
     if (execve("./cgi_tester", NULL, env) == -1)
       throw FdDupFailed();
   } else {
     close(fromCgi[FD_WRITE]);
     close(toCgi[FD_READ]);
 
-    if (client->request->body.size() > 0) {
+    if (this->request->body.size() > 0) {
       fcntl(toCgi[FD_WRITE], F_SETFL, O_NONBLOCK);
       kq.AddEvent(toCgi[FD_WRITE], EVFILT_WRITE, this);
     }

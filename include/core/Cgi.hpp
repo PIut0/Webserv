@@ -25,16 +25,16 @@ class Cgi : public FdInterface
   Cgi(KQueue &kq, const std::string &path, Client *client);
   virtual ~Cgi();
 
-  int EventRead();
-  int EventWrite();
-  int EventWriteToCgi();
-  void SetResponseMessage();
+  int   EventRead();
+  int   EventWrite();
+  int   EventWriteToCgi();
+  void  SetResponseMessage();
 
-  int target_fd;
-  Client *client;
-  RequestHeader *request;
-  ResponseHeader *response;
-  LocationBlock *location;
+  int             target_fd;
+  Client          *client;
+  RequestHeader   *request;
+  ResponseHeader  *response;
+  LocationBlock   *location;
 
   int fromCgi[2];
   int toCgi[2];
