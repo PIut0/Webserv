@@ -1,9 +1,5 @@
 #include "Cgi.hpp"
 
-// TODO CGI 클래스 새로 만들기
-// TODO ToCgi에 path 넣어주기
-// TODO ident 값으로 비교하기
-// TODO signal issue 등록하기
 Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : FdInterface(kq, kFdCgi), client(client)
 {
   target_fd = client->interface_fd;
