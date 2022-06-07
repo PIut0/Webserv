@@ -84,6 +84,8 @@ std::string StatusCode(const int &code)
   {
     case 200:
       return "200 OK";
+    case 204:
+      return "204 No Content";
     case 300:
       return "300 Multiple Choices";
     case 301:

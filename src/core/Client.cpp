@@ -200,8 +200,14 @@ const std::string Client::GetFilePath()
 
 void Client::SetResponseMessage()
 {
-  if (response->status_code == "")
-    response->SetItem("Status", StatusCode(200));
+  if (response->status_code == "") {
+    if (response->body.size() > 0)
+      response->SetItem("Status", StatusCode(200));
+    else
+      response->SetItem("Status", StatusCode(204));
+  }
+  else
+    response->SetItem("Content-Type", "text/html");
 
   response->SetItem("Content-Length", ft_itos(response->body.size()));
 

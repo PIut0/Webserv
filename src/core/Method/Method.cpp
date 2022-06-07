@@ -64,13 +64,17 @@ void Method::ResponseErrorPage()
 
 void Method::SetResponseMessage()
 {
-  if (response->status_code == "")
-    response->SetItem("Status", StatusCode(200));
+  response->SetBody(data);
+
+  if (response->status_code == "") {
+    if (response->body.size() > 0)
+      SetResponseStatus(response, 200);
+    else
+      SetResponseStatus(response, 204);
+  }
   else
     response->SetItem("Content-Type", "text/html");
 
-
-  response->SetBody(data);
   response->SetItem("Content-Length", ft_itos(response->body.size()));
 
   if (response->body.size() > 0) {
