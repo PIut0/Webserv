@@ -19,6 +19,8 @@ class PutMethod : public Method
   PutMethod(KQueue &kq, const std::string &path, Client *client);
   ~PutMethod();
 
+  int FileWrite();
+
   std::string target_path;
   std::vector<std::string> file_list;
 };

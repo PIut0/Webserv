@@ -117,14 +117,16 @@ FdInterfaceType Client::ParseHeader()
     }
   }
 
-  if (atoi(request->GetItem("Content-Length").value.c_str()) > 0 && request->body.size() <= 0)
+  if (ft_stoi(request->GetItem("Content-Length").value) > 0 && request->body.size() <= 0)
     return kFdNone;
   else if(request->GetItem("Transfer-Encoding").value == "chunked")
     return kFdNone;
   else if(CheckCgi())
     return kFdCgi;
-  else if(request->host != "")
+  else if(request->host != "" && request->method == HTTP_GET)
     return kFdGetMethod;
+  else if(request->host != "" && request->method == HTTP_PUT)
+    return kFdPutMethod;
   else
     return kFdNone;
 }
@@ -140,8 +142,10 @@ FdInterfaceType Client::ParseBody()
       return kFdNone;
     else if (status == 0 && CheckCgi())
       return kFdCgi;
-    else if (status == 0 && request->host != "")
+    else if (status == 0 && request->host != "" && request->method == HTTP_GET)
       return kFdGetMethod;
+    else if (status == 0 && request->host != "" && request->method == HTTP_PUT)
+      return kFdPutMethod;
     else
       return kFdNone;
   }
@@ -149,8 +153,10 @@ FdInterfaceType Client::ParseBody()
     request->SetBody(req);
     if (CheckCgi())
       return kFdCgi;
-    else if (request->host != "")
+    else if(request->host != "" && request->method == HTTP_GET)
       return kFdGetMethod;
+    else if(request->host != "" && request->method == HTTP_PUT)
+      return kFdPutMethod;
     else
       return kFdNone;
   }
