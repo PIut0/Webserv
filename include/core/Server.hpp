@@ -10,7 +10,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include "KQueue.hpp"
 #include "FdInterface.hpp"
 #include "Client.hpp"
 #include "utils.hpp"
