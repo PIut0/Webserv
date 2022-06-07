@@ -6,30 +6,38 @@ PutMethod::PutMethod(KQueue &kq, const std::string &path, Client *client) : Meth
   target_path = path;
 
   try {
+    int is_file = access(target_path.c_str(), F_OK);
     if (IsDir(target_path))
       throw NotFoundError(); // TODO : 400 BadRequest
 
-    if (access(target_path.c_str(), F_OK) != 0 &&
+    if (is_file != 0 &&
         access(target_path.substr(0, target_path.find_last_of("/")).c_str(), W_OK) != 0)
       throw ForbiddenError();
 
-    else if (access(target_path.c_str(), F_OK) == 0 && access(target_path.c_str(), W_OK) != 0)
+    else if (is_file == 0 && access(target_path.c_str(), W_OK) != 0)
       throw ForbiddenError();
 
     request->SetHost(target_path);
-    interface_fd = open(request->host.c_str(), O_CREAT | O_WRONLY, 0644);
+
+    if (is_file != 0) {
+      interface_fd = open(request->host.c_str(), O_CREAT, 0644);
+      SetResponseStatus(response, 201);
+    }
+    else
+      interface_fd = open(request->host.c_str(), O_WRONLY);
+
     if (interface_fd < 0)
       throw InternalServerError();
 
   } catch (NotFoundError &e) {
-    SetResponseErrorPage(response, 404);
+    SetResponseStatus(response, 404);
   } catch (ForbiddenError &e) {
-    SetResponseErrorPage(response, 403);
+    SetResponseStatus(response, 403);
   } catch (InternalServerError &e) {
-    SetResponseErrorPage(response, 500);
+    SetResponseStatus(response, 500);
   }
 
-  if (response->status_code != "") {
+  if (ft_stoi(response->status_code) >= 400) {
     ResponseErrorPage();
     return ;
   }
