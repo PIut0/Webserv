@@ -2,7 +2,7 @@
 
 int main()
 {
-  const std::string dummy = "Status: 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n\r\nHELLO\r\n\r\n";
+  const std::string dummy = "Status: 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n\r\nHELLO";
   const std::string dummyr = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n\r\nHELLO\r\n\r\n";
   { // constructor with string
     ResponseHeader responseHeader;
@@ -11,6 +11,7 @@ int main()
       std::cout << "TRUE" << std::endl;
     }
     else {
+      std::cout << "Body : " << responseHeader.body << std::endl;
       std::cout << "Dummy length : " << dummy.length() << std::endl;
       std::cout << "Parser length : " << responseHeader.ToString().length() << std::endl;
       exit(1);

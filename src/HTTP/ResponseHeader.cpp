@@ -256,15 +256,10 @@ int ResponseHeader::ParseBody(const std::string &data)
 {
   if (this->pos_ == data.length()) {
     this->body = "";
-    return WSV_OK;
+  } else {
+    this->body = data.substr(this->pos_, data.length() - this->pos_);
   }
-
-  if (wsv_str_4cmp_p(data, data.length() - 4, '\r', '\n', '\r', '\n')) {
-    this->body = data.substr(this->pos_, data.length() - this->pos_ - 4);
-    return WSV_OK;
-  }
-
-  throw HttpParseInvalidBody();
+  return WSV_OK;
 }
 
 std::string ResponseHeader::ToString()
