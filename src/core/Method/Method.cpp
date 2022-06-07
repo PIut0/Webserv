@@ -43,7 +43,7 @@ int Method::IsDir(const std::string &path)
   return (path.back() == '/');
 }
 
-void Method::SetResponseErrorPage(ResponseHeader *response, const int code)
+void Method::SetResponseStatus(ResponseHeader *response, const int code)
 {
   if (!response)
     return ;

@@ -66,11 +66,11 @@ GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Meth
     if (interface_fd < 0)
       throw InternalServerError();
   } catch (NotFoundError &e) {
-    SetResponseErrorPage(response, 404);
+    SetResponseStatus(response, 404);
   } catch (ForbiddenError &e) {
-    SetResponseErrorPage(response, 403);
+    SetResponseStatus(response, 403);
   } catch (InternalServerError &e) {
-    SetResponseErrorPage(response, 500);
+    SetResponseStatus(response, 500);
   }
 
   if (response->status_code != "") {
