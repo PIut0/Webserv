@@ -1,9 +1,8 @@
 #include "PutMethod.hpp"
 #include "utils.hpp"
 
-PutMethod::PutMethod(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdGetMethod)
+PutMethod::PutMethod(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdPutMethod)
 {
-  std::cout << "file: " << path << std::endl;
   target_path = path;
 
   try {
@@ -18,7 +17,7 @@ PutMethod::PutMethod(KQueue &kq, const std::string &path, Client *client) : Meth
       throw ForbiddenError();
 
     request->SetHost(target_path);
-    interface_fd = open(request->host.c_str(), O_WRONLY);
+    interface_fd = open(request->host.c_str(), O_CREAT | O_WRONLY, 0644);
     if (interface_fd < 0)
       throw InternalServerError();
 
