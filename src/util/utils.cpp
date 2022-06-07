@@ -107,6 +107,15 @@ std::string StatusCode(const int &code)
   }
 }
 
+std::string DefaultErrorPage(const int &code)
+{
+  std::stringstream ss;
+  ss << "<html><head><title>" << StatusCode(code) << "</title></head>"
+     << "<body><center><h1>" << StatusCode(code) << "</h1></center>"
+     << "<hr /><center>Init6_Nginx</center></body></html>";
+  return ss.str();
+}
+
 std::string GetAutoindexPage(std::string &target_path, std::vector<std::string> &files)
 {
   std::stringstream ss;

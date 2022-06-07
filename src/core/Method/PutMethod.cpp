@@ -1,18 +1,6 @@
 #include "PutMethod.hpp"
 #include "utils.hpp"
 
-int IsDir(const std::string &path)
-{
-  return (path.back() == '/');
-}
-
-void SetResponseErrorPage(ResponseHeader *response, const int code)
-{
-  if (!response)
-    return ;
-  response->SetItem("Status", StatusCode(code));
-}
-
 PutMethod::PutMethod(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdGetMethod)
 {
   std::cout << "file: " << path << std::endl;
@@ -43,15 +31,10 @@ PutMethod::PutMethod(KQueue &kq, const std::string &path, Client *client) : Meth
   }
 
   if (response->status_code != "") {
-    if (location->error_page != "")
-      interface_fd = open(location->error_page.c_str(), O_RDONLY);
-    else {
-      data = "";
-      SetResponseMessage();
-      kq.AddEvent(target_fd, EVFILT_WRITE, this);
-      return ;
-    }
+    ResponseErrorPage();
+    return ;
   }
+
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
   kq.AddEvent(interface_fd, EVFILT_WRITE, this);
 }

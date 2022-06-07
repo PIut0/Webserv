@@ -25,6 +25,7 @@ int IsEOF(int fd);
 void SetMime();
 std::string MimeType(const std::string &ext);
 std::string StatusCode(const int &code);
+std::string DefaultErrorPage(const int &code)
 std::string GetAutoindexPage(std::string &target_path, std::vector<std::string> &files);
 
 #endif

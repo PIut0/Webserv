@@ -38,10 +38,37 @@ int Method::EventWrite()
   return n;
 }
 
+int Method::IsDir(const std::string &path)
+{
+  return (path.back() == '/');
+}
+
+void Method::SetResponseErrorPage(ResponseHeader *response, const int code)
+{
+  if (!response)
+    return ;
+  response->SetItem("Status", StatusCode(code));
+}
+
+void Method::ResponseErrorPage()
+{
+  if ((interface_fd = open(location->error_page.c_str(), O_RDONLY)) < 0) {
+    data = DefaultErrorPage(ft_stoi(response->status_code));
+    SetResponseMessage();
+    kq.AddEvent(target_fd, EVFILT_WRITE, this);
+  } else {
+    fcntl(interface_fd, F_SETFL, O_NONBLOCK);
+    kq.AddEvent(interface_fd, EVFILT_READ, this);
+  }
+}
+
 void Method::SetResponseMessage()
 {
   if (response->status_code == "")
     response->SetItem("Status", StatusCode(200));
+  else
+    response->SetItem("Content-Type", "text/html");
+
 
   response->SetBody(data);
   response->SetItem("Content-Length", ft_itos(response->body.size()));
