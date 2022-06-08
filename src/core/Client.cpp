@@ -100,10 +100,10 @@ FdInterfaceType Client::ParseHeader()
     status = ft_stoi(loc->ret.substr(0, 3));
 
     if (loc->ret.size() > 4) {
-      std::string red = loc->ret.substr(4);
-      red = rtrim(ltrim(red));
-      if (red.size() > 0)
-        response->SetItem("Location", red);
+      std::string ret = loc->ret.substr(4);
+      ret = trim(ret);
+      if (ret.size() > 0)
+        response->SetItem("Location", ret);
     }
   }
 
