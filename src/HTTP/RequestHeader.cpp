@@ -80,9 +80,9 @@ int RequestHeader::SetChunked(const std::string &chunked)
   }
 
   pos = chunked.find(CRLF);
-  contents_length = atoi(chunked.substr(0, pos).c_str());
+  contents_length = ft_stoi(chunked.substr(0, pos));
   if (contents_length == 0) return 0;
-  this->body = chunked.substr(pos + 2, contents_length);
+  this->body += chunked.substr(pos + 2, contents_length);
   return contents_length;
 }
 
