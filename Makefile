@@ -3,7 +3,8 @@ NAME			=	webserv
 INCLUDE 	=	-I./include -I./include/http -I./include/config -I./include/error -I./include/common -I./include/debug -I./include/core -I./include/core/method -I./include/util
 
 CXX				=	c++
-CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 $(INCLUDE)
+#CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 $(INCLUDE)
+CXXFLAGS	=	-g -Wall -Wextra -Werror -std=c++98 $(INCLUDE)
 
 MAIN			= main.cpp
 
