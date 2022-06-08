@@ -69,12 +69,12 @@ int Client::CheckRequest()
     request->Parse(req);
   } catch(const HttpParseInvalidBody& e) {
     return 400;
-  } catch(const HttpParseInvalidMethod& e) {
-    return 405;
   } catch(const HttpParseInvalidRequest& e) {
     return 400;
   } catch(const HttpParseInvalidResponse& e) {
-    return 0;
+    return 500;
+  } catch(const NotImplementedError& e) {
+    return 405;
   }
 
   if (request->HttpVersionToString() != "HTTP/1.1")

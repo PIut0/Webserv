@@ -104,6 +104,8 @@ std::string StatusCode(const int &code)
       return "405 Method Not Allowed";
     case 500:
       return "500 Internal Server Error";
+    case 501:
+      return "501 Not Implemented";
     case 505:
       return "505 HTTP Version Not Supported";
     default:
