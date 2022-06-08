@@ -3,6 +3,11 @@
 
 PutMethod::PutMethod(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdPutMethod)
 {
+  if (ft_stoi(response->status_code) >= 400) {
+    ResponseErrorPage();
+    return ;
+  }
+
   target_path = path;
   try {
     int is_file = access(target_path.c_str(), F_OK);

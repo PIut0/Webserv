@@ -3,6 +3,11 @@
 
 DeleteMethod::DeleteMethod(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdPostMethod)
 {
+  if (response->status_code != "") {
+    ResponseErrorPage();
+    return;
+  }
+
   target_path = path;
   try {
     int is_file = access(target_path.c_str(), F_OK);

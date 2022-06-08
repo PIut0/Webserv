@@ -23,9 +23,12 @@ std::vector<std::string> GetFileList(const std::string &path)
 
 GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdGetMethod)
 {
-  std::cout << "file: " << path << std::endl;
-  target_path = path;
+  if (response->status_code != "") {
+    ResponseErrorPage();
+    return;
+  }
 
+  target_path = path;
   try {
     if (access(target_path.c_str(), F_OK) != 0)
       throw NotFoundError();
