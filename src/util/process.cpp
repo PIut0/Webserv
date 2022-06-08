@@ -40,6 +40,11 @@ void Client_Event_Read(Client *client)
       client->request = nullptr;
       client->response = nullptr;
       break;
+    case kFdDeleteMethod:
+      new DeleteMethod(client->kq, client->GetFilePath(), client);
+      client->request = nullptr;
+      client->response = nullptr;
+      break;
     case kFdCgi:
       break;
     default:
@@ -145,6 +150,27 @@ void PostMethod_Event_Write(PostMethod *postmethod, int fd)
   return ;
 }
 
+void DeleteMethod_Event_Read(DeleteMethod *deletemethod)
+{
+  if (deletemethod->EventRead() <= 0)
+  {
+    deletemethod->SetResponseMessage();
+    deletemethod->kq.DeleteEvent(deletemethod->interface_fd, EVFILT_READ);
+    deletemethod->kq.AddEvent(deletemethod->target_fd, EVFILT_WRITE, deletemethod);
+  }
+}
+
+void DeleteMethod_Event_Write(DeleteMethod *deletemethod)
+{
+  if (deletemethod->EventWrite() <= 0) {
+    deletemethod->kq.DeleteEvent(deletemethod->target_fd, EVFILT_WRITE);
+    if (deletemethod->request->GetItem("Connection").value == "close")
+      delete deletemethod->client;
+    delete deletemethod;
+  }
+  return ;
+}
+
 void Process(FdInterface *target, struct kevent event)
 {
   if (event.filter == EVFILT_READ)
@@ -165,6 +191,9 @@ void Process(FdInterface *target, struct kevent event)
       break;
     case kFdPostMethod:
       PostMethod_Event_Read(static_cast<PostMethod *>(target));
+      break;
+    case kFdDeleteMethod:
+      DeleteMethod_Event_Read(static_cast<DeleteMethod *>(target));
       break;
     default:
       break;
@@ -188,6 +217,9 @@ void Process(FdInterface *target, struct kevent event)
       break;
     case kFdPostMethod:
       PostMethod_Event_Write(static_cast<PostMethod *>(target), event.ident);
+      break;
+    case kFdDeleteMethod:
+      DeleteMethod_Event_Write(static_cast<DeleteMethod *>(target));
       break;
     default:
       break;

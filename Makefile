@@ -14,6 +14,7 @@ SRC				=	core/KQueue.cpp \
 						core/Method/GetMethod.cpp \
 						core/Method/PutMethod.cpp \
 						core/Method/PostMethod.cpp \
+						core/Method/DeleteMethod.cpp \
 						util/utils.cpp \
 						util/mimes.cpp \
 						util/process.cpp \
