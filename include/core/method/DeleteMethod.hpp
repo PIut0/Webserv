@@ -18,8 +18,6 @@ class DeleteMethod : public Method
  public:
   DeleteMethod(KQueue &kq, const std::string &path, Client *client);
   ~DeleteMethod();
-
-  std::string target_path;
 };
 
 #endif

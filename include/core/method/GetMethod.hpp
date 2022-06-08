@@ -19,7 +19,6 @@ class GetMethod : public Method
   GetMethod(KQueue &kq, const std::string &path, Client *client);
   ~GetMethod();
 
-  std::string target_path;
   std::vector<std::string> file_list;
 };
 

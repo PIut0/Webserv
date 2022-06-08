@@ -20,8 +20,6 @@ class PutMethod : public Method
   ~PutMethod();
 
   int FileWrite();
-
-  std::string target_path;
 };
 
 #endif

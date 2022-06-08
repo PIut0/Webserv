@@ -42,6 +42,7 @@ class Method : public FdInterface
   void SetResponseMessage();
 
   int target_fd;
+  std::string target_path;
   std::string data;
   Client *client;
   RequestHeader *request;
