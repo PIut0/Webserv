@@ -134,7 +134,7 @@ int RequestHeader::ParseRequestLine(const std::string &data)
     {
       case wsb_start:
         if ((ch < 'A' || ch > 'Z') && ch != '_' && ch != '-') {
-          throw HttpParseInvalidMethod();
+          throw NotImplementedError();
         }
 
         state = wsb_method;
@@ -159,7 +159,7 @@ int RequestHeader::ParseRequestLine(const std::string &data)
           }
 
           else {
-            throw HttpParseInvalidMethod();
+            throw NotImplementedError();
           }
 
           state = wsb_before_uri;
