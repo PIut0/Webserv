@@ -4,7 +4,6 @@
 PutMethod::PutMethod(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdPutMethod)
 {
   target_path = path;
-
   try {
     int is_file = access(target_path.c_str(), F_OK);
     if (IsDir(target_path))
@@ -19,12 +18,10 @@ PutMethod::PutMethod(KQueue &kq, const std::string &path, Client *client) : Meth
 
     request->SetHost(target_path);
 
-    if (is_file != 0) {
-      interface_fd = open(request->host.c_str(), O_CREAT, 0644);
+    if (is_file != 0)
       SetResponseStatus(response, 201);
-    }
-    else
-      interface_fd = open(request->host.c_str(), O_WRONLY);
+
+    interface_fd = open(request->host.c_str(), O_WRONLY | O_CREAT, 0666);
 
     if (interface_fd < 0)
       throw InternalServerError();
