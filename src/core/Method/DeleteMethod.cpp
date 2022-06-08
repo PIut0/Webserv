@@ -1,11 +1,11 @@
 #include "DeleteMethod.hpp"
 #include "utils.hpp"
 
-DeleteMethod::DeleteMethod(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdPostMethod)
+DeleteMethod::DeleteMethod(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdDeleteMethod)
 {
-  if (response->status_code != "") {
+  if (ft_stoi(response->status_code) >= 400) {
     ResponseErrorPage();
-    return;
+    return ;
   }
 
   target_path = path;
