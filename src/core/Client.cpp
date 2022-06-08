@@ -127,6 +127,8 @@ FdInterfaceType Client::ParseHeader()
     return kFdGetMethod;
   else if(request->host != "" && request->method == HTTP_PUT)
     return kFdPutMethod;
+  else if(request->host != "" && request->method == HTTP_POST)
+    return kFdPostMethod;
   else
     return kFdNone;
 }
@@ -162,19 +164,27 @@ FdInterfaceType Client::ParseBody()
     return kFdGetMethod;
   else if (request->host != "" && request->method == HTTP_PUT)
     return kFdPutMethod;
+  else if (request->host != "" && request->method == HTTP_POST)
+    return kFdPostMethod;
   else
     return kFdNone;
 }
 
 FdInterfaceType Client::ParseReq()
 {
+  FdInterfaceType type;
+
   if (request == nullptr) {
     if (!IsCRLF(request_message))
       return kFdNone;
-    return ParseHeader();
+
+    type = ParseHeader();
+
+    if (request_message.size() <= 0)
+      return type;
   }
-  else
-    return ParseBody();
+
+  return ParseBody();
 }
 
 const std::string Client::GetFilePath()
