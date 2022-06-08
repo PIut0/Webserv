@@ -129,6 +129,8 @@ FdInterfaceType Client::ParseHeader()
     return kFdPutMethod;
   else if(request->host != "" && request->method == HTTP_POST)
     return kFdPostMethod;
+  else if(request->host != "" && request->method == HTTP_DELETE)
+    return kFdDeleteMethod;
   else
     return kFdNone;
 }
@@ -166,12 +168,15 @@ FdInterfaceType Client::ParseBody()
     return kFdPutMethod;
   else if (request->host != "" && request->method == HTTP_POST)
     return kFdPostMethod;
+  else if (request->host != "" && request->method == HTTP_DELETE)
+    return kFdDeleteMethod;
   else
     return kFdNone;
 }
 
 FdInterfaceType Client::ParseReq()
 {
+  std::cout << "ParseReq: " << request_message << std::endl;
   FdInterfaceType type;
 
   if (request == nullptr) {

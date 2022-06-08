@@ -13,6 +13,7 @@ enum FdInterfaceType {
   kFdGetMethod,
   kFdPutMethod,
   kFdPostMethod,
+  kFdDeleteMethod,
   kFdCgi,
   kFdNone
 };
