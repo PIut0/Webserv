@@ -112,7 +112,7 @@ FdInterfaceType Client::ParseHeader()
     if (loc && loc->error_page != "")
       return kFdGetMethod;
     else {
-      response->body = "";
+      response->body = DefaultErrorPage(status);
       return kFdClient;
     }
   }
@@ -196,19 +196,12 @@ const std::string Client::GetFilePath()
 {
   std::string path;
 
-  if (response->status_code != "") {
-    request->SetHost(GetLocationBlock()->error_page);
-    path = request->host;
-  }
+  int location_index = server->server_block.GetLocationBlockByPath(request->host);
 
-  else {
-    int location_index = server->server_block.GetLocationBlockByPath(request->host);
-
-    if (location_index == -1)
-      throw NotFoundError();
-    path = GetLocationBlock()->root
-      + request->host.substr(request->host.find(GetLocationBlock()->location_path) + GetLocationBlock()->location_path.size());
-  }
+  if (location_index == -1)
+    throw NotFoundError(); // TODO : Catch 추가
+  path = GetLocationBlock()->root
+    + request->host.substr(request->host.find(GetLocationBlock()->location_path) + GetLocationBlock()->location_path.size());
 
   return path;
 }
