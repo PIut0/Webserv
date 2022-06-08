@@ -29,7 +29,6 @@ void Client_Event_Read(Client *client)
       client->request = nullptr;
       client->response = nullptr;
       break;
-      break;
     case kFdPutMethod:
       new PutMethod(client->kq, client->GetFilePath(), client);
       client->request = nullptr;
