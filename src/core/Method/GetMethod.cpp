@@ -81,6 +81,14 @@ GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Meth
     return;
   }
 
+  std::cout << "fd: " << IsEOF(interface_fd) << std::endl;
+  if (!IsEOF(interface_fd)) {
+    std::cout << "EOF" << std::endl;
+    SetResponseMessage();
+    kq.AddEvent(target_fd, EVFILT_WRITE, this);
+    return ;
+  }
+
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
   kq.AddEvent(interface_fd, EVFILT_READ, this);
 }
