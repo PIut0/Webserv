@@ -14,6 +14,7 @@ Method::~Method()
   delete request;
   delete response;
   close(interface_fd);
+  close(target_fd);
 }
 
 int Method::EventRead()
@@ -72,7 +73,8 @@ void Method::SetResponseMessage()
     else
       SetResponseStatus(response, 204);
   }
-  else
+
+  if (ft_stoi(response->status_code) >= 400)
     response->SetItem("Content-Type", "text/html");
 
   if (response->body.size() > 0) {
@@ -88,6 +90,6 @@ void Method::SetResponseMessage()
 
   if (request && request->FindItem("Connection")->first == "Connection")
     response->SetItem("Connection", request->FindItem("Connection")->second->value);
-  else
+  else if (response->FindItem("Connection") == response->conf.end())
     response->SetItem("Connection", "keep-alive");
 }
