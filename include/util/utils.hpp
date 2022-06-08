@@ -8,6 +8,7 @@
 #include <sstream>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 static std::map<std::string, std::string> _mimes;
 
@@ -21,6 +22,7 @@ std::string& trim(std::string& s);
 std::string ft_itos(int i);
 int ft_stoi(const std::string &s);
 int IsEOF(int fd);
+int IsRegularFile(const std::string &path);
 
 void SetMime();
 std::string MimeType(const std::string &ext);

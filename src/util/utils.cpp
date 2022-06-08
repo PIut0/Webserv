@@ -78,6 +78,14 @@ int IsEOF(int fd)
   return n;
 }
 
+int IsRegularFile(const std::string &path)
+{
+  struct stat st;
+  if (stat(path.c_str(), &st) < 0)
+    return -1;
+  return S_ISREG(st.st_mode);
+}
+
 std::string StatusCode(const int &code)
 {
   switch (code)

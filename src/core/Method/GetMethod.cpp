@@ -33,6 +33,9 @@ GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Meth
     if (access(target_path.c_str(), F_OK) != 0)
       throw NotFoundError();
 
+    if (!IsRegularFile(target_path))
+      target_path += "/";
+
     if (IsDir(target_path)) {
       file_list = GetFileList(target_path);
 
@@ -68,6 +71,18 @@ GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Meth
 
     if (interface_fd < 0)
       throw InternalServerError();
+
+    int is_eof = IsEOF(interface_fd);
+
+    if (is_eof == 0) { // empty file
+      SetResponseMessage();
+      kq.AddEvent(target_fd, EVFILT_WRITE, this);
+      return ;
+    }
+
+    else if (is_eof < 0) // read error | file is directory
+      throw InternalServerError();
+
   } catch (NotFoundError &e) {
     SetResponseStatus(response, 404);
   } catch (ForbiddenError &e) {
@@ -79,14 +94,6 @@ GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Meth
   if (response->status_code != "") {
     ResponseErrorPage();
     return;
-  }
-
-  std::cout << "fd: " << IsEOF(interface_fd) << std::endl;
-  if (!IsEOF(interface_fd)) {
-    std::cout << "EOF" << std::endl;
-    SetResponseMessage();
-    kq.AddEvent(target_fd, EVFILT_WRITE, this);
-    return ;
   }
 
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
