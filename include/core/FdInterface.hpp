@@ -11,6 +11,7 @@ enum FdInterfaceType {
   kFdServer,
   kFdClient,
   kFdGetMethod,
+  kFdPutMethod,
   kFdCgi,
   kFdNone
 };

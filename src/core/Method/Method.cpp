@@ -14,6 +14,7 @@ Method::~Method()
   delete request;
   delete response;
   close(interface_fd);
+  close(target_fd);
 }
 
 int Method::EventRead()
@@ -38,15 +39,47 @@ int Method::EventWrite()
   return n;
 }
 
+int Method::IsDir(const std::string &path)
+{
+  return (path.back() == '/');
+}
+
+void Method::SetResponseStatus(ResponseHeader *response, const int code)
+{
+  if (!response)
+    return ;
+  response->SetItem("Status", StatusCode(code));
+}
+
+void Method::ResponseErrorPage()
+{
+  if ((interface_fd = open(location->error_page.c_str(), O_RDONLY)) < 0) {
+    data = DefaultErrorPage(ft_stoi(response->status_code));
+    SetResponseMessage();
+    kq.AddEvent(target_fd, EVFILT_WRITE, this);
+  } else {
+    fcntl(interface_fd, F_SETFL, O_NONBLOCK);
+    kq.AddEvent(interface_fd, EVFILT_READ, this);
+  }
+}
+
 void Method::SetResponseMessage()
 {
-  if (response->status_code == "")
-    response->SetItem("Status", StatusCode(200));
-
   response->SetBody(data);
-  response->SetItem("Content-Length", ft_itos(response->body.size()));
+
+  if (response->status_code == "") {
+    if (response->body.size() > 0)
+      SetResponseStatus(response, 200);
+    else
+      SetResponseStatus(response, 204);
+  }
+
+  if (ft_stoi(response->status_code) >= 400)
+    response->SetItem("Content-Type", "text/html");
 
   if (response->body.size() > 0) {
+    response->SetItem("Content-Length", ft_itos(response->body.size()));
+
     if (response->FindItem("Content-Type") == response->conf.end()) {
       if (request && request->host.size() && request->host.find_last_of(".") != std::string::npos)
         response->SetItem("Content-Type", MimeType(request->host.substr(request->host.find_last_of(".") + 1)));
@@ -57,6 +90,6 @@ void Method::SetResponseMessage()
 
   if (request && request->FindItem("Connection")->first == "Connection")
     response->SetItem("Connection", request->FindItem("Connection")->second->value);
-  else
+  else if (response->FindItem("Connection") == response->conf.end())
     response->SetItem("Connection", "keep-alive");
 }

@@ -75,20 +75,15 @@ int RequestHeader::SetChunked(const std::string &chunked)
   int contents_length;
   int pos;
 
-  if (chunked.length() == 0) {
-    return 0;
+  if (chunked.length() == 0 || chunked.find(CRLF) == std::string::npos) {
+    return -1;
   }
 
   pos = chunked.find(CRLF);
   contents_length = atoi(chunked.substr(0, pos).c_str());
   if (contents_length == 0) return 0;
-
-  if (wsv_str_4cmp_p(chunked, chunked.length() - 4, '\r', '\n', '\r', '\n')) {
-    this->body += chunked.substr(pos + 2, chunked.length() - (pos + 2) - 4);
-    return contents_length;
-  }
-
-  return -1;
+  this->body = chunked.substr(pos + 2, contents_length);
+  return contents_length;
 }
 
 req_header_it_t RequestHeader::FindItem(const std::string &key)
@@ -152,11 +147,11 @@ int RequestHeader::ParseRequestLine(const std::string &data)
           }
 
           else if (pos == 3 && wsb_str_3cmp(data, 'P', 'U', 'T')) {
-            this->method = HTTP_POST;
+            this->method = HTTP_PUT;
           }
 
           else if (pos == 4 && wsb_str_4cmp(data, 'P', 'O', 'S', 'T')) {
-            this->method = HTTP_PUT;
+            this->method = HTTP_POST;
           }
 
           else if (pos == 6 && wsb_str_6cmp(data, 'D', 'E', 'L', 'E', 'T', 'E')) {

@@ -117,52 +117,62 @@ FdInterfaceType Client::ParseHeader()
     }
   }
 
-  if (atoi(request->GetItem("Content-Length").value.c_str()) > 0 && request->body.size() <= 0)
+  if (ft_stoi(request->GetItem("Content-Length").value) > 0 && request->body.size() <= 0)
     return kFdNone;
   else if(request->GetItem("Transfer-Encoding").value == "chunked")
     return kFdNone;
   else if(CheckCgi())
     return kFdCgi;
-  else if(request->host != "")
+  else if(request->host != "" && request->method == HTTP_GET)
     return kFdGetMethod;
+  else if(request->host != "" && request->method == HTTP_PUT)
+    return kFdPutMethod;
   else
     return kFdNone;
 }
 
 FdInterfaceType Client::ParseBody()
 {
-  std::string req = request_message.substr(0, request_message.find(D_CRLF));
-  request_message = request_message.substr(request_message.find(D_CRLF) + 4);
+  std::string req;
+  int content_length;
+
+  if (IsCRLF(request_message)) {
+    req = request_message.substr(0, request_message.find(D_CRLF));
+    request_message = request_message.substr(request_message.find(D_CRLF) + 4);
+  } else {
+    req = request_message;
+    request_message = "";
+  }
 
   if (request->GetItem("Transfer-Encoding").value == "chunked") {
-    int status = request->SetChunked(req);
-    if (status > 0)
-      return kFdNone;
-    else if (status == 0 && CheckCgi())
-      return kFdCgi;
-    else if (status == 0 && request->host != "")
-      return kFdGetMethod;
-    else
+    if (request->SetChunked(req) != 0)
       return kFdNone;
   }
-  else {
-    request->SetBody(req);
-    if (CheckCgi())
-      return kFdCgi;
-    else if (request->host != "")
-      return kFdGetMethod;
-    else
+
+  else if((content_length = ft_stoi(request->GetItem("Content-Length").value)) > 0) {
+    request->SetBody(request->body + req);
+    if (request->body.length() < static_cast<unsigned long>(content_length))
       return kFdNone;
+    request->SetBody(request->body.substr(0, content_length));
   }
+
+  if (CheckCgi())
+    return kFdCgi;
+  else if (request->host != "" && request->method == HTTP_GET)
+    return kFdGetMethod;
+  else if (request->host != "" && request->method == HTTP_PUT)
+    return kFdPutMethod;
+  else
+    return kFdNone;
 }
 
 FdInterfaceType Client::ParseReq()
 {
-  if (!IsCRLF(request_message))
-    return kFdNone;
-
-  if (request == nullptr)
+  if (request == nullptr) {
+    if (!IsCRLF(request_message))
+      return kFdNone;
     return ParseHeader();
+  }
   else
     return ParseBody();
 }
@@ -190,12 +200,18 @@ const std::string Client::GetFilePath()
 
 void Client::SetResponseMessage()
 {
-  if (response->status_code == "")
-    response->SetItem("Status", StatusCode(200));
-
-  response->SetItem("Content-Length", ft_itos(response->body.size()));
+  if (response->status_code == "") {
+    if (response->body.size() > 0)
+      response->SetItem("Status", StatusCode(200));
+    else
+      response->SetItem("Status", StatusCode(204));
+  }
+  else
+    response->SetItem("Content-Type", "text/html");
 
   if (response->body.size() > 0) {
+    response->SetItem("Content-Length", ft_itos(response->body.size()));
+
     if (response->FindItem("Content-Type") == response->conf.end()) {
       if (request && request->host.size() && request->host.find_last_of(".") != std::string::npos)
         response->SetItem("Content-Type", MimeType(request->host.substr(request->host.find_last_of(".") + 1)));

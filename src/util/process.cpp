@@ -29,6 +29,12 @@ void Client_Event_Read(Client *client)
       client->request = nullptr;
       client->response = nullptr;
       break;
+      break;
+    case kFdPutMethod:
+      new PutMethod(client->kq, client->GetFilePath(), client);
+      client->request = nullptr;
+      client->response = nullptr;
+      break;
     case kFdCgi:
       break;
     default:
@@ -70,6 +76,38 @@ void GetMethod_Event_Write(GetMethod *getmethod)
   return ;
 }
 
+void PutMethod_Event_Read(PutMethod *putmethod)
+{
+  if (putmethod->EventRead() <= 0)
+  {
+    putmethod->SetResponseMessage();
+    putmethod->kq.DeleteEvent(putmethod->interface_fd, EVFILT_READ);
+    putmethod->kq.AddEvent(putmethod->target_fd, EVFILT_WRITE, putmethod);
+  }
+}
+
+void PutMethod_Event_Write(PutMethod *putmethod, int fd)
+{
+  if (fd == putmethod->target_fd)
+  {
+    if (putmethod->EventWrite() <= 0) {
+      putmethod->kq.DeleteEvent(putmethod->target_fd, EVFILT_WRITE);
+      if (putmethod->request->GetItem("Connection").value == "close")
+        delete putmethod->client;
+      delete putmethod;
+    }
+  }
+  else
+  {
+    if (putmethod->FileWrite() <= 0) {
+      putmethod->SetResponseMessage();
+      putmethod->kq.DeleteEvent(putmethod->interface_fd, EVFILT_WRITE);
+      putmethod->kq.AddEvent(putmethod->target_fd, EVFILT_WRITE, putmethod);
+    }
+  }
+  return ;
+}
+
 void Process(FdInterface *target, struct kevent event)
 {
   if (event.filter == EVFILT_READ)
@@ -85,6 +123,8 @@ void Process(FdInterface *target, struct kevent event)
     case kFdGetMethod:
       GetMethod_Event_Read(static_cast<GetMethod *>(target));
       break;
+    case kFdPutMethod:
+      PutMethod_Event_Read(static_cast<PutMethod *>(target));
     default:
       break;
     }
@@ -102,6 +142,8 @@ void Process(FdInterface *target, struct kevent event)
     case kFdGetMethod:
       GetMethod_Event_Write(static_cast<GetMethod *>(target));
       break;
+    case kFdPutMethod:
+      PutMethod_Event_Write(static_cast<PutMethod *>(target), event.ident);
     default:
       break;
     }

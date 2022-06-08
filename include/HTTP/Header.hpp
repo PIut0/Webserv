@@ -15,8 +15,8 @@
 #define  HTTP_UNKNOWN  0x00000001
 #define  HTTP_GET      0x00000002
 #define  HTTP_POST     0x00000004
-#define  HTTP_PUT      0x00000006
-#define  HTTP_DELETE   0x00000008
+#define  HTTP_PUT      0x00000008
+#define  HTTP_DELETE   0x00000010
 
 #define  CRLF   "\r\n"
 #define  CR     '\r'

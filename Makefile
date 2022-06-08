@@ -1,6 +1,6 @@
 NAME			=	webserv
 
-INCLUDE 	=	-I./include -I./include/http -I./include/config -I./include/error -I./include/common -I./include/debug -I./include/core -I./include/util
+INCLUDE 	=	-I./include -I./include/http -I./include/config -I./include/error -I./include/common -I./include/debug -I./include/core -I./include/core/method -I./include/util
 
 CXX				=	c++
 CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 $(INCLUDE)
@@ -10,8 +10,9 @@ MAIN			= main.cpp
 SRC				=	core/KQueue.cpp \
 						core/Server.cpp \
 						core/Client.cpp \
-						core/Method.cpp \
-						core/GetMethod.cpp \
+						core/Method/Method.cpp \
+						core/Method/GetMethod.cpp \
+						core/Method/PutMethod.cpp \
 						util/utils.cpp \
 						util/mimes.cpp \
 						util/process.cpp \

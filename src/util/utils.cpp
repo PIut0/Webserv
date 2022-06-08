@@ -84,6 +84,10 @@ std::string StatusCode(const int &code)
   {
     case 200:
       return "200 OK";
+    case 201:
+      return "201 Created";
+    case 204:
+      return "204 No Content";
     case 300:
       return "300 Multiple Choices";
     case 301:
@@ -105,6 +109,15 @@ std::string StatusCode(const int &code)
     default:
       return "500 Internal Server Error";
   }
+}
+
+std::string DefaultErrorPage(const int &code)
+{
+  std::stringstream ss;
+  ss << "<html><head><title>" << StatusCode(code) << "</title></head>"
+     << "<body><center><h1>" << StatusCode(code) << "</h1></center>"
+     << "<hr /><center>Init6_Nginx</center></body></html>";
+  return ss.str();
 }
 
 std::string GetAutoindexPage(std::string &target_path, std::vector<std::string> &files)

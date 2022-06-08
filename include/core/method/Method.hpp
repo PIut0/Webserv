@@ -36,6 +36,9 @@ class Method : public FdInterface
 
   int EventRead();
   int EventWrite();
+  int IsDir(const std::string &path);
+  void SetResponseStatus(ResponseHeader *response, const int code);
+  void ResponseErrorPage();
   void SetResponseMessage();
 
   int target_fd;
