@@ -22,7 +22,6 @@ class PutMethod : public Method
   int FileWrite();
 
   std::string target_path;
-  std::vector<std::string> file_list;
 };
 
 #endif

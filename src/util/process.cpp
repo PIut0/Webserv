@@ -35,6 +35,11 @@ void Client_Event_Read(Client *client)
       client->request = nullptr;
       client->response = nullptr;
       break;
+    case kFdPostMethod:
+      new PostMethod(client->kq, client->GetFilePath(), client);
+      client->request = nullptr;
+      client->response = nullptr;
+      break;
     case kFdCgi:
       break;
     default:
@@ -108,6 +113,38 @@ void PutMethod_Event_Write(PutMethod *putmethod, int fd)
   return ;
 }
 
+void PostMethod_Event_Read(PostMethod *postmethod)
+{
+  if (postmethod->EventRead() <= 0)
+  {
+    postmethod->SetResponseMessage();
+    postmethod->kq.DeleteEvent(postmethod->interface_fd, EVFILT_READ);
+    postmethod->kq.AddEvent(postmethod->target_fd, EVFILT_WRITE, postmethod);
+  }
+}
+
+void PostMethod_Event_Write(PostMethod *postmethod, int fd)
+{
+  if (fd == postmethod->target_fd)
+  {
+    if (postmethod->EventWrite() <= 0) {
+      postmethod->kq.DeleteEvent(postmethod->target_fd, EVFILT_WRITE);
+      if (postmethod->request->GetItem("Connection").value == "close")
+        delete postmethod->client;
+      delete postmethod;
+    }
+  }
+  else
+  {
+    if (postmethod->FileWrite() <= 0) {
+      postmethod->SetResponseMessage();
+      postmethod->kq.DeleteEvent(postmethod->interface_fd, EVFILT_WRITE);
+      postmethod->kq.AddEvent(postmethod->target_fd, EVFILT_WRITE, postmethod);
+    }
+  }
+  return ;
+}
+
 void Process(FdInterface *target, struct kevent event)
 {
   if (event.filter == EVFILT_READ)
@@ -125,6 +162,10 @@ void Process(FdInterface *target, struct kevent event)
       break;
     case kFdPutMethod:
       PutMethod_Event_Read(static_cast<PutMethod *>(target));
+      break;
+    case kFdPostMethod:
+      PostMethod_Event_Read(static_cast<PostMethod *>(target));
+      break;
     default:
       break;
     }
@@ -144,6 +185,10 @@ void Process(FdInterface *target, struct kevent event)
       break;
     case kFdPutMethod:
       PutMethod_Event_Write(static_cast<PutMethod *>(target), event.ident);
+      break;
+    case kFdPostMethod:
+      PostMethod_Event_Write(static_cast<PostMethod *>(target), event.ident);
+      break;
     default:
       break;
     }
