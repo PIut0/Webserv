@@ -7,7 +7,11 @@ RequestHeader::RequestHeader(const RequestHeader &origin)
   *this = origin;
 }
 
-RequestHeader::~RequestHeader() {}
+RequestHeader::~RequestHeader() {
+  for (req_header_it_t it = this->conf.begin(); it != this->conf.end(); ++it) {
+    delete it->second;
+  }
+}
 
 RequestHeader& RequestHeader::operator=(const RequestHeader &rv)
 {
