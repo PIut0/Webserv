@@ -69,7 +69,7 @@ int Client::CheckRequest()
     request->Parse(req);
   } catch(const HttpParseInvalidBody& e) {
     return 400;
-  } catch(const HttpParseInvalidMethod& e) {
+  } catch(const NotImplementedError& e) {
     return 405;
   } catch(const HttpParseInvalidRequest& e) {
     return 400;

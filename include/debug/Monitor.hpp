@@ -10,13 +10,13 @@
 #include "utils.hpp"
 
 #include "HttpParseInvalidBody.hpp"
-#include "HttpParseInvalidMethod.hpp"
 #include "HttpParseInvalidRequest.hpp"
 #include "HttpParseInvalidResponse.hpp"
 #include "HttpParseInvalidVersion.hpp"
 
 #include "NotFoundError.hpp"
 #include "ForbiddenError.hpp"
+#include "NotImplementedError.hpp"
 #include "InternalServerError.hpp"
 
 class Monitor
