@@ -194,6 +194,8 @@ void Process(FdInterface *target, struct kevent event)
     case kFdDeleteMethod:
       DeleteMethod_Event_Read(static_cast<DeleteMethod *>(target));
       break;
+    case kFdCgi:
+      Cgi_Event_Read()
     default:
       break;
     }
