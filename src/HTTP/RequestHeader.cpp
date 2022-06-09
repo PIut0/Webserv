@@ -142,25 +142,67 @@ int RequestHeader::ParseRequestLine(const std::string &data)
 
       case wsb_method:
         if (ch == ' ') {
-          if (pos == 3 && wsb_str_3cmp(data, 'G', 'E', 'T')) {
-            this->method = HTTP_GET;
+          switch (pos)
+          {
+            case 3:
+              if (wsb_str_3cmp(data, 'G', 'E', 'T')) {
+                this->method = HTTP_GET;
+                break;
+              }
+
+              if (wsb_str_3cmp(data, 'P', 'U', 'T')) {
+                this->method = HTTP_PUT;
+                break;
+              }
+
+              break;
+
+            case 4:
+              if (wsb_str_4cmp(data, 'P', 'O', 'S', 'T')) {
+                this->method = HTTP_POST;
+                break;
+              }
+              if (wsb_str_4cmp(data, 'H', 'E', 'A', 'D')) {
+                throw NotAllowedError();
+              }
+
+              break;
+
+            case 5:
+              if (wsb_str_5cmp(data, 'P', 'A', 'T', 'C', 'H')) {
+                throw NotAllowedError();
+              }
+
+              if (wsb_str_5cmp(data, 'T', 'R', 'A', 'C', 'E')) {
+                throw NotAllowedError();
+              }
+
+              break;
+
+            case 6:
+              if (wsb_str_6cmp(data, 'D', 'E', 'L', 'E', 'T', 'E')) {
+                this->method = HTTP_DELETE;
+              }
+
+              break;
+
+            case 7:
+              if (wsb_str_7cmp(data, 'C', 'O', 'N', 'N', 'E', 'C', 'T')) {
+                throw NotAllowedError();
+              }
+              if (wsb_str_7cmp(data, 'O', 'P', 'T', 'I', 'O', 'N', 'S')) {
+                throw NotAllowedError();
+              }
+
+              break;
+
+            default:
+
+              break;
           }
 
-          else if (pos == 3 && wsb_str_3cmp(data, 'P', 'U', 'T')) {
-            this->method = HTTP_PUT;
-          }
-
-          else if (pos == 4 && wsb_str_4cmp(data, 'P', 'O', 'S', 'T')) {
-            this->method = HTTP_POST;
-          }
-
-          else if (pos == 6 && wsb_str_6cmp(data, 'D', 'E', 'L', 'E', 'T', 'E')) {
-            this->method = HTTP_DELETE;
-          }
-
-          else {
+          if (!this->method)
             throw NotImplementedError();
-          }
 
           state = wsb_before_uri;
 
