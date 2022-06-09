@@ -68,10 +68,10 @@ int Client::CheckCgi()
   LocationBlock *locationBlock;
   std::string extension;
 
-  if ((pos = this->request->host.find('.')) == std::string::npos){
+  if ((pos = this->request->host.find_last_of('.')) == std::string::npos){
     return 0;
   }
-  extension = this->request->host.substr(pos, this->request->host.length() - pos);
+  extension = this->request->host.substr(pos);
   locationBlock = GetLocationBlock();
   if ((it = locationBlock->cgi_info.find(extension)) == locationBlock->cgi_info.end()) {
     return 0;
