@@ -8,10 +8,16 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : FdInterface(kq, 
   location = client->GetLocationBlock();
   data_ = WSV_STR_EMPTY;
 
+  std::string cgi_path, extension;
+
   pipe(this->fromCgi);
   pipe(this->toCgi);
 
   pid_t pid = fork();
+
+  extension = this->request->host.substr(this->request->host.find_last_of('.'));
+  cgi_path = this->location->cgi_info[extension];
+
   if (pid == PS_CHILD) {
     if (dup2(fromCgi[FD_WRITE], STDOUT_FILENO) == -1)
       throw FdDupFailed();
@@ -24,7 +30,7 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : FdInterface(kq, 
 
     char **env = this->request->ToCgi(path);
     // TODO cgi_tester 경로 지정하기
-    if (execve(path.c_str(), NULL, env) == -1)
+    if (execve(cgi_path.c_str(), NULL, env) == -1)
       throw FdDupFailed();
   } else {
     close(fromCgi[FD_WRITE]);
