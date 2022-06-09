@@ -62,6 +62,7 @@ LocationBlock *Client::GetLocationBlock()
 int Client::CheckCgi()
 {
   // TODO : CGI 처리를 해야하는지 확인하는 부분
+  // request->host 의 . 뒷부분을 locationblock cgi_info에서 찾아서 있으면 OK
   return 0;
 }
 
