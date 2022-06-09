@@ -11,6 +11,10 @@ Client::Client(KQueue &kq, int fd, Server *server) : FdInterface(kq, kFdClient, 
 
 Client::~Client()
 {
+  if (request)
+    delete request;
+  if (response)
+    delete response;
   kq.DeleteEvent(interface_fd, EVFILT_READ);
   close(interface_fd);
 }
