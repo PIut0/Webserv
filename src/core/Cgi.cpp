@@ -1,6 +1,6 @@
 #include "Cgi.hpp"
 
-Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : FdInterface(kq, kFdCgi), client(client)
+Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdCgi)
 {
   target_fd = client->interface_fd;
   request = (client->request) ? client->request : new RequestHeader();

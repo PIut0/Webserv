@@ -2,6 +2,7 @@
 #define CGI_HPP
 
 #include "Client.hpp"
+#include "Method.hpp"
 #include "RequestHeader.hpp"
 #include "ResponseHeader.hpp"
 #include "Server.hpp"
@@ -17,7 +18,7 @@ class KQueue;
 class LocationBlock;
 
 
-class Cgi : public FdInterface
+class Cgi : public Method
 {
  public:
   Cgi(KQueue &kq, const std::string &path, Client *client);
@@ -27,12 +28,6 @@ class Cgi : public FdInterface
   int   EventWrite();
   int   EventWriteToCgi();
   void  SetResponseMessage();
-
-  int             target_fd;
-  Client          *client;
-  RequestHeader   *request;
-  ResponseHeader  *response;
-  LocationBlock   *location;
 
   int fromCgi[2];
   int toCgi[2];
