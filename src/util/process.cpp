@@ -45,6 +45,9 @@ void Client_Event_Read(Client *client)
       client->response = nullptr;
       break;
     case kFdCgi:
+      new Cgi(client->kq, client->GetFilePath(), client);
+      client->request = nullptr;
+      client->response = nullptr;
       break;
     default:
       break;
