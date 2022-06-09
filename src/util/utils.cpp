@@ -78,6 +78,14 @@ int IsEOF(int fd)
   return n;
 }
 
+int IsRegularFile(const std::string &path)
+{
+  struct stat st;
+  if (stat(path.c_str(), &st) < 0)
+    return -1;
+  return S_ISREG(st.st_mode);
+}
+
 std::string StatusCode(const int &code)
 {
   switch (code)
@@ -104,6 +112,8 @@ std::string StatusCode(const int &code)
       return "405 Method Not Allowed";
     case 500:
       return "500 Internal Server Error";
+    case 501:
+      return "501 Not Implemented";
     case 505:
       return "505 HTTP Version Not Supported";
     default:

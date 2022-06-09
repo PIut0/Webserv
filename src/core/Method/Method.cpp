@@ -57,9 +57,16 @@ void Method::ResponseErrorPage()
     data = DefaultErrorPage(ft_stoi(response->status_code));
     SetResponseMessage();
     kq.AddEvent(target_fd, EVFILT_WRITE, this);
-  } else {
-    fcntl(interface_fd, F_SETFL, O_NONBLOCK);
-    kq.AddEvent(interface_fd, EVFILT_READ, this);
+  }
+  else {
+    if (!IsEOF(interface_fd)) {
+      SetResponseMessage();
+      kq.AddEvent(target_fd, EVFILT_WRITE, this);
+    }
+    else {
+      fcntl(interface_fd, F_SETFL, O_NONBLOCK);
+      kq.AddEvent(interface_fd, EVFILT_READ, this);
+    }
   }
 }
 

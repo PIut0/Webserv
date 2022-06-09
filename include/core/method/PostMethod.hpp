@@ -20,8 +20,6 @@ class PostMethod : public Method
   ~PostMethod();
 
   int FileWrite();
-
-  std::string target_path;
 };
 
 #endif

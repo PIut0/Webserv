@@ -23,12 +23,18 @@ std::vector<std::string> GetFileList(const std::string &path)
 
 GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdGetMethod)
 {
-  std::cout << "file: " << path << std::endl;
-  target_path = path;
+  if (response->status_code != "") {
+    ResponseErrorPage();
+    return;
+  }
 
+  target_path = path;
   try {
     if (access(target_path.c_str(), F_OK) != 0)
       throw NotFoundError();
+
+    if (!IsRegularFile(target_path))
+      target_path += "/";
 
     if (IsDir(target_path)) {
       file_list = GetFileList(target_path);
@@ -65,6 +71,18 @@ GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Meth
 
     if (interface_fd < 0)
       throw InternalServerError();
+
+    int is_eof = IsEOF(interface_fd);
+
+    if (is_eof == 0) { // empty file
+      SetResponseMessage();
+      kq.AddEvent(target_fd, EVFILT_WRITE, this);
+      return ;
+    }
+
+    else if (is_eof < 0) // read error | file is directory
+      throw InternalServerError();
+
   } catch (NotFoundError &e) {
     SetResponseStatus(response, 404);
   } catch (ForbiddenError &e) {

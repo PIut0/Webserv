@@ -11,6 +11,11 @@ Client::Client(KQueue &kq, int fd, Server *server) : FdInterface(kq, kFdClient, 
 
 Client::~Client()
 {
+  if (request)
+    delete request;
+  if (response)
+    delete response;
+  kq.DeleteEvent(interface_fd, EVFILT_READ);
   close(interface_fd);
 }
 
@@ -74,7 +79,9 @@ int Client::CheckRequest()
   } catch(const HttpParseInvalidRequest& e) {
     return 400;
   } catch(const HttpParseInvalidResponse& e) {
-    return 0;
+    return 500;
+  } catch(const NotImplementedError& e) {
+    return 405;
   }
 
   if (request->HttpVersionToString() != "HTTP/1.1")
@@ -100,10 +107,10 @@ FdInterfaceType Client::ParseHeader()
     status = ft_stoi(loc->ret.substr(0, 3));
 
     if (loc->ret.size() > 4) {
-      std::string red = loc->ret.substr(4);
-      red = rtrim(ltrim(red));
-      if (red.size() > 0)
-        response->SetItem("Location", red);
+      std::string ret = loc->ret.substr(4);
+      ret = trim(ret);
+      if (ret.size() > 0)
+        response->SetItem("Location", ret);
     }
   }
 
@@ -112,7 +119,7 @@ FdInterfaceType Client::ParseHeader()
     if (loc && loc->error_page != "")
       return kFdGetMethod;
     else {
-      response->body = "";
+      response->body = DefaultErrorPage(status);
       return kFdClient;
     }
   }
@@ -140,24 +147,32 @@ FdInterfaceType Client::ParseBody()
   std::string req;
   int content_length;
 
-  if (IsCRLF(request_message)) {
-    req = request_message.substr(0, request_message.find(D_CRLF));
-    request_message = request_message.substr(request_message.find(D_CRLF) + 4);
-  } else {
-    req = request_message;
-    request_message = "";
-  }
-
   if (request->GetItem("Transfer-Encoding").value == "chunked") {
+    // TODO : chunked 데이터 파싱 추후 확정필요
+    if (!IsCRLF(request_message))
+      return kFdNone;
+
+    req = request_message.substr(0, request_message.find(D_CRLF) + 4);
+    request_message = request_message.substr(request_message.find(D_CRLF) + 4);
     if (request->SetChunked(req) != 0)
       return kFdNone;
   }
 
-  else if((content_length = ft_stoi(request->GetItem("Content-Length").value)) > 0) {
-    request->SetBody(request->body + req);
-    if (request->body.length() < static_cast<unsigned long>(content_length))
-      return kFdNone;
-    request->SetBody(request->body.substr(0, content_length));
+  else {
+    if (IsCRLF(request_message)) {
+      req = request_message.substr(0, request_message.find(D_CRLF));
+      request_message = request_message.substr(request_message.find(D_CRLF) + 4);
+    } else {
+      req = request_message;
+      request_message = "";
+    }
+
+    if((content_length = ft_stoi(request->GetItem("Content-Length").value)) > 0) {
+      request->SetBody(request->body + req);
+      if (request->body.length() < static_cast<unsigned long>(content_length))
+        return kFdNone;
+      request->SetBody(request->body.substr(0, content_length));
+    }
   }
 
   if (CheckCgi())
@@ -176,7 +191,7 @@ FdInterfaceType Client::ParseBody()
 
 FdInterfaceType Client::ParseReq()
 {
-  std::cout << "ParseReq: " << request_message << std::endl;
+  //std::cout << "ParseReq: " << request_message << std::endl;
   FdInterfaceType type;
 
   if (request == nullptr) {
@@ -196,19 +211,12 @@ const std::string Client::GetFilePath()
 {
   std::string path;
 
-  if (response->status_code != "") {
-    request->SetHost(GetLocationBlock()->error_page);
-    path = request->host;
-  }
+  int location_index = server->server_block.GetLocationBlockByPath(request->host);
 
-  else {
-    int location_index = server->server_block.GetLocationBlockByPath(request->host);
-
-    if (location_index == -1)
-      throw NotFoundError();
-    path = GetLocationBlock()->root
-      + request->host.substr(request->host.find(GetLocationBlock()->location_path) + GetLocationBlock()->location_path.size());
-  }
+  if (location_index == -1)
+    throw NotFoundError(); // TODO : Catch 추가
+  path = GetLocationBlock()->root
+    + request->host.substr(request->host.find(GetLocationBlock()->location_path) + GetLocationBlock()->location_path.size());
 
   return path;
 }

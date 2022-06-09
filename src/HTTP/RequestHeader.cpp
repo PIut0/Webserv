@@ -7,7 +7,11 @@ RequestHeader::RequestHeader(const RequestHeader &origin)
   *this = origin;
 }
 
-RequestHeader::~RequestHeader() {}
+RequestHeader::~RequestHeader() {
+  for (req_header_it_t it = this->conf.begin(); it != this->conf.end(); ++it) {
+    delete it->second;
+  }
+}
 
 RequestHeader& RequestHeader::operator=(const RequestHeader &rv)
 {
@@ -71,18 +75,20 @@ void RequestHeader::SetBody(const std::string &body)
 
 int RequestHeader::SetChunked(const std::string &chunked)
 {
-  std::string ret;
   int contents_length;
   int pos;
+
+  if (chunked.find("0\r\n\r\n") != std::string::npos)
+    return 0;
 
   if (chunked.length() == 0 || chunked.find(CRLF) == std::string::npos) {
     return -1;
   }
 
   pos = chunked.find(CRLF);
-  contents_length = atoi(chunked.substr(0, pos).c_str());
+  contents_length = ft_stoi(chunked.substr(0, pos));
   if (contents_length == 0) return 0;
-  this->body = chunked.substr(pos + 2, contents_length);
+  this->body += chunked.substr(pos + 2, contents_length);
   return contents_length;
 }
 

@@ -13,6 +13,7 @@
 #include "HttpParseInvalidRequest.hpp"
 #include "HttpParseInvalidResponse.hpp"
 #include "HttpParseInvalidVersion.hpp"
+#include "NotImplementedError.hpp"
 
 #include "NotFoundError.hpp"
 #include "ForbiddenError.hpp"
