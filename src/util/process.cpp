@@ -169,7 +169,6 @@ void DeleteMethod_Event_Write(DeleteMethod *deletemethod)
 
 void Cgi_Event_Read(Cgi *cgi, int ident)
 {
-  std::cout << "CGI_Event_Read" << std::endl;
   if (ident == cgi->interface_fd) {
     if (cgi->EventRead() <= 0)
     {
@@ -194,7 +193,8 @@ void Cgi_Event_Write(Cgi *cgi, int ident)
     if (cgi->EventWrite() <= 0) {
       // client에 다 보냈으면 쓰는 이벤트 지우기
       cgi->kq.DeleteEvent(cgi->target_fd, EVFILT_WRITE);
-      if (cgi->request->GetItem("Connection").value == "close")
+      //if (cgi->request->GetItem("Connection").value == "close")
+      // TODO : 이거 왜 안되는지 모르겠다.
         delete cgi->client;
       delete cgi;
     }

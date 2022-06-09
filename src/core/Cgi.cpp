@@ -2,7 +2,6 @@
 
 Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdCgi)
 {
-  std::cout << "path: " << path << std::endl;
   cgi_data = WSV_STR_EMPTY;
   std::string cgi_path, extension;
 
@@ -22,6 +21,7 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
         throw FdDupFailed();
 
       close(fromCgi[FD_READ]);
+      close(toCgi[FD_WRITE]);
       close(toCgi[FD_READ]);
 
       char **env = this->request->ToCgi(path);
@@ -84,6 +84,8 @@ Cgi::~Cgi()
   close(fromCgi[FD_WRITE]);
   close(toCgi[FD_READ]);
   close(toCgi[FD_WRITE]);
+  if (interface_fd > 2)
+    close(interface_fd);
 }
 
 void Cgi::SetResponseMessageCgi()
@@ -91,9 +93,7 @@ void Cgi::SetResponseMessageCgi()
   try {
     response->Parse(cgi_data);
   } catch (HttpParseInvalidResponse &e) {
-    std::cerr << "HttpParseInvalidResponse" << std::endl;
-    SetResponseStatus(response, 400);
+    response->SetBody("");
   }
-  std::cout << "response: " << response->ToString() << std::endl;
-  //SetResponseMessage();
+  SetResponseMessage();
 }
