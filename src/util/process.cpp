@@ -169,23 +169,30 @@ void DeleteMethod_Event_Write(DeleteMethod *deletemethod)
 
 void Cgi_Event_Read(Cgi *cgi)
 {
-  if (cgi->EventRead() <= 0)
-  {
+  if (cgi->EventRead() <= 0) { // 2
     cgi->SetResponseMessage();
+    // cgi에서 읽는 이벤트 지우기
     cgi->kq.DeleteEvent(cgi->fromCgi[FD_READ], EVFILT_READ);
+    // target_fd로 쓰는 이벤트 등록하기
     cgi->kq.AddEvent(cgi->target_fd, EVFILT_WRITE, cgi);
   }
 }
 
 void Cgi_Event_Write(Cgi *cgi, int ident)
 {
-  if (ident == cgi->target_fd) {
+  if (ident == cgi->target_fd) { // cgi response to client 3
     if (cgi->EventWrite() <= 0) {
-      // cgi response to client
+      // client에 다 보냈으면 쓰는 이벤트 지우기
+      cgi->kq.DeleteEvent(cgi->target_fd, EVFILT_WRITE);
+      delete cgi->client;
+      delete cgi;
     }
   } else {
-    if (cgi->EventWriteToCgi() <= 0) {
-      // request to cgi process
+    if (cgi->EventWriteToCgi() <= 0) { // request to cgi process 1
+      // cgi에 다 썼으면 쓰는 이벤트 지우기
+      cgi->kq.DeleteEvent(cgi->toCgi[FD_WRITE], EVFILT_WRITE);
+      // 읽는 이벤트 등록하기 => 근데 이건 cgi.cpp에서 동시에 진행함
+      // cgi->kq.AddEvent(cgi->fromCgi[FD_READ], EVFILT_READ, cgi);
     }
   }
 }
