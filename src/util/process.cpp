@@ -49,7 +49,6 @@ void Client_Event_Read(Client *client)
     default:
       break;
   }
-  return ;
 }
 
 void Client_Event_Write(Client *client)
@@ -61,7 +60,6 @@ void Client_Event_Write(Client *client)
     if(client->request->GetItem("Connection").value == "close")
       delete client;
   }
-  return ;
 }
 
 void GetMethod_Event_Read(GetMethod *getmethod)
@@ -82,7 +80,6 @@ void GetMethod_Event_Write(GetMethod *getmethod)
       delete getmethod->client;
     delete getmethod;
   }
-  return ;
 }
 
 void PutMethod_Event_Read(PutMethod *putmethod)
@@ -114,7 +111,6 @@ void PutMethod_Event_Write(PutMethod *putmethod, int fd)
       putmethod->kq.AddEvent(putmethod->target_fd, EVFILT_WRITE, putmethod);
     }
   }
-  return ;
 }
 
 void PostMethod_Event_Read(PostMethod *postmethod)
@@ -146,7 +142,6 @@ void PostMethod_Event_Write(PostMethod *postmethod, int fd)
       postmethod->kq.AddEvent(postmethod->target_fd, EVFILT_WRITE, postmethod);
     }
   }
-  return ;
 }
 
 void DeleteMethod_Event_Read(DeleteMethod *deletemethod)
@@ -167,7 +162,29 @@ void DeleteMethod_Event_Write(DeleteMethod *deletemethod)
       delete deletemethod->client;
     delete deletemethod;
   }
-  return ;
+}
+
+void Cgi_Event_Read(Cgi *cgi)
+{
+  if (cgi->EventRead() <= 0)
+  {
+    cgi->SetResponseMessage();
+    cgi->kq.DeleteEvent(cgi->fromCgi[FD_READ], EVFILT_READ);
+    cgi->kq.AddEvent(cgi->target_fd, EVFILT_WRITE, cgi);
+  }
+}
+
+void Cgi_Event_Write(Cgi *cgi, int ident)
+{
+  if (ident == cgi->target_fd) {
+    if (cgi->EventWrite() <= 0) {
+      // cgi response to client
+    }
+  } else {
+    if (cgi->EventWriteToCgi() <= 0) {
+      // request to cgi process
+    }
+  }
 }
 
 void Process(FdInterface *target, struct kevent event)
@@ -195,7 +212,7 @@ void Process(FdInterface *target, struct kevent event)
       DeleteMethod_Event_Read(static_cast<DeleteMethod *>(target));
       break;
     case kFdCgi:
-      Cgi_Event_Read()
+      Cgi_Event_Read(static_cast<Cgi *>(target));
     default:
       break;
     }
@@ -222,6 +239,8 @@ void Process(FdInterface *target, struct kevent event)
     case kFdDeleteMethod:
       DeleteMethod_Event_Write(static_cast<DeleteMethod *>(target));
       break;
+    case kFdCgi:
+      Cgi_Event_Write(static_cast<Cgi *>(target), event.ident);
     default:
       break;
     }
