@@ -13,8 +13,8 @@ Method::~Method()
 {
   delete request;
   delete response;
-  close(interface_fd);
-  close(target_fd);
+  if (interface_fd > 2)
+    close(interface_fd);
 }
 
 int Method::EventRead()

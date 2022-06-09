@@ -12,8 +12,10 @@ void Server_Event_Write(Server *server)
 
 void Client_Event_Read(Client *client)
 {
-  if (client->EventRead() <= 0)
+  if (client->EventRead() <= 0) {
     delete client;
+    return;
+  }
 
   switch(client->ParseReq())
   {
@@ -56,7 +58,7 @@ void Client_Event_Write(Client *client)
   {
     client->kq.EnableEvent(client->interface_fd, EVFILT_READ, client);
     client->kq.DeleteEvent(client->interface_fd, EVFILT_WRITE);
-    //if(client->request->GetItem("Connection").value == "close")
+    if(client->request->GetItem("Connection").value == "close")
       delete client;
   }
   return ;
@@ -76,7 +78,7 @@ void GetMethod_Event_Write(GetMethod *getmethod)
 {
   if ( getmethod->EventWrite() <= 0) {
     getmethod->kq.DeleteEvent(getmethod->target_fd, EVFILT_WRITE);
-    //if (getmethod->request->GetItem("Connection").value == "close")
+    if (getmethod->request->GetItem("Connection").value == "close")
       delete getmethod->client;
     delete getmethod;
   }
@@ -99,7 +101,7 @@ void PutMethod_Event_Write(PutMethod *putmethod, int fd)
   {
     if (putmethod->EventWrite() <= 0) {
       putmethod->kq.DeleteEvent(putmethod->target_fd, EVFILT_WRITE);
-      //if (putmethod->request->GetItem("Connection").value == "close")
+      if (putmethod->request->GetItem("Connection").value == "close")
         delete putmethod->client;
       delete putmethod;
     }
@@ -131,7 +133,7 @@ void PostMethod_Event_Write(PostMethod *postmethod, int fd)
   {
     if (postmethod->EventWrite() <= 0) {
       postmethod->kq.DeleteEvent(postmethod->target_fd, EVFILT_WRITE);
-      //if (postmethod->request->GetItem("Connection").value == "close")
+      if (postmethod->request->GetItem("Connection").value == "close")
         delete postmethod->client;
       delete postmethod;
     }
@@ -161,7 +163,7 @@ void DeleteMethod_Event_Write(DeleteMethod *deletemethod)
 {
   if (deletemethod->EventWrite() <= 0) {
     deletemethod->kq.DeleteEvent(deletemethod->target_fd, EVFILT_WRITE);
-    //if (deletemethod->request->GetItem("Connection").value == "close")
+    if (deletemethod->request->GetItem("Connection").value == "close")
       delete deletemethod->client;
     delete deletemethod;
   }
@@ -222,4 +224,6 @@ void Process(FdInterface *target, struct kevent event)
       break;
     }
   }
+  //if (event.flags & EV_EOF)
+  //  std::cout << "EV_EOF" << std::endl;
 }
