@@ -23,7 +23,6 @@ int Method::EventRead()
   int n = read(interface_fd, buf, sizeof(buf) - 1);
   buf[n] = '\0';
   data += buf;
-  std::cout << "n: " << n << std::endl;
 
   return IsEOF(interface_fd);
 }
@@ -31,7 +30,6 @@ int Method::EventRead()
 int Method::EventWrite()
 {
   std::string res = response->ToString();
-  std::cout << "=========res==========" << std::endl << res << std::endl;
   int n = write(target_fd, res.c_str(), res.size());
   if (n <= 0)
     return n;

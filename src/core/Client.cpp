@@ -146,6 +146,7 @@ FdInterfaceType Client::ParseBody()
   int content_length;
 
   if (request->GetItem("Transfer-Encoding").value == "chunked") {
+    // TODO : chunked 데이터 파싱 추후 확정필요
     if (!IsCRLF(request_message))
       return kFdNone;
 
