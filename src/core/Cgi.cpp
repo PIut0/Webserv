@@ -14,7 +14,6 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
   pipe(this->toCgi);
 
   pid_t pid = fork();
-
   extension = this->request->host.substr(this->request->host.find_last_of('.'));
   cgi_path = this->location->cgi_info[extension];
 
