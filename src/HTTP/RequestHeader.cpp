@@ -551,7 +551,7 @@ std::string RequestHeader::HttpVersionToString()
   return "HTTP/" + charset[this->http_major] + "." + charset[this->http_minor];
 }
 
-char** RequestHeader::ToCgi(const int &type) {
+char** RequestHeader::ToCgi(const std::string &path) {
   const std::string php[4] = {
     "REQUEST_METHOD",
     "SERVER_PROTOCOL",
@@ -559,17 +559,6 @@ char** RequestHeader::ToCgi(const int &type) {
     "CONTENT_LENGTH"
   };
 
-  const std::string bla[2] = {
-    "REQUEST_METHOD",
-    "SERVER_PROTOCOL",
-  };
-
-  // const std::string* cgiHeader[2] = {
-  //   php,
-  //   bla,
-  // };
-
-  (void)type;
   std::string tmp;
   char **ret;
   int n, i;
@@ -582,7 +571,7 @@ char** RequestHeader::ToCgi(const int &type) {
     } else if (php[i] == "SERVER_PROTOCOL") {
       tmp = "SERVER_PROTOCOL=" + HttpVersionToString();
     } else if (php[i] == "PATH_INFO") {
-      tmp = "PATH_INFO=../";
+      tmp = "PATH_INFO=" + path;
     } else if (php[i] == "CONTENT_LENGTH") {
       std::string value = GetItem("Content-Length").value;
       tmp = "CONTENT_LENGTH=" + (value == "" ? "0" : value);
