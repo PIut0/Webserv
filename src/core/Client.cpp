@@ -15,16 +15,18 @@ Client::~Client()
     delete request;
   if (response)
     delete response;
-  kq.DeleteEvent(interface_fd, EVFILT_READ);
-  close(interface_fd);
+  if (interface_fd > 2)
+    close(interface_fd);
 }
 
 int Client::EventRead()
 {
   char buf[1024];
+  memset(buf, 0, sizeof(buf));
   int n = read(interface_fd, buf, sizeof(buf) - 1);
-  if (n <= 0)	// n == 0: 클라이언트에서 close & n == -1: 클라이언트 프로세스가 종료됨
+  if (n <= 0) {
     return n;
+  }	// n == 0: 클라이언트에서 close & n == -1: 클라이언트 프로세스가 종료됨
   buf[n] = '\0';
   request_message += buf;
 
@@ -76,10 +78,12 @@ int Client::CheckRequest()
     return 400;
   } catch(const HttpParseInvalidRequest& e) {
     return 400;
+  } catch(const NotAllowedError& e) {
+    return 405;
   } catch(const HttpParseInvalidResponse& e) {
     return 500;
   } catch(const NotImplementedError& e) {
-    return 405;
+    return 501;
   }
 
   if (request->HttpVersionToString() != "HTTP/1.1")
