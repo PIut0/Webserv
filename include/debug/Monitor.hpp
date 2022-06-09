@@ -17,6 +17,7 @@
 
 #include "NotFoundError.hpp"
 #include "ForbiddenError.hpp"
+#include "NotAllowedError.hpp"
 #include "NotImplementedError.hpp"
 #include "InternalServerError.hpp"
 
