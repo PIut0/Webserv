@@ -75,9 +75,11 @@ void RequestHeader::SetBody(const std::string &body)
 
 int RequestHeader::SetChunked(const std::string &chunked)
 {
-  std::string ret;
   int contents_length;
   int pos;
+
+  if (chunked.find("0\r\n\r\n") != std::string::npos)
+    return 0;
 
   if (chunked.length() == 0 || chunked.find(CRLF) == std::string::npos) {
     return -1;

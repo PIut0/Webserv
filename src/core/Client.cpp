@@ -141,24 +141,31 @@ FdInterfaceType Client::ParseBody()
   std::string req;
   int content_length;
 
-  if (IsCRLF(request_message)) {
-    req = request_message.substr(0, request_message.find(D_CRLF));
-    request_message = request_message.substr(request_message.find(D_CRLF) + 4);
-  } else {
-    req = request_message;
-    request_message = "";
-  }
-
   if (request->GetItem("Transfer-Encoding").value == "chunked") {
+    if (!IsCRLF(request_message))
+      return kFdNone;
+
+    req = request_message.substr(0, request_message.find(D_CRLF) + 4);
+    request_message = request_message.substr(request_message.find(D_CRLF) + 4);
     if (request->SetChunked(req) != 0)
       return kFdNone;
   }
 
-  else if((content_length = ft_stoi(request->GetItem("Content-Length").value)) > 0) {
-    request->SetBody(request->body + req);
-    if (request->body.length() < static_cast<unsigned long>(content_length))
-      return kFdNone;
-    request->SetBody(request->body.substr(0, content_length));
+  else {
+    if (IsCRLF(request_message)) {
+      req = request_message.substr(0, request_message.find(D_CRLF));
+      request_message = request_message.substr(request_message.find(D_CRLF) + 4);
+    } else {
+      req = request_message;
+      request_message = "";
+    }
+
+    if((content_length = ft_stoi(request->GetItem("Content-Length").value)) > 0) {
+      request->SetBody(request->body + req);
+      if (request->body.length() < static_cast<unsigned long>(content_length))
+        return kFdNone;
+      request->SetBody(request->body.substr(0, content_length));
+    }
   }
 
   if (CheckCgi())
@@ -177,7 +184,7 @@ FdInterfaceType Client::ParseBody()
 
 FdInterfaceType Client::ParseReq()
 {
-  std::cout << "ParseReq: " << request_message << std::endl;
+  //std::cout << "ParseReq: " << request_message << std::endl;
   FdInterfaceType type;
 
   if (request == nullptr) {
