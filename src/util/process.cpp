@@ -173,6 +173,7 @@ void Cgi_Event_Read(Cgi *cgi)
     cgi->SetResponseMessage();
     // cgi에서 읽는 이벤트 지우기
     cgi->kq.DeleteEvent(cgi->fromCgi[FD_READ], EVFILT_READ);
+    close(cgi->fromCgi[FD_READ]);
     // target_fd로 쓰는 이벤트 등록하기
     cgi->kq.AddEvent(cgi->target_fd, EVFILT_WRITE, cgi);
   }
@@ -191,6 +192,7 @@ void Cgi_Event_Write(Cgi *cgi, int ident)
     if (cgi->EventWriteToCgi() <= 0) { // request to cgi process 1
       // cgi에 다 썼으면 쓰는 이벤트 지우기
       cgi->kq.DeleteEvent(cgi->toCgi[FD_WRITE], EVFILT_WRITE);
+      close(cgi->toCgi[FD_WRITE]);
       // 읽는 이벤트 등록하기 => 근데 이건 cgi.cpp에서 동시에 진행함
       // cgi->kq.AddEvent(cgi->fromCgi[FD_READ], EVFILT_READ, cgi);
     }
