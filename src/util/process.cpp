@@ -167,15 +167,24 @@ void DeleteMethod_Event_Write(DeleteMethod *deletemethod)
   }
 }
 
-void Cgi_Event_Read(Cgi *cgi)
+void Cgi_Event_Read(Cgi *cgi, int ident)
 {
-  if (cgi->EventRead() <= 0) { // 2
-    cgi->SetResponseMessage();
-    // cgi에서 읽는 이벤트 지우기
-    cgi->kq.DeleteEvent(cgi->fromCgi[FD_READ], EVFILT_READ);
-    close(cgi->fromCgi[FD_READ]);
-    // target_fd로 쓰는 이벤트 등록하기
-    cgi->kq.AddEvent(cgi->target_fd, EVFILT_WRITE, cgi);
+  std::cout << "CGI_Event_Read" << std::endl;
+  if (ident == cgi->interface_fd) {
+    if (cgi->EventRead() <= 0)
+    {
+      cgi->SetResponseMessage();
+      cgi->kq.DeleteEvent(cgi->interface_fd, EVFILT_READ);
+      cgi->kq.AddEvent(cgi->target_fd, EVFILT_WRITE, cgi);
+    }
+  } else {
+    if (cgi->EventReadToCgi() <= 0) { // 2
+      cgi->SetResponseMessageCgi();
+      cgi->kq.DeleteEvent(cgi->fromCgi[FD_READ], EVFILT_READ);
+      close(cgi->fromCgi[FD_READ]);
+      // target_fd로 쓰는 이벤트 등록하기
+      cgi->kq.AddEvent(cgi->target_fd, EVFILT_WRITE, cgi);
+    }
   }
 }
 
@@ -185,13 +194,15 @@ void Cgi_Event_Write(Cgi *cgi, int ident)
     if (cgi->EventWrite() <= 0) {
       // client에 다 보냈으면 쓰는 이벤트 지우기
       cgi->kq.DeleteEvent(cgi->target_fd, EVFILT_WRITE);
-      delete cgi->client;
+      if (cgi->request->GetItem("Connection").value == "close")
+        delete cgi->client;
       delete cgi;
     }
   } else {
     if (cgi->EventWriteToCgi() <= 0) { // request to cgi process 1
       // cgi에 다 썼으면 쓰는 이벤트 지우기
       cgi->kq.DeleteEvent(cgi->toCgi[FD_WRITE], EVFILT_WRITE);
+      cgi->kq.AddEvent(cgi->fromCgi[FD_READ], EVFILT_READ, cgi);
       close(cgi->toCgi[FD_WRITE]);
       // 읽는 이벤트 등록하기 => 근데 이건 cgi.cpp에서 동시에 진행함
       // cgi->kq.AddEvent(cgi->fromCgi[FD_READ], EVFILT_READ, cgi);
@@ -224,7 +235,7 @@ void Process(FdInterface *target, struct kevent event)
       DeleteMethod_Event_Read(static_cast<DeleteMethod *>(target));
       break;
     case kFdCgi:
-      Cgi_Event_Read(static_cast<Cgi *>(target));
+      Cgi_Event_Read(static_cast<Cgi *>(target), event.ident);
     default:
       break;
     }

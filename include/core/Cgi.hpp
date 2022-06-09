@@ -22,12 +22,11 @@ class Cgi : public Method
 {
  public:
   Cgi(KQueue &kq, const std::string &path, Client *client);
-  virtual ~Cgi();
+  ~Cgi();
 
-  int   EventRead();
-  int   EventWrite();
+  int   EventReadToCgi();
   int   EventWriteToCgi();
-  void  SetResponseMessage();
+  void  SetResponseMessageCgi();
 
   int fromCgi[2];
   int toCgi[2];
@@ -37,7 +36,7 @@ class Cgi : public Method
   Cgi(const Cgi &);
   Cgi &operator=(const Cgi &);
 
-  std::string data_;
+  std::string cgi_data;
 };
 
 #endif

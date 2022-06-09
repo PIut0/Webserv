@@ -63,7 +63,7 @@ int Client::CheckCgi()
 {
   // TODO : CGI 처리를 해야하는지 확인하는 부분
   // request->host 의 . 뒷부분을 locationblock cgi_info에서 찾아서 있으면 OK
-  int pos;
+  size_t pos;
   cgiinfo_it_t it;
   LocationBlock *locationBlock;
   std::string extension;
@@ -71,11 +71,13 @@ int Client::CheckCgi()
   if ((pos = this->request->host.find_last_of('.')) == std::string::npos){
     return 0;
   }
+
   extension = this->request->host.substr(pos);
   locationBlock = GetLocationBlock();
   if ((it = locationBlock->cgi_info.find(extension)) == locationBlock->cgi_info.end()) {
     return 0;
   }
+
   return 1;
 }
 
@@ -119,7 +121,6 @@ FdInterfaceType Client::ParseHeader()
   LocationBlock *loc = GetLocationBlock();
 
   if (status == 0 && loc->ret != "") {
-    std::cout << "ret: " << loc->ret << std::endl;
     status = ft_stoi(loc->ret.substr(0, 3));
 
     if (loc->ret.size() > 4) {

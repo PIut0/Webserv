@@ -3,6 +3,7 @@
 
 Method::Method(KQueue &kq, Client *client, FdInterfaceType type) : FdInterface(kq, type), data(""), client(client)
 {
+  data = WSV_STR_EMPTY;
   target_fd = client->interface_fd;
   request = (client->request) ? client->request : new RequestHeader();
   response = (client->response) ? client->response : new ResponseHeader();

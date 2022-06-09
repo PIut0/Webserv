@@ -60,7 +60,8 @@ void KQueue::DisableEvent(int ident, int16_t filter, void *udata)
 void KQueue::DeleteEvent(int ident, int16_t filter)
 {
   struct kevent ev;
-  EV_SET(&ev, ident, filter, EV_DELETE, 0, 0, &timeout);
+  EV_SET(&ev, ident, filter, EV_DELETE, 0, 0, NULL);
+  //TODO : udata 추가
 
   event_count = kevent(kq, &ev, 1, events, EVENT_SIZE, &timeout);
   if (event_count == -1)
