@@ -208,6 +208,10 @@ FdInterfaceType Client::ParseBody()
     }
   }
 
+  size_t max_body_size = GetLocationBlock()->request_max_body_size;
+  if (request->body.size() > max_body_size)
+    response->SetItem("Status", StatusCode(413));
+
   if (CheckCgi())
     return kFdCgi;
   else if (request->host != "" && request->method == HTTP_GET)

@@ -14,7 +14,7 @@
 #define OFF     0
 #define ON      1
 
-#define DEFAULT_REQUEST_MAX_BODY_SIZE 1024
+#define DEFAULT_REQUEST_MAX_BODY_SIZE 10000000001
 
 typedef std::map<std::string, std::string>            cgiinfo_t;
 typedef std::map<std::string, std::string>::iterator  cgiinfo_it_t;
