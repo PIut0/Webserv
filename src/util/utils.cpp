@@ -129,6 +129,8 @@ std::string StatusCode(const int &code)
       return "404 Not Found";
     case 405:
       return "405 Method Not Allowed";
+    case 413:
+      return "413 Request Entity Too Large";
     case 500:
       return "500 Internal Server Error";
     case 501:
