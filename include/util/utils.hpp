@@ -21,6 +21,7 @@ std::string& rtrim(std::string& s);
 std::string& trim(std::string& s);
 std::string ft_itos(int i);
 int ft_stoi(const std::string &s);
+int ft_hextoi(const std::string &s);
 int IsEOF(int fd);
 int IsRegularFile(const std::string &path);
 

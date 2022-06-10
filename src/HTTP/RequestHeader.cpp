@@ -78,15 +78,13 @@ int RequestHeader::SetChunked(const std::string &chunked)
   int contents_length;
   int pos;
 
-  if (chunked.find("0\r\n\r\n") != std::string::npos)
-    return 0;
-
   if (chunked.length() == 0 || chunked.find(CRLF) == std::string::npos) {
     return -1;
   }
 
   pos = chunked.find(CRLF);
-  contents_length = ft_stoi(chunked.substr(0, pos));
+  contents_length = ft_hextoi(chunked.substr(0, pos));
+  //std::cout << "contents_length: " << contents_length << std::endl;
   if (contents_length == 0) return 0;
   this->body += chunked.substr(pos + 2, contents_length);
   return contents_length;
@@ -573,7 +571,7 @@ char** RequestHeader::ToCgi(const std::string &path) {
     } else if (php[i] == "PATH_INFO") {
       tmp = "PATH_INFO=" + path;
     } else if (php[i] == "CONTENT_LENGTH") {
-      std::string value = GetItem("Content-Length").value;
+      std::string value = ft_itos(body.size());
       tmp = "CONTENT_LENGTH=" + (value == "" ? "0" : value);
     }
     ret[i] = strdup(tmp.c_str());

@@ -69,6 +69,16 @@ int ft_stoi(const std::string &s)
   return atoi(s.c_str());
 }
 
+int ft_hextoi(const std::string &s)
+{
+  int x;
+  std::stringstream ss;
+
+  ss << std::hex << s;
+  ss >> x;
+  return x;
+}
+
 int IsEOF(int fd)
 {
   char buf[1];

@@ -13,7 +13,9 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
     extension = this->request->host.substr(this->request->host.find_last_of('.'));
     cgi_path = this->location->cgi_info[extension];
 
+
     if (pid == PS_CHILD) {
+      char **env = this->request->ToCgi(path);
       if (dup2(fromCgi[FD_WRITE], STDOUT_FILENO) == -1)
         throw FdDupFailed();
 
@@ -23,12 +25,16 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
       close(fromCgi[FD_READ]);
       close(toCgi[FD_WRITE]);
       close(toCgi[FD_READ]);
-
-      char **env = this->request->ToCgi(path);
+      char *argv[2] = {const_cast<char *>(cgi_path.c_str()), 0};
+      //char **env = this->request->ToCgi(path);
       // TODO cgi_tester 경로 지정하기
-      if (execve(cgi_path.c_str(), NULL, env) == -1)
+      if (execve(cgi_path.c_str(), argv, env) == -1)
         throw FdDupFailed();
     } else {
+
+      //for(int i=0;env[i];i++)
+      //  std::cout << "env[" << i << "] = " << env[i] << std::endl;
+
       close(fromCgi[FD_WRITE]);
       close(toCgi[FD_READ]);
 
@@ -68,13 +74,17 @@ int Cgi::EventWriteToCgi()
     cgi_data = request->body;
   }
 
-  int n = write(toCgi[FD_WRITE], cgi_data.c_str(), cgi_data.size());
+  std::cout << "toCgi fd: " << toCgi[FD_WRITE] << std::endl;
+  int len = cgi_data.size() > 65536 ? 65536 : cgi_data.size();
+  int n = write(toCgi[FD_WRITE], cgi_data.c_str(), len);
+  std::cout << "n: " << n << std::endl;
+
   if (n <= 0) {
     cgi_data = WSV_STR_EMPTY;
     return n;
   }
   cgi_data = cgi_data.substr(n);
-
+  std::cout << "cgi_data: " << cgi_data.size() << std::endl;
   return cgi_data.size();
 }
 
@@ -97,3 +107,11 @@ void Cgi::SetResponseMessageCgi()
   }
   SetResponseMessage();
 }
+
+
+//toCgi fd: 9
+//n: 65536
+//cgi_data: 99934464
+//toCgi fd: 9
+//n: 65536
+//cgi_data: 99868928

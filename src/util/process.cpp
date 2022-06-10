@@ -30,11 +30,13 @@ void Client_Event_Read(Client *client)
       client->response = nullptr;
       break;
     case kFdPutMethod:
+      std::cout << "Put Done" << std::endl;
       new PutMethod(client->kq, client->GetFilePath(), client);
       client->request = nullptr;
       client->response = nullptr;
       break;
     case kFdPostMethod:
+      std::cout << "Post Done" << std::endl;
       new PostMethod(client->kq, client->GetFilePath(), client);
       client->request = nullptr;
       client->response = nullptr;
@@ -62,6 +64,14 @@ void Client_Event_Write(Client *client)
     client->kq.DeleteEvent(client->interface_fd, EVFILT_WRITE);
     if(client->request->GetItem("Connection").value == "close")
       delete client;
+    //if (client->response) {
+    //  delete client->response;
+    //  client->response = nullptr;
+    //}
+    //if (client->request) {
+    //  delete client->request;
+    //  client->request = nullptr;
+    //}
   }
 }
 
@@ -189,6 +199,7 @@ void Cgi_Event_Read(Cgi *cgi, int ident)
 
 void Cgi_Event_Write(Cgi *cgi, int ident)
 {
+  std::cout << "Cgi_Event_Write" << std::endl;
   if (ident == cgi->target_fd) { // cgi response to client 3
     if (cgi->EventWrite() <= 0) {
       // client에 다 보냈으면 쓰는 이벤트 지우기

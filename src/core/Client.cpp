@@ -115,8 +115,20 @@ int Client::CheckRequest()
   return 0;
 }
 
+size_t FindSecondCRLF(std::string &request_message)
+{
+  size_t pos = request_message.find(CRLF);
+  if (pos == std::string::npos)
+    return pos;
+  pos = request_message.find(CRLF, pos + 2);
+  if (pos == std::string::npos)
+    return pos;
+  return pos;
+}
+
 FdInterfaceType Client::ParseHeader()
 {
+  std::cout << "request-header: " << request_message << std::endl;
   int status = CheckRequest();
   LocationBlock *loc = GetLocationBlock();
 
@@ -166,11 +178,15 @@ FdInterfaceType Client::ParseBody()
 
   if (request->GetItem("Transfer-Encoding").value == "chunked") {
     // TODO : chunked 데이터 파싱 추후 확정필요
-    if (!IsCRLF(request_message))
+    //if (!IsCRLF(request_message))
+    //  return kFdNone;
+    size_t pos;
+    if ((pos = FindSecondCRLF(request_message)) == std::string::npos)
       return kFdNone;
 
-    req = request_message.substr(0, request_message.find(D_CRLF) + 4);
-    request_message = request_message.substr(request_message.find(D_CRLF) + 4);
+    //std::cout << "request_message" << request_message << std::endl;
+    req = request_message.substr(0, pos);
+    request_message = request_message.substr(pos + 2);
     if (request->SetChunked(req) != 0)
       return kFdNone;
   }
