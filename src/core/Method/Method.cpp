@@ -92,9 +92,9 @@ void Method::SetResponseMessage()
   if (ft_stoi(response->status_code) >= 400)
     response->SetItem("Content-Type", "text/html");
 
-  if (response->body.size() > 0) {
-    response->SetItem("Content-Length", ft_itos(response->body.size()));
+  response->SetItem("Content-Length", ft_itos(response->body.size()));
 
+  if (response->body.size() > 0) {
     if (response->FindItem("Content-Type") == response->conf.end()) {
       if (request && request->host.size() && request->host.find_last_of(".") != std::string::npos)
         response->SetItem("Content-Type", MimeType(request->host.substr(request->host.find_last_of(".") + 1)));

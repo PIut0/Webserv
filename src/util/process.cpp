@@ -197,12 +197,10 @@ void Cgi_Event_Read(Cgi *cgi, int ident)
 
 void Cgi_Event_Write(Cgi *cgi, int ident)
 {
-  if (ident == cgi->target_fd) { // cgi response to client 3
+  if (ident == cgi->target_fd) {
     if (cgi->EventWrite() <= 0) {
-      // client에 다 보냈으면 쓰는 이벤트 지우기
       cgi->kq.DeleteEvent(cgi->target_fd, EVFILT_WRITE);
-      //if (cgi->request->GetItem("Connection").value == "close")
-      // TODO : 이거 왜 안되는지 모르겠다.
+      if (cgi->request->GetItem("Connection").value == "close")
         delete cgi->client;
       delete cgi;
     }
