@@ -199,7 +199,6 @@ void Cgi_Event_Read(Cgi *cgi, int ident)
 
 void Cgi_Event_Write(Cgi *cgi, int ident)
 {
-  std::cout << "Cgi_Event_Write" << std::endl;
   if (ident == cgi->target_fd) { // cgi response to client 3
     if (cgi->EventWrite() <= 0) {
       // client에 다 보냈으면 쓰는 이벤트 지우기

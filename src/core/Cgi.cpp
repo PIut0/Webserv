@@ -2,7 +2,6 @@
 
 Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdCgi)
 {
-  cgi_data = WSV_STR_EMPTY;
   std::string cgi_path, extension;
 
   try {
@@ -13,6 +12,10 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
     extension = this->request->host.substr(this->request->host.find_last_of('.'));
     cgi_path = this->location->cgi_info[extension];
 
+    fcntl(toCgi[FD_READ], F_SETFL, O_NONBLOCK);
+    fcntl(toCgi[FD_WRITE], F_SETFL, O_NONBLOCK);
+    fcntl(fromCgi[FD_READ], F_SETFL, O_NONBLOCK);
+    fcntl(fromCgi[FD_WRITE], F_SETFD, O_NONBLOCK);
 
     if (pid == PS_CHILD) {
       char **env = this->request->ToCgi(path);
@@ -25,6 +28,7 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
       close(fromCgi[FD_READ]);
       close(toCgi[FD_WRITE]);
       close(toCgi[FD_READ]);
+
       char *argv[2] = {const_cast<char *>(cgi_path.c_str()), 0};
       // TODO cgi_tester 경로 지정하기
       if (execve(cgi_path.c_str(), argv, env) == -1)
@@ -33,16 +37,13 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
       close(fromCgi[FD_WRITE]);
       close(toCgi[FD_READ]);
 
-      fcntl(toCgi[FD_WRITE], F_SETFL, O_NONBLOCK);
-      fcntl(fromCgi[FD_READ], F_SETFL, O_NONBLOCK);
-
       if (this->request->body.size() > 0 && this->request->method != HTTP_GET) {
         kq.AddEvent(toCgi[FD_WRITE], EVFILT_WRITE, this);
       }
       else {
         close(toCgi[FD_WRITE]);
-        kq.AddEvent(fromCgi[FD_READ], EVFILT_READ, this);
       }
+      kq.AddEvent(fromCgi[FD_READ], EVFILT_READ, this);
     }
   }
   catch (FdDupFailed &e) {
@@ -58,30 +59,28 @@ int Cgi::EventReadToCgi()
   if (n <= 0)	// n == 0: 클라이언트에서 close & n == -1: 클라이언트 프로세스가 종료됨
     return n;
   buf[n] = '\0';
-  cgi_data += buf;
+  cgi_read_data += buf;
+  if (request->body.size() <= cgi_read_data.size())
+    return 0;
 
   return n;
 }
 
 int Cgi::EventWriteToCgi()
 {
-  if (cgi_data == WSV_STR_EMPTY) {
-    cgi_data = request->body;
+  if (cgi_write_data == WSV_STR_EMPTY) {
+    cgi_write_data = request->body;
   }
 
-  std::cout << "toCgi fd: " << toCgi[FD_WRITE] << std::endl;
-  int len = cgi_data.size() > 65535 ? 65535 : cgi_data.size();
-  int n = write(toCgi[FD_WRITE], cgi_data.c_str(), len);
-
-  std::cout << "n: " << n << std::endl;
+  int len = cgi_write_data.size() > 65535 ? 65535 : cgi_write_data.size();
+  int n = write(toCgi[FD_WRITE], cgi_write_data.c_str(), len);
 
   if (n <= 0) {
-    cgi_data = WSV_STR_EMPTY;
+    cgi_write_data = WSV_STR_EMPTY;
     return n;
   }
-  cgi_data = cgi_data.substr(n);
-  std::cout << "cgi_data: " << cgi_data.size() << std::endl;
-  return cgi_data.size();
+  cgi_write_data = cgi_write_data.substr(n);
+  return cgi_write_data.size();
 }
 
 Cgi::~Cgi()
@@ -97,7 +96,7 @@ Cgi::~Cgi()
 void Cgi::SetResponseMessageCgi()
 {
   try {
-    response->Parse(cgi_data);
+    response->Parse(cgi_read_data);
   } catch (HttpParseInvalidResponse &e) {
     response->SetBody("");
   }

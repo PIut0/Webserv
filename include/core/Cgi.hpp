@@ -36,7 +36,8 @@ class Cgi : public Method
   Cgi(const Cgi &);
   Cgi &operator=(const Cgi &);
 
-  std::string cgi_data;
+  std::string cgi_read_data;
+  std::string cgi_write_data;
 };
 
 #endif
