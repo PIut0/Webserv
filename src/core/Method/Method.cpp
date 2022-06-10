@@ -30,12 +30,13 @@ int Method::EventRead()
 
 int Method::EventWrite()
 {
-  std::string res = response->ToString();
-  int n = write(target_fd, res.c_str(), res.size());
+  if (response_data.size() <= 0)
+    response_data = response->ToString();
+  int n = write(target_fd, response_data.c_str(), response_data.size());
   if (n <= 0)
     return n;
-  res = res.substr(n);
-  n = res.size();
+  response_data = response_data.substr(n);
+  n = response_data.size();
 
   return n;
 }
