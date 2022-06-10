@@ -96,6 +96,15 @@ int IsRegularFile(const std::string &path)
   return S_ISREG(st.st_mode);
 }
 
+std::string GetDate() // GMT TIME
+{
+  time_t t = time(NULL);
+  struct tm *tm = gmtime(&t);
+  char buf[128];
+  strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", tm);
+  return buf;
+}
+
 std::string StatusCode(const int &code)
 {
   switch (code)

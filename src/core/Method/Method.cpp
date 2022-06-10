@@ -107,4 +107,7 @@ void Method::SetResponseMessage()
     response->SetItem("Connection", request->FindItem("Connection")->second->value);
   else if (response->FindItem("Connection") == response->conf.end())
     response->SetItem("Connection", "keep-alive");
+
+  response->SetItem("Server", client->server->server_block.server_name);
+  response->SetItem("Date", GetDate());
 }

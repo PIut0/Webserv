@@ -26,6 +26,7 @@ int IsEOF(int fd);
 int IsRegularFile(const std::string &path);
 
 void SetMime();
+std::string GetDate();
 std::string MimeType(const std::string &ext);
 std::string StatusCode(const int &code);
 std::string DefaultErrorPage(const int &code);
