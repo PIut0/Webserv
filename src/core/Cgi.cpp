@@ -26,15 +26,10 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
       close(toCgi[FD_WRITE]);
       close(toCgi[FD_READ]);
       char *argv[2] = {const_cast<char *>(cgi_path.c_str()), 0};
-      //char **env = this->request->ToCgi(path);
       // TODO cgi_tester 경로 지정하기
       if (execve(cgi_path.c_str(), argv, env) == -1)
         throw FdDupFailed();
     } else {
-
-      //for(int i=0;env[i];i++)
-      //  std::cout << "env[" << i << "] = " << env[i] << std::endl;
-
       close(fromCgi[FD_WRITE]);
       close(toCgi[FD_READ]);
 
@@ -58,7 +53,7 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
 
 int Cgi::EventReadToCgi()
 {
-  char buf[1024];
+  char buf[65536];
   int n = read(fromCgi[FD_READ], buf, sizeof(buf) - 1);
   if (n <= 0)	// n == 0: 클라이언트에서 close & n == -1: 클라이언트 프로세스가 종료됨
     return n;
@@ -75,8 +70,9 @@ int Cgi::EventWriteToCgi()
   }
 
   std::cout << "toCgi fd: " << toCgi[FD_WRITE] << std::endl;
-  int len = cgi_data.size() > 65536 ? 65536 : cgi_data.size();
+  int len = cgi_data.size() > 65535 ? 65535 : cgi_data.size();
   int n = write(toCgi[FD_WRITE], cgi_data.c_str(), len);
+
   std::cout << "n: " << n << std::endl;
 
   if (n <= 0) {

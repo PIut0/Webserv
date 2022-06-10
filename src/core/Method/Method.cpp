@@ -73,7 +73,8 @@ void Method::ResponseErrorPage()
 
 void Method::SetResponseMessage()
 {
-  response->SetBody(data);
+  if (response->body.size() <= 0)
+    response->SetBody(data);
 
   if (response->status_code == "") {
     if (response->body.size() > 0)
