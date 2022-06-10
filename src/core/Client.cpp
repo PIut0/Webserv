@@ -262,7 +262,8 @@ void Client::SetResponseMessage()
     else
       response->SetItem("Status", StatusCode(204));
   }
-  else
+
+  if (ft_stoi(response->status_code) >= 400)
     response->SetItem("Content-Type", "text/html");
 
   if (response->body.size() > 0) {
@@ -278,6 +279,6 @@ void Client::SetResponseMessage()
 
   if (request && request->FindItem("Connection") != request->conf.end())
     response->SetItem("Connection", request->FindItem("Connection")->second->value);
-  else
+  else if (response->FindItem("Connection") == response->conf.end())
     response->SetItem("Connection", "keep-alive");
 }
