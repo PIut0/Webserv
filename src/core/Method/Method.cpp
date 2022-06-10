@@ -97,7 +97,7 @@ void Method::SetResponseMessage()
     }
   }
 
-  if (request && request->FindItem("Connection")->first == "Connection")
+  if (request && request->FindItem("Connection") != request->conf.end())
     response->SetItem("Connection", request->FindItem("Connection")->second->value);
   else if (response->FindItem("Connection") == response->conf.end())
     response->SetItem("Connection", "keep-alive");
