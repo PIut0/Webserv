@@ -17,7 +17,6 @@ class Client;
 class KQueue;
 class LocationBlock;
 
-
 class Cgi : public Method
 {
  public:
@@ -36,6 +35,8 @@ class Cgi : public Method
   Cgi(const Cgi &);
   Cgi &operator=(const Cgi &);
 
+  int cgi_write_idx;
+  int cgi_write_data_size;
   std::string cgi_read_data;
   std::string cgi_write_data;
 };

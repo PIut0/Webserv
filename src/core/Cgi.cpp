@@ -69,19 +69,19 @@ int Cgi::EventReadToCgi()
 int Cgi::EventWriteToCgi()
 {
   if (cgi_write_data == WSV_STR_EMPTY) {
+    cgi_write_idx = 0;
     cgi_write_data = request->body;
+    cgi_write_data_size = request->body.size();
   }
 
-  int len = cgi_write_data.size() > 65535 ? 65535 : cgi_write_data.size();
-  int n = write(toCgi[FD_WRITE], cgi_write_data.c_str(), len);
-  std::cout << "n: " << n << std::endl;
+  int len = cgi_write_data_size - cgi_write_idx > 65535 ? 65535 : cgi_write_data_size - cgi_write_idx;
+  int n = write(toCgi[FD_WRITE], cgi_write_data.c_str() + cgi_write_idx, len);
 
-  if (n <= 0) {
-    cgi_write_data = WSV_STR_EMPTY;
+  if (n <= 0)
     return n;
-  }
-  cgi_write_data = cgi_write_data.substr(n);
-  return cgi_write_data.size();
+
+  cgi_write_idx += n;
+  return cgi_write_data_size - cgi_write_idx;
 }
 
 Cgi::~Cgi()

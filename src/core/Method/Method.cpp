@@ -30,15 +30,20 @@ int Method::EventRead()
 
 int Method::EventWrite()
 {
-  if (response_data.size() <= 0)
+  if (response_data == WSV_STR_EMPTY) {
+    response_idx = 0;
     response_data = response->ToString();
-  int n = write(target_fd, response_data.c_str(), response_data.size());
+    response_data_size = response_data.size();
+  }
+
+  int len = response_data_size - response_idx > 65535 ? 65535 : response_data_size - response_idx;
+  int n = write(target_fd, response_data.c_str() + response_idx, len);
+
   if (n <= 0)
     return n;
-  response_data = response_data.substr(n);
-  n = response_data.size();
 
-  return n;
+  response_idx += n;
+  return response_data_size - response_idx;
 }
 
 int Method::IsDir(const std::string &path)
