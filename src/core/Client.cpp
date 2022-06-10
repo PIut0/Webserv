@@ -5,7 +5,6 @@ Client::Client(KQueue &kq, int fd, Server *server) : FdInterface(kq, kFdClient, 
 {
   request = nullptr;
   response = nullptr;
-  fcntl(interface_fd, F_SETFL, O_NONBLOCK);
   kq.AddEvent(interface_fd, EVFILT_READ, this);
 }
 
@@ -21,9 +20,9 @@ Client::~Client()
 
 int Client::EventRead()
 {
-  char buf[1024];
-  memset(buf, 0, sizeof(buf));
-  int n = read(interface_fd, buf, sizeof(buf) - 1);
+  char buf[BUFFER_SIZE];
+  memset(buf, 0, BUFFER_SIZE);
+  int n = read(interface_fd, buf, BUFFER_SIZE - 1);
   if (n <= 0) {
     return n;
   }	// n == 0: 클라이언트에서 close & n == -1: 클라이언트 프로세스가 종료됨
@@ -131,8 +130,6 @@ FdInterfaceType Client::ParseHeader()
   int status = CheckRequest();
   LocationBlock *loc = GetLocationBlock();
 
-  std::cout << request->ToString() << std::endl;
-
   if (status == 0 && loc->ret != "") {
     status = ft_stoi(loc->ret.substr(0, 3));
 
@@ -153,6 +150,8 @@ FdInterfaceType Client::ParseHeader()
       return kFdClient;
     }
   }
+
+  std::cout << "- Request -" << std::endl << request->ToString() << std::endl;
 
   if (ft_stoi(request->GetItem("Content-Length").value) > 0 && request->body.size() <= 0)
     return kFdNone;
@@ -178,9 +177,6 @@ FdInterfaceType Client::ParseBody()
   int content_length;
 
   if (request->GetItem("Transfer-Encoding").value == "chunked") {
-    // TODO : chunked 데이터 파싱 추후 확정필요
-    //if (!IsCRLF(request_message))
-    //  return kFdNone;
     size_t pos;
     if ((pos = FindSecondCRLF(request_message)) == std::string::npos)
       return kFdNone;
@@ -241,10 +237,9 @@ FdInterfaceType Client::ParseReq()
 
     type = ParseHeader();
 
-    if (request_message.size() <= 0)
+    if (response->status_code != "" || request_message.size() <= 0)
       return type;
   }
-
 
   return ParseBody();
 }

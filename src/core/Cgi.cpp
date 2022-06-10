@@ -54,8 +54,9 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
 
 int Cgi::EventReadToCgi()
 {
-  char buf[65536];
-  int n = read(fromCgi[FD_READ], buf, sizeof(buf) - 1);
+  char buf[BUFFER_SIZE];
+  memset(buf, 0, BUFFER_SIZE);
+  int n = read(fromCgi[FD_READ], buf, BUFFER_SIZE - 1);
   if (n <= 0)	// n == 0: 클라이언트에서 close & n == -1: 클라이언트 프로세스가 종료됨
     return n;
   buf[n] = '\0';

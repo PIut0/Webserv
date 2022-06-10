@@ -34,6 +34,7 @@ int Server::EventRead()
   int client_interface_fd;
   if ((client_interface_fd = accept(interface_fd, NULL, NULL)) == -1)
     ExitWithPerror("server_event_read");
+  fcntl(client_interface_fd, F_SETFL, O_NONBLOCK);
   new Client(kq, client_interface_fd, this);
 
   return 1;

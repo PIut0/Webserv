@@ -20,8 +20,9 @@ Method::~Method()
 
 int Method::EventRead()
 {
-  char buf[1024];
-  int n = read(interface_fd, buf, sizeof(buf) - 1);
+  char buf[BUFFER_SIZE];
+  memset(buf, 0, BUFFER_SIZE);
+  int n = read(interface_fd, buf, BUFFER_SIZE - 1);
   buf[n] = '\0';
   data += buf;
 
@@ -43,6 +44,10 @@ int Method::EventWrite()
     return n;
 
   response_idx += n;
+  if (response_data_size - response_idx <= 0) {
+    response->SetBody("");
+    std::cout << "- Response -" << std::endl << response->ToString() << std::endl;
+  }
   return response_data_size - response_idx;
 }
 
