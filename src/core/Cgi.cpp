@@ -74,6 +74,7 @@ int Cgi::EventWriteToCgi()
 
   int len = cgi_write_data.size() > 65535 ? 65535 : cgi_write_data.size();
   int n = write(toCgi[FD_WRITE], cgi_write_data.c_str(), len);
+  std::cout << "n: " << n << std::endl;
 
   if (n <= 0) {
     cgi_write_data = WSV_STR_EMPTY;
