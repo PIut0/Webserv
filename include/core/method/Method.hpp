@@ -44,6 +44,7 @@ class Method : public FdInterface
   int target_fd;
   std::string target_path;
   std::string data;
+  std::string response_data;
   Client *client;
   RequestHeader *request;
   ResponseHeader *response;
