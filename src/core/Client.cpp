@@ -128,7 +128,6 @@ size_t FindSecondCRLF(std::string &request_message)
 
 FdInterfaceType Client::ParseHeader()
 {
-  std::cout << "request-header: " << request_message << std::endl;
   int status = CheckRequest();
   LocationBlock *loc = GetLocationBlock();
 
@@ -184,10 +183,13 @@ FdInterfaceType Client::ParseBody()
     if ((pos = FindSecondCRLF(request_message)) == std::string::npos)
       return kFdNone;
 
-    //std::cout << "request_message" << request_message << std::endl;
     req = request_message.substr(0, pos);
     request_message = request_message.substr(pos + 2);
-    if (request->SetChunked(req) != 0)
+
+    int chunked_status = request->SetChunked(req);
+    if (chunked_status && FindSecondCRLF(request_message) != std::string::npos)
+      return ParseBody();
+    if (chunked_status != 0)
       return kFdNone;
   }
 
@@ -240,6 +242,7 @@ FdInterfaceType Client::ParseReq()
     if (request_message.size() <= 0)
       return type;
   }
+
 
   return ParseBody();
 }
