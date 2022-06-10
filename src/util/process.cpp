@@ -12,7 +12,9 @@ void Server_Event_Write(Server *server)
 
 void Client_Event_Read(Client *client)
 {
-  if (client->EventRead() <= 0) {
+  int status = client->EventRead();
+  if (status <= 0) {
+    // TODO : delete 부분과 밀접한 연관이 있음
     delete client;
     return;
   }
@@ -59,7 +61,9 @@ void Client_Event_Write(Client *client)
   if (client->EventWrite() <= 0)
   {
     client->kq.EnableEvent(client->interface_fd, EVFILT_READ, client);
-    client->kq.DeleteEvent(client->interface_fd, EVFILT_WRITE);
+    client->kq.DisableEvent(client->interface_fd, EVFILT_WRITE, client);
+    //client->kq.DeleteEvent(client->interface_fd, EVFILT_WRITE);
+
     if(client->request->GetItem("Connection").value == "close")
       delete client;
     //if (client->response) {
@@ -78,15 +82,19 @@ void GetMethod_Event_Read(GetMethod *getmethod)
   if (getmethod->EventRead() <= 0)
   {
     getmethod->SetResponseMessage();
-    getmethod->kq.DeleteEvent(getmethod->interface_fd, EVFILT_READ);
+    getmethod->kq.DisableEvent(getmethod->interface_fd, EVFILT_READ, getmethod);
+    //getmethod->kq.DeleteEvent(getmethod->interface_fd, EVFILT_READ);
+
     getmethod->kq.AddEvent(getmethod->target_fd, EVFILT_WRITE, getmethod);
   }
 }
 
 void GetMethod_Event_Write(GetMethod *getmethod)
 {
-  if ( getmethod->EventWrite() <= 0) {
-    getmethod->kq.DeleteEvent(getmethod->target_fd, EVFILT_WRITE);
+  if (getmethod->EventWrite() <= 0) {
+    getmethod->kq.DisableEvent(getmethod->target_fd, EVFILT_WRITE, getmethod);
+    //getmethod->kq.DeleteEvent(getmethod->target_fd, EVFILT_WRITE);
+
     if (getmethod->request->GetItem("Connection").value == "close")
       delete getmethod->client;
     delete getmethod;
@@ -98,7 +106,9 @@ void PutMethod_Event_Read(PutMethod *putmethod)
   if (putmethod->EventRead() <= 0)
   {
     putmethod->SetResponseMessage();
-    putmethod->kq.DeleteEvent(putmethod->interface_fd, EVFILT_READ);
+    putmethod->kq.DisableEvent(putmethod->interface_fd, EVFILT_READ, putmethod);
+    //putmethod->kq.DeleteEvent(putmethod->interface_fd, EVFILT_READ);
+
     putmethod->kq.AddEvent(putmethod->target_fd, EVFILT_WRITE, putmethod);
   }
 }
@@ -108,7 +118,9 @@ void PutMethod_Event_Write(PutMethod *putmethod, int fd)
   if (fd == putmethod->target_fd)
   {
     if (putmethod->EventWrite() <= 0) {
-      putmethod->kq.DeleteEvent(putmethod->target_fd, EVFILT_WRITE);
+      putmethod->kq.DisableEvent(putmethod->target_fd, EVFILT_WRITE, putmethod);
+      //putmethod->kq.DeleteEvent(putmethod->target_fd, EVFILT_WRITE);
+
       if (putmethod->request->GetItem("Connection").value == "close")
         delete putmethod->client;
       delete putmethod;
@@ -118,7 +130,9 @@ void PutMethod_Event_Write(PutMethod *putmethod, int fd)
   {
     if (putmethod->FileWrite() <= 0) {
       putmethod->SetResponseMessage();
-      putmethod->kq.DeleteEvent(putmethod->interface_fd, EVFILT_WRITE);
+      putmethod->kq.DisableEvent(putmethod->interface_fd, EVFILT_WRITE, putmethod);
+      //putmethod->kq.DeleteEvent(putmethod->interface_fd, EVFILT_WRITE);
+
       putmethod->kq.AddEvent(putmethod->target_fd, EVFILT_WRITE, putmethod);
     }
   }
@@ -129,7 +143,9 @@ void PostMethod_Event_Read(PostMethod *postmethod)
   if (postmethod->EventRead() <= 0)
   {
     postmethod->SetResponseMessage();
-    postmethod->kq.DeleteEvent(postmethod->interface_fd, EVFILT_READ);
+    postmethod->kq.DisableEvent(postmethod->interface_fd, EVFILT_READ, postmethod);
+    //postmethod->kq.DeleteEvent(postmethod->interface_fd, EVFILT_READ);
+
     postmethod->kq.AddEvent(postmethod->target_fd, EVFILT_WRITE, postmethod);
   }
 }
@@ -139,7 +155,9 @@ void PostMethod_Event_Write(PostMethod *postmethod, int fd)
   if (fd == postmethod->target_fd)
   {
     if (postmethod->EventWrite() <= 0) {
-      postmethod->kq.DeleteEvent(postmethod->target_fd, EVFILT_WRITE);
+      postmethod->kq.DisableEvent(postmethod->target_fd, EVFILT_WRITE, postmethod);
+      //postmethod->kq.DeleteEvent(postmethod->target_fd, EVFILT_WRITE);
+
       if (postmethod->request->GetItem("Connection").value == "close")
         delete postmethod->client;
       delete postmethod;
@@ -149,7 +167,9 @@ void PostMethod_Event_Write(PostMethod *postmethod, int fd)
   {
     if (postmethod->FileWrite() <= 0) {
       postmethod->SetResponseMessage();
-      postmethod->kq.DeleteEvent(postmethod->interface_fd, EVFILT_WRITE);
+      postmethod->kq.DisableEvent(postmethod->interface_fd, EVFILT_WRITE, postmethod);
+      //postmethod->kq.DeleteEvent(postmethod->interface_fd, EVFILT_WRITE);
+
       postmethod->kq.AddEvent(postmethod->target_fd, EVFILT_WRITE, postmethod);
     }
   }
@@ -160,7 +180,9 @@ void DeleteMethod_Event_Read(DeleteMethod *deletemethod)
   if (deletemethod->EventRead() <= 0)
   {
     deletemethod->SetResponseMessage();
-    deletemethod->kq.DeleteEvent(deletemethod->interface_fd, EVFILT_READ);
+    deletemethod->kq.DisableEvent(deletemethod->interface_fd, EVFILT_READ, deletemethod);
+    //deletemethod->kq.DeleteEvent(deletemethod->interface_fd, EVFILT_READ);
+
     deletemethod->kq.AddEvent(deletemethod->target_fd, EVFILT_WRITE, deletemethod);
   }
 }
@@ -168,7 +190,9 @@ void DeleteMethod_Event_Read(DeleteMethod *deletemethod)
 void DeleteMethod_Event_Write(DeleteMethod *deletemethod)
 {
   if (deletemethod->EventWrite() <= 0) {
-    deletemethod->kq.DeleteEvent(deletemethod->target_fd, EVFILT_WRITE);
+    deletemethod->kq.DisableEvent(deletemethod->target_fd, EVFILT_WRITE, deletemethod);
+    //deletemethod->kq.DeleteEvent(deletemethod->target_fd, EVFILT_WRITE);
+
     if (deletemethod->request->GetItem("Connection").value == "close")
       delete deletemethod->client;
     delete deletemethod;
@@ -181,13 +205,17 @@ void Cgi_Event_Read(Cgi *cgi, int ident)
     if (cgi->EventRead() <= 0)
     {
       cgi->SetResponseMessage();
-      cgi->kq.DeleteEvent(cgi->interface_fd, EVFILT_READ);
+      cgi->kq.DisableEvent(cgi->interface_fd, EVFILT_READ, cgi);
+      //cgi->kq.DeleteEvent(cgi->interface_fd, EVFILT_READ);
+
       cgi->kq.AddEvent(cgi->target_fd, EVFILT_WRITE, cgi);
     }
   } else {
     if (cgi->EventReadToCgi() <= 0) { // 2
       cgi->SetResponseMessageCgi();
+      //cgi->kq.DisableEvent(cgi->fromCgi[FD_READ], EVFILT_READ, cgi);
       cgi->kq.DeleteEvent(cgi->fromCgi[FD_READ], EVFILT_READ);
+
       close(cgi->fromCgi[FD_READ]);
       // target_fd로 쓰는 이벤트 등록하기
       cgi->kq.AddEvent(cgi->target_fd, EVFILT_WRITE, cgi);
@@ -199,7 +227,9 @@ void Cgi_Event_Write(Cgi *cgi, int ident)
 {
   if (ident == cgi->target_fd) {
     if (cgi->EventWrite() <= 0) {
-      cgi->kq.DeleteEvent(cgi->target_fd, EVFILT_WRITE);
+      cgi->kq.DisableEvent(cgi->target_fd, EVFILT_WRITE, cgi);
+      //cgi->kq.DeleteEvent(cgi->target_fd, EVFILT_WRITE);
+
       if (cgi->request->GetItem("Connection").value == "close")
         delete cgi->client;
       delete cgi;
@@ -207,7 +237,9 @@ void Cgi_Event_Write(Cgi *cgi, int ident)
   } else {
     if (cgi->EventWriteToCgi() <= 0) { // request to cgi process 1
       // cgi에 다 썼으면 쓰는 이벤트 지우기
+      //cgi->kq.DisableEvent(cgi->toCgi[FD_WRITE], EVFILT_WRITE, cgi);
       cgi->kq.DeleteEvent(cgi->toCgi[FD_WRITE], EVFILT_WRITE);
+
       close(cgi->toCgi[FD_WRITE]);
     }
   }

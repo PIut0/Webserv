@@ -37,6 +37,7 @@ class KQueue
   struct timespec timeout;
   int           kq;
   int           event_count;
+  std::vector<struct kevent> event_list;
   struct kevent events[EVENT_SIZE];
 };
 
