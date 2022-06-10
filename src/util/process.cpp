@@ -30,13 +30,11 @@ void Client_Event_Read(Client *client)
       client->response = nullptr;
       break;
     case kFdPutMethod:
-      std::cout << "Put Done" << std::endl;
       new PutMethod(client->kq, client->GetFilePath(), client);
       client->request = nullptr;
       client->response = nullptr;
       break;
     case kFdPostMethod:
-      std::cout << "Post Done" << std::endl;
       new PostMethod(client->kq, client->GetFilePath(), client);
       client->request = nullptr;
       client->response = nullptr;
@@ -275,6 +273,4 @@ void Process(FdInterface *target, struct kevent event)
       break;
     }
   }
-  //if (event.flags & EV_EOF)
-  //  std::cout << "EV_EOF" << std::endl;
 }
