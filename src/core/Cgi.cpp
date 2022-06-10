@@ -3,6 +3,7 @@
 Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdCgi), cgi_write_idx(0)
 {
   std::string cgi_path, extension;
+  cgi_read_data.reserve(this->request->body.size());
 
   try {
     pipe(this->fromCgi);
@@ -30,7 +31,6 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
       close(toCgi[FD_READ]);
 
       char *argv[2] = {const_cast<char *>(cgi_path.c_str()), 0};
-      // TODO cgi_tester 경로 지정하기
       if (execve(cgi_path.c_str(), argv, env) == -1)
         throw FdDupFailed();
     } else {
