@@ -291,6 +291,6 @@ void Client::SetResponseMessage()
   else if (response->FindItem("Connection") == response->conf.end())
     response->SetItem("Connection", "keep-alive");
 
-  response->SetItem("Server", client->server->server_block.server_name);
+  response->SetItem("Server", server->server_block.server_name);
   response->SetItem("Date", GetDate());
 }
