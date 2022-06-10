@@ -1,6 +1,6 @@
 #include "Cgi.hpp"
 
-Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdCgi)
+Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdCgi), cgi_write_idx(0)
 {
   std::string cgi_path, extension;
 
@@ -68,14 +68,12 @@ int Cgi::EventReadToCgi()
 
 int Cgi::EventWriteToCgi()
 {
-  if (cgi_write_data == WSV_STR_EMPTY) {
-    cgi_write_idx = 0;
-    cgi_write_data = request->body;
+  if (cgi_write_idx == 0) {
     cgi_write_data_size = request->body.size();
   }
 
   int len = cgi_write_data_size - cgi_write_idx > 65535 ? 65535 : cgi_write_data_size - cgi_write_idx;
-  int n = write(toCgi[FD_WRITE], cgi_write_data.c_str() + cgi_write_idx, len);
+  int n = write(toCgi[FD_WRITE], request->body.c_str() + cgi_write_idx, len);
 
   if (n <= 0)
     return n;
