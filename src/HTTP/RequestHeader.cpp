@@ -561,9 +561,11 @@ char** RequestHeader::ToCgi(const std::string &path) {
   cgi.push_back("PATH_INFO");
   cgi.push_back("CONTENT_LENGTH");
 
+
   for (req_header_it_t it = this->conf.begin() ; it != this->conf.end() ; ++it) {
     if (wsb_str_2cmp(it->first, 'X', '-')) {
       cgi.push_back("HTTP_" + it->second->key + "=" + it->second->value);
+      // std::cout << "push !! " << "HTTP_" + it->second->key + "=" + it->second->value << std::endl;
     }
   }
 
