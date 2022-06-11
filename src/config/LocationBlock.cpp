@@ -140,6 +140,9 @@ void LocationBlock::InitLocationBlock(std::vector<std::string> &data)
   LocationAttribute type;
 
   for (size_t i = 0 ; i < data.size() ; i++) {
+    if (!(data[i][0] == '\t' && data[i][1] == '\t'))
+      ExitWithMsg("Location Block Error");
+
     index = data[i].find(' ');
 
     command = data[i].substr(2, index - 2);

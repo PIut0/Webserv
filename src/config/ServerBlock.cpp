@@ -83,6 +83,9 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
     switch (state)
     {
       case S_SERVER:
+        if (data[i][0] != '\t')
+          ExitWithMsg("Server Block Error");
+
         index = data[i].find(' ');
 
         command = data[i].substr(1, index - 1);
