@@ -90,7 +90,7 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
         switch (type)
         {
           case kLocation:
-            location_path = data[i].substr(10, data[i].find('{', 0) - 11);
+            location_path = ToLower(data[i].substr(10, data[i].find('{', 0) - 11));
             state <<= 1;
             break;
 

@@ -96,6 +96,17 @@ int IsRegularFile(const std::string &path)
   return S_ISREG(st.st_mode);
 }
 
+std::string ToLower(const std::string &origin)
+{
+  std::string ret;
+
+  for (size_t i  = 0 ; i < origin.size() ; ++i) {
+    ret.push_back(std::tolower(origin[i]));
+  }
+
+  return ret;
+}
+
 std::string GetDate() // GMT TIME
 {
   time_t t = time(NULL);
