@@ -61,8 +61,8 @@ int Cgi::EventReadToCgi()
     return n;
   buf[n] = '\0';
   cgi_read_data += buf;
-  if (request->body.size() <= cgi_read_data.size())
-    return 0;
+  // if (request->body.size() <= cgi_read_data.size())
+  //   return 0;
 
   return n;
 }
