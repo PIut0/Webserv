@@ -29,6 +29,15 @@ void KQueue::Refresh()
     ErrorIgnore("refresh");
 }
 
+void KQueue::DeleteList()
+{
+  // delete kq.delete_list
+  for (std::set<FdInterface *>::iterator it = delete_list.begin(); it != delete_list.end(); it++) {
+    delete *it;
+  }
+  delete_list.clear();
+}
+
 void KQueue::AddEvent(int ident, int16_t filter, void *udata)
 {
   struct kevent ev;
