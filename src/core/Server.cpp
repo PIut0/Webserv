@@ -16,7 +16,7 @@ Server::Server(KQueue &kq, ServerBlock &_sb) : FdInterface(kq, kFdServer), serve
   if (bind(interface_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
     ExitWithPerror("bind");
 
-  if (listen(interface_fd, 64) == -1)
+  if (listen(interface_fd, 2048) == -1)
     ExitWithPerror("listen");
 
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);

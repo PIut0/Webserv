@@ -93,8 +93,8 @@ void GetMethod_Event_Read(GetMethod *getmethod)
 void GetMethod_Event_Write(GetMethod *getmethod)
 {
   if (getmethod->EventWrite() <= 0) {
-    getmethod->kq.DisableEvent(getmethod->target_fd, EVFILT_WRITE, getmethod);
-    //getmethod->kq.DeleteEvent(getmethod->target_fd, EVFILT_WRITE);
+    //getmethod->kq.DisableEvent(getmethod->target_fd, EVFILT_WRITE, getmethod);
+    getmethod->kq.DeleteEvent(getmethod->target_fd, EVFILT_WRITE);
 
     if (getmethod->request->GetItem("Connection").value == "close")
       getmethod->kq.delete_list.insert(getmethod->client);
@@ -108,8 +108,8 @@ void PutMethod_Event_Read(PutMethod *putmethod)
   if (putmethod->EventRead() <= 0)
   {
     putmethod->SetResponseMessage();
-    putmethod->kq.DisableEvent(putmethod->interface_fd, EVFILT_READ, putmethod);
-    //putmethod->kq.DeleteEvent(putmethod->interface_fd, EVFILT_READ);
+    //putmethod->kq.DisableEvent(putmethod->interface_fd, EVFILT_READ, putmethod);
+    putmethod->kq.DeleteEvent(putmethod->interface_fd, EVFILT_READ);
 
     putmethod->kq.AddEvent(putmethod->target_fd, EVFILT_WRITE, putmethod);
   }
