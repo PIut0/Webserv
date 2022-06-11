@@ -28,7 +28,7 @@ std::string ServerManager::CheckLine(const std::string &line)
     return str;
   ch = str[str.length() - 1];
   if (ch != ';' && ch != '}' && ch != '{' )
-    ExitWithMsg("error");
+    ExitWithMsg("config Syntax error");
   return str;
 }
 
