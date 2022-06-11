@@ -15,10 +15,6 @@ int main(int argc, char** argv) {
 
   while (1) {
     kq.Refresh();
-    //if (kq.event_count > 0) {
-    //  FdInterface *target = static_cast<FdInterface *>(kq.events[0].udata);
-    //  Process(target, kq.events[0]);
-    //}
     for (int i = 0; i < kq.event_count; i++) {
       FdInterface *target = static_cast<FdInterface *>(kq.events[i].udata);
       Process(target, kq.events[i]);

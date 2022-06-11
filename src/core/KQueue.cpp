@@ -32,10 +32,15 @@ void KQueue::Refresh()
 void KQueue::DeleteList()
 {
   // delete kq.delete_list
+  std::vector<std::set<FdInterface *>::iterator> delete_list_it;
   for (std::set<FdInterface *>::iterator it = delete_list.begin(); it != delete_list.end(); it++) {
+    if ((*it)->interface_type == kFdClient && static_cast<Client *>(*it)->method_list.size() > 0)
+      continue;
     delete *it;
+    delete_list_it.push_back(it);
   }
-  delete_list.clear();
+  for (size_t i = 0; i < delete_list_it.size(); i++)
+    delete_list.erase(delete_list_it[i]);
 }
 
 void KQueue::AddEvent(int ident, int16_t filter, void *udata)
@@ -86,4 +91,13 @@ void KQueue::DeleteEvent(int ident, int16_t filter)
 void KQueue::AddServer(Server &server)
 {
   AddEvent(server.interface_fd, EVFILT_READ, &server);
+}
+
+void KQueue::AddClient(Client *client)
+{
+  AddEvent(client->interface_fd, EVFILT_READ, client);
+  if (fd_map.find(client->interface_fd) != fd_map.end()) {
+    //delete_list.insert(fd_map[client->interface_fd]);
+  }
+  fd_map[client->interface_fd] = client;
 }

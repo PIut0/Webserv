@@ -162,3 +162,8 @@ std::string GetAutoindexPage(std::string &target_path, std::vector<std::string> 
   ss << "</pre><hr /><center>Init6_Nginx</center></body></html>";
   return ss.str();
 }
+
+void break_point()
+{
+  std::cout << "break_point" << std::endl;
+}

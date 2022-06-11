@@ -7,9 +7,11 @@
 #include "RequestHeader.hpp"
 #include "ResponseHeader.hpp"
 #include "Server.hpp"
+#include "Method.hpp"
 
 class Server;
 class KQueue;
+class Method;
 class LocationBlock;
 
 #define D_CRLF "\r\n\r\n"
@@ -39,6 +41,7 @@ class Client : public FdInterface
   Server *server;
   RequestHeader *request;
   ResponseHeader *response;
+  std::set<Method *> method_list;
   std::string request_message;
 };
 

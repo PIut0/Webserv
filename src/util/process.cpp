@@ -21,33 +21,28 @@ void Client_Event_Read(Client *client)
 
   switch(client->ParseReq())
   {
-    case kFdClient:
-      client->SetResponseMessage();
-      client->kq.DisableEvent(client->interface_fd, EVFILT_READ, client);
-      client->kq.AddEvent(client->interface_fd, EVFILT_WRITE, client);
-      break;
     case kFdGetMethod:
-      new GetMethod(client->kq, client->GetFilePath(), client);
+      client->method_list.insert(new GetMethod(client->kq, client->GetFilePath(), client));
       client->request = nullptr;
       client->response = nullptr;
       break;
     case kFdPutMethod:
-      new PutMethod(client->kq, client->GetFilePath(), client);
+      client->method_list.insert(new PutMethod(client->kq, client->GetFilePath(), client));
       client->request = nullptr;
       client->response = nullptr;
       break;
     case kFdPostMethod:
-      new PostMethod(client->kq, client->GetFilePath(), client);
+      client->method_list.insert(new PostMethod(client->kq, client->GetFilePath(), client));
       client->request = nullptr;
       client->response = nullptr;
       break;
     case kFdDeleteMethod:
-      new DeleteMethod(client->kq, client->GetFilePath(), client);
+      client->method_list.insert(new DeleteMethod(client->kq, client->GetFilePath(), client));
       client->request = nullptr;
       client->response = nullptr;
       break;
     case kFdCgi:
-      new Cgi(client->kq, client->GetFilePath(), client);
+      client->method_list.insert(new Cgi(client->kq, client->GetFilePath(), client));
       client->request = nullptr;
       client->response = nullptr;
       break;
@@ -257,6 +252,11 @@ void Cgi_Event_Write(Cgi *cgi, int ident)
 
 void Process(FdInterface *target, struct kevent event)
 {
+  if (event.flags & EV_EOF && target->interface_type == kFdClient) {
+    break_point();
+    target->kq.delete_list.insert(target);
+    return ;
+  }
   if (event.filter == EVFILT_READ)
   {
     switch (target->interface_type)
