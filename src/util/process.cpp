@@ -15,7 +15,7 @@ void Client_Event_Read(Client *client)
   int status = client->EventRead();
   if (status <= 0) {
     // TODO : delete 부분과 밀접한 연관이 있음
-    delete client;
+    client->kq.delete_list.insert(client);
     return;
   }
 
@@ -65,7 +65,8 @@ void Client_Event_Write(Client *client)
     //client->kq.DeleteEvent(client->interface_fd, EVFILT_WRITE);
 
     if(client->request->GetItem("Connection").value == "close")
-      delete client;
+      //delete client;
+      client->kq.delete_list.insert(client);
     //if (client->response) {
     //  delete client->response;
     //  client->response = nullptr;
@@ -96,8 +97,9 @@ void GetMethod_Event_Write(GetMethod *getmethod)
     //getmethod->kq.DeleteEvent(getmethod->target_fd, EVFILT_WRITE);
 
     if (getmethod->request->GetItem("Connection").value == "close")
-      delete getmethod->client;
-    delete getmethod;
+      getmethod->kq.delete_list.insert(getmethod->client);
+    //delete getmethod;
+    getmethod->kq.delete_list.insert(getmethod);
   }
 }
 
@@ -122,8 +124,10 @@ void PutMethod_Event_Write(PutMethod *putmethod, int fd)
       //putmethod->kq.DeleteEvent(putmethod->target_fd, EVFILT_WRITE);
 
       if (putmethod->request->GetItem("Connection").value == "close")
-        delete putmethod->client;
-      delete putmethod;
+        //delete putmethod->client;
+        putmethod->kq.delete_list.insert(putmethod->client);
+      //delete putmethod;
+      putmethod->kq.delete_list.insert(putmethod);
     }
   }
   else
@@ -159,8 +163,10 @@ void PostMethod_Event_Write(PostMethod *postmethod, int fd)
       //postmethod->kq.DeleteEvent(postmethod->target_fd, EVFILT_WRITE);
 
       if (postmethod->request->GetItem("Connection").value == "close")
-        delete postmethod->client;
-      delete postmethod;
+        //delete postmethod->client;
+        postmethod->kq.delete_list.insert(postmethod->client);
+      //delete postmethod;
+      postmethod->kq.delete_list.insert(postmethod);
     }
   }
   else
@@ -194,8 +200,10 @@ void DeleteMethod_Event_Write(DeleteMethod *deletemethod)
     //deletemethod->kq.DeleteEvent(deletemethod->target_fd, EVFILT_WRITE);
 
     if (deletemethod->request->GetItem("Connection").value == "close")
-      delete deletemethod->client;
-    delete deletemethod;
+      //delete deletemethod->client;
+      deletemethod->kq.delete_list.insert(deletemethod->client);
+    //delete deletemethod;
+    deletemethod->kq.delete_list.insert(deletemethod);
   }
 }
 
@@ -231,8 +239,10 @@ void Cgi_Event_Write(Cgi *cgi, int ident)
       //cgi->kq.DeleteEvent(cgi->target_fd, EVFILT_WRITE);
 
       if (cgi->request->GetItem("Connection").value == "close")
-        delete cgi->client;
-      delete cgi;
+        //delete cgi->client;
+        cgi->kq.delete_list.insert(cgi->client);
+      //delete cgi;
+      cgi->kq.delete_list.insert(cgi);
     }
   } else {
     if (cgi->EventWriteToCgi() <= 0) { // request to cgi process 1

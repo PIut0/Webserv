@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
       FdInterface *target = static_cast<FdInterface *>(kq.events[0].udata);
       Process(target, kq.events[0]);
     }
+    kq.DeleteList();
     //for (int i = 0; i < kq.event_count; i++) {
     //  FdInterface *target = static_cast<FdInterface *>(kq.events[i].udata);
     //  Process(target, kq.events[i]);
