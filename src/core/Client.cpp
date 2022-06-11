@@ -31,6 +31,7 @@ int Client::EventRead()
   }	// n == 0: 클라이언트에서 close & n == -1: 클라이언트 프로세스가 종료됨
   buf[n] = '\0';
   request_message += buf;
+  //std::cout << "- Request Row Message -" << std::endl << request_message << std::endl;
 
   return n;
 }
@@ -110,10 +111,6 @@ int Client::CheckRequest()
   if (!request->method || request->host.size() <= 0 || request->host[0] != '/')
     return 400;
 
-  LocationBlock *location_block = GetLocationBlock();
-  if (!(location_block->allow_methods & request->method))
-    return 405;
-
   return 0;
 }
 
@@ -155,7 +152,13 @@ FdInterfaceType Client::ParseHeader()
     return kFdNone;
   else if(request->GetItem("Transfer-Encoding").value == "chunked")
     return kFdNone;
-  else if(CheckCgi())
+
+  if (!(loc->allow_methods & request->method)) {
+    response->SetItem("Status", StatusCode(405));
+    return kFdGetMethod;
+  }
+
+  if(CheckCgi())
     return kFdCgi;
   else if(request->host != "" && request->method == HTTP_GET)
     return kFdGetMethod;
@@ -206,9 +209,14 @@ FdInterfaceType Client::ParseBody()
     }
   }
 
-  size_t max_body_size = GetLocationBlock()->request_max_body_size;
+  LocationBlock *loc = GetLocationBlock();
+  size_t max_body_size = loc->request_max_body_size;
+
   if (request->body.size() > max_body_size)
     response->SetItem("Status", StatusCode(413));
+
+  if (!(loc->allow_methods & request->method))
+    response->SetItem("Status", StatusCode(405));
 
   if (CheckCgi())
     return kFdCgi;
