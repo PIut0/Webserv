@@ -9,9 +9,13 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
     pipe(this->fromCgi);
     pipe(this->toCgi);
 
-    pid_t pid = fork();
     extension = this->request->host.substr(this->request->host.find_last_of('.'));
     cgi_path = this->location->cgi_info[extension];
+    if (access(cgi_path.c_str(), X_OK) != 0){
+      throw ForbiddenError();
+    }
+
+    pid_t pid = fork();
 
     fcntl(toCgi[FD_READ], F_SETFL, O_NONBLOCK);
     fcntl(toCgi[FD_WRITE], F_SETFL, O_NONBLOCK);
@@ -49,6 +53,12 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
   catch (FdDupFailed &e) {
     std::cerr << e.what() << std::endl;
     exit(1);
+  } catch (ForbiddenError &e) {
+    SetResponseStatus(response, 403);
+  }
+  if (ft_stoi(response->status_code) >= 400) {
+    ResponseErrorPage();
+    return ;
   }
 }
 
@@ -61,8 +71,6 @@ int Cgi::EventReadToCgi()
     return n;
   buf[n] = '\0';
   cgi_read_data += buf;
-  // if (request->body.size() <= cgi_read_data.size())
-  //   return 0;
 
   return n;
 }
@@ -102,11 +110,3 @@ void Cgi::SetResponseMessageCgi()
   }
   SetResponseMessage();
 }
-
-
-//toCgi fd: 9
-//n: 65536
-//cgi_data: 99934464
-//toCgi fd: 9
-//n: 65536
-//cgi_data: 99868928
