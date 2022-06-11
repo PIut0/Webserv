@@ -87,3 +87,12 @@ void KQueue::AddServer(Server &server)
 {
   AddEvent(server.interface_fd, EVFILT_READ, &server);
 }
+
+void KQueue::AddClient(Client *client)
+{
+  AddEvent(client->interface_fd, EVFILT_READ, client);
+  if (fd_map.find(client->interface_fd) != fd_map.end()) {
+    //delete fd_map[client->interface_fd];
+  }
+  fd_map[client->interface_fd] = client;
+}

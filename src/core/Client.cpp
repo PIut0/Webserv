@@ -5,7 +5,7 @@ Client::Client(KQueue &kq, int fd, Server *server) : FdInterface(kq, kFdClient, 
 {
   request = nullptr;
   response = nullptr;
-  kq.AddEvent(interface_fd, EVFILT_READ, this);
+  kq.AddClient(this);
 }
 
 Client::~Client()

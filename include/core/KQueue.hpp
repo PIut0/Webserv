@@ -17,6 +17,7 @@
 #define EVENT_SIZE 64
 
 class Server;
+class Client;
 class FdInterface;
 
 class KQueue
@@ -36,12 +37,14 @@ class KQueue
   void DisableEvent(int ident, int16_t filter, void *udata);
   void DeleteEvent(int ident, int16_t filter);
   void AddServer(Server &serv);
+  void AddClient(Client *cli);
 
 
   struct timespec timeout;
   int           kq;
   int           event_count;
   std::vector<struct kevent> event_list;
+  std::map<int, FdInterface *> fd_map;
   std::set<FdInterface *> delete_list;
   struct kevent events[EVENT_SIZE];
 };
