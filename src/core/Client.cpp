@@ -146,12 +146,7 @@ FdInterfaceType Client::ParseHeader()
 
   if (status) {
     response->SetItem("Status", StatusCode(status));
-    if (loc && loc->error_page != "")
-      return kFdGetMethod;
-    else {
-      response->body = DefaultErrorPage(status);
-      return kFdClient;
-    }
+    return kFdGetMethod;
   }
 
   std::cout << "- Request -" << std::endl << request->ToString() << std::endl;
@@ -251,6 +246,9 @@ const std::string Client::GetFilePath()
 {
   std::string path;
 
+  if (response->status_code != "")
+    return path;
+
   int location_index = server->server_block.GetLocationBlockByPath(request->host);
 
   if (location_index == -1)
@@ -259,36 +257,4 @@ const std::string Client::GetFilePath()
     + request->host.substr(request->host.find(GetLocationBlock()->location_path) + GetLocationBlock()->location_path.size());
 
   return path;
-}
-
-void Client::SetResponseMessage()
-{
-  if (response->status_code == "") {
-    if (response->body.size() > 0)
-      response->SetItem("Status", StatusCode(200));
-    else
-      response->SetItem("Status", StatusCode(204));
-  }
-
-  if (ft_stoi(response->status_code) >= 400)
-    response->SetItem("Content-Type", "text/html");
-
-  response->SetItem("Content-Length", ft_itos(response->body.size()));
-
-  if (response->body.size() > 0) {
-    if (response->FindItem("Content-Type") == response->conf.end()) {
-      if (request && request->host.size() && request->host.find_last_of(".") != std::string::npos)
-        response->SetItem("Content-Type", MimeType(request->host.substr(request->host.find_last_of(".") + 1)));
-      else
-        response->SetItem("Content-Type", "application/octet-stream");
-    }
-  }
-
-  if (request && request->FindItem("Connection") != request->conf.end())
-    response->SetItem("Connection", request->FindItem("Connection")->second->value);
-  else if (response->FindItem("Connection") == response->conf.end())
-    response->SetItem("Connection", "keep-alive");
-
-  response->SetItem("Server", server->server_block.server_name);
-  response->SetItem("Date", GetDate());
 }

@@ -66,7 +66,7 @@ void Method::SetResponseStatus(ResponseHeader *response, const int code)
 
 void Method::ResponseErrorPage()
 {
-  if ((interface_fd = open(location->error_page.c_str(), O_RDONLY)) < 0) {
+  if (!location || (interface_fd = open(location->error_page.c_str(), O_RDONLY)) < 0) {
     data = DefaultErrorPage(ft_stoi(response->status_code));
     SetResponseMessage();
     kq.AddEvent(target_fd, EVFILT_WRITE, this);

@@ -21,11 +21,6 @@ void Client_Event_Read(Client *client)
 
   switch(client->ParseReq())
   {
-    case kFdClient:
-      client->SetResponseMessage();
-      client->kq.DisableEvent(client->interface_fd, EVFILT_READ, client);
-      client->kq.AddEvent(client->interface_fd, EVFILT_WRITE, client);
-      break;
     case kFdGetMethod:
       client->method_list.insert(new GetMethod(client->kq, client->GetFilePath(), client));
       client->request = nullptr;
