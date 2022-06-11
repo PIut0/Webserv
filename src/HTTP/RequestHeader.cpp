@@ -1,6 +1,8 @@
 #include "RequestHeader.hpp"
 
-RequestHeader::RequestHeader() : pos_(0) {}
+RequestHeader::RequestHeader() : pos_(0) {
+  this->SetItem("", "");
+}
 
 RequestHeader::RequestHeader(const RequestHeader &origin)
 {
@@ -99,8 +101,7 @@ wsv_header_t& RequestHeader::GetItem(const std::string &key)
 {
   req_header_it_t it = FindItem(key);
   if (it == this->conf.end()) {
-    this->SetItem(key, "");
-    return GetItem(key);
+    return *(this->conf[""]);
   }
   return *(it->second);
 }
