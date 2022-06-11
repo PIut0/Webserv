@@ -21,10 +21,12 @@ std::string& rtrim(std::string& s);
 std::string& trim(std::string& s);
 std::string ft_itos(int i);
 int ft_stoi(const std::string &s);
+int ft_hextoi(const std::string &s);
 int IsEOF(int fd);
 int IsRegularFile(const std::string &path);
 
 void SetMime();
+std::string GetDate();
 std::string MimeType(const std::string &ext);
 std::string StatusCode(const int &code);
 std::string DefaultErrorPage(const int &code);

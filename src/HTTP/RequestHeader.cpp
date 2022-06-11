@@ -78,15 +78,13 @@ int RequestHeader::SetChunked(const std::string &chunked)
   int contents_length;
   int pos;
 
-  if (chunked.find("0\r\n\r\n") != std::string::npos)
-    return 0;
-
   if (chunked.length() == 0 || chunked.find(CRLF) == std::string::npos) {
     return -1;
   }
 
   pos = chunked.find(CRLF);
-  contents_length = ft_stoi(chunked.substr(0, pos));
+  contents_length = ft_hextoi(chunked.substr(0, pos));
+  //std::cout << "contents_length: " << contents_length << std::endl;
   if (contents_length == 0) return 0;
   this->body += chunked.substr(pos + 2, contents_length);
   return contents_length;
@@ -551,45 +549,47 @@ std::string RequestHeader::HttpVersionToString()
   return "HTTP/" + charset[this->http_major] + "." + charset[this->http_minor];
 }
 
-char** RequestHeader::ToCgi(const int &type) {
-  const std::string php[4] = {
-    "REQUEST_METHOD",
-    "SERVER_PROTOCOL",
-    "PATH_INFO",
-    "CONTENT_LENGTH"
-  };
-
-  const std::string bla[2] = {
-    "REQUEST_METHOD",
-    "SERVER_PROTOCOL",
-  };
-
-  // const std::string* cgiHeader[2] = {
-  //   php,
-  //   bla,
-  // };
-
-  (void)type;
+char** RequestHeader::ToCgi(const std::string &path) {
   std::string tmp;
-  char **ret;
-  int n, i;
+  char        **ret;
+  size_t      len, i;
 
-  n = 4 + 1;
-  ret = (char **)malloc(sizeof(char *) * n);
-  for (i = 0 ; i < n - 1 ; ++i) {
-    if (php[i] == "REQUEST_METHOD") {
+  std::vector<std::string> cgi;
+
+  cgi.push_back("REQUEST_METHOD");
+  cgi.push_back("SERVER_PROTOCOL");
+  cgi.push_back("PATH_INFO");
+  cgi.push_back("CONTENT_LENGTH");
+
+
+  for (req_header_it_t it = this->conf.begin() ; it != this->conf.end() ; ++it) {
+    if (wsb_str_2cmp(it->first, 'X', '-')) {
+      cgi.push_back("HTTP_" + it->second->key + "=" + it->second->value);
+      // std::cout << "push !! " << "HTTP_" + it->second->key + "=" + it->second->value << std::endl;
+    }
+  }
+
+  len = cgi.size() + 1;
+  ret = (char **)malloc(sizeof(char *) * len);
+
+  for (i = 0 ; i < len - 1 ; ++i) {
+    if (cgi[i] == "REQUEST_METHOD") {
       tmp = "REQUEST_METHOD=" + MethodToString();
-    } else if (php[i] == "SERVER_PROTOCOL") {
+    } else if (cgi[i] == "SERVER_PROTOCOL") {
       tmp = "SERVER_PROTOCOL=" + HttpVersionToString();
-    } else if (php[i] == "PATH_INFO") {
-      tmp = "PATH_INFO=../";
-    } else if (php[i] == "CONTENT_LENGTH") {
-      std::string value = GetItem("Content-Length").value;
+    } else if (cgi[i] == "PATH_INFO") {
+      tmp = "PATH_INFO=" + path;
+    } else if (cgi[i] == "CONTENT_LENGTH") {
+      std::string value = ft_itos(body.size());
       tmp = "CONTENT_LENGTH=" + (value == "" ? "0" : value);
+    } else {
+      ret[i] = strdup(cgi[i].c_str());
+      continue;
     }
     ret[i] = strdup(tmp.c_str());
   }
   ret[i] = NULL;
+
   return ret;
 }
 

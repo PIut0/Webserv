@@ -5,7 +5,6 @@ Client::Client(KQueue &kq, int fd, Server *server) : FdInterface(kq, kFdClient, 
 {
   request = nullptr;
   response = nullptr;
-  fcntl(interface_fd, F_SETFL, O_NONBLOCK);
   kq.AddEvent(interface_fd, EVFILT_READ, this);
 }
 
@@ -21,9 +20,9 @@ Client::~Client()
 
 int Client::EventRead()
 {
-  char buf[1024];
-  memset(buf, 0, sizeof(buf));
-  int n = read(interface_fd, buf, sizeof(buf) - 1);
+  char buf[BUFFER_SIZE];
+  memset(buf, 0, BUFFER_SIZE);
+  int n = read(interface_fd, buf, BUFFER_SIZE - 1);
   if (n <= 0) {
     return n;
   }	// n == 0: 클라이언트에서 close & n == -1: 클라이언트 프로세스가 종료됨
@@ -62,7 +61,23 @@ LocationBlock *Client::GetLocationBlock()
 int Client::CheckCgi()
 {
   // TODO : CGI 처리를 해야하는지 확인하는 부분
-  return 0;
+  // request->host 의 . 뒷부분을 locationblock cgi_info에서 찾아서 있으면 OK
+  size_t pos;
+  cgiinfo_it_t it;
+  LocationBlock *locationBlock;
+  std::string extension;
+
+  if ((pos = this->request->host.find_last_of('.')) == std::string::npos){
+    return 0;
+  }
+
+  extension = this->request->host.substr(pos);
+  locationBlock = GetLocationBlock();
+  if ((it = locationBlock->cgi_info.find(extension)) == locationBlock->cgi_info.end()) {
+    return 0;
+  }
+
+  return 1;
 }
 
 int Client::CheckRequest()
@@ -99,13 +114,23 @@ int Client::CheckRequest()
   return 0;
 }
 
+size_t FindSecondCRLF(std::string &request_message)
+{
+  size_t pos = request_message.find(CRLF);
+  if (pos == std::string::npos)
+    return pos;
+  pos = request_message.find(CRLF, pos + 2);
+  if (pos == std::string::npos)
+    return pos;
+  return pos;
+}
+
 FdInterfaceType Client::ParseHeader()
 {
   int status = CheckRequest();
   LocationBlock *loc = GetLocationBlock();
 
   if (status == 0 && loc->ret != "") {
-    std::cout << "ret: " << loc->ret << std::endl;
     status = ft_stoi(loc->ret.substr(0, 3));
 
     if (loc->ret.size() > 4) {
@@ -125,6 +150,8 @@ FdInterfaceType Client::ParseHeader()
       return kFdClient;
     }
   }
+
+  std::cout << "- Request -" << std::endl << request->ToString() << std::endl;
 
   if (ft_stoi(request->GetItem("Content-Length").value) > 0 && request->body.size() <= 0)
     return kFdNone;
@@ -150,13 +177,17 @@ FdInterfaceType Client::ParseBody()
   int content_length;
 
   if (request->GetItem("Transfer-Encoding").value == "chunked") {
-    // TODO : chunked 데이터 파싱 추후 확정필요
-    if (!IsCRLF(request_message))
+    size_t pos;
+    if ((pos = FindSecondCRLF(request_message)) == std::string::npos)
       return kFdNone;
 
-    req = request_message.substr(0, request_message.find(D_CRLF) + 4);
-    request_message = request_message.substr(request_message.find(D_CRLF) + 4);
-    if (request->SetChunked(req) != 0)
+    req = request_message.substr(0, pos);
+    request_message = request_message.substr(pos + 2);
+
+    int chunked_status = request->SetChunked(req);
+    if (chunked_status && FindSecondCRLF(request_message) != std::string::npos)
+      return ParseBody();
+    if (chunked_status != 0)
       return kFdNone;
   }
 
@@ -176,6 +207,10 @@ FdInterfaceType Client::ParseBody()
       request->SetBody(request->body.substr(0, content_length));
     }
   }
+
+  size_t max_body_size = GetLocationBlock()->request_max_body_size;
+  if (request->body.size() > max_body_size)
+    response->SetItem("Status", StatusCode(413));
 
   if (CheckCgi())
     return kFdCgi;
@@ -202,7 +237,7 @@ FdInterfaceType Client::ParseReq()
 
     type = ParseHeader();
 
-    if (request_message.size() <= 0)
+    if (response->status_code != "" || request_message.size() <= 0)
       return type;
   }
 
@@ -231,12 +266,13 @@ void Client::SetResponseMessage()
     else
       response->SetItem("Status", StatusCode(204));
   }
-  else
+
+  if (ft_stoi(response->status_code) >= 400)
     response->SetItem("Content-Type", "text/html");
 
-  if (response->body.size() > 0) {
-    response->SetItem("Content-Length", ft_itos(response->body.size()));
+  response->SetItem("Content-Length", ft_itos(response->body.size()));
 
+  if (response->body.size() > 0) {
     if (response->FindItem("Content-Type") == response->conf.end()) {
       if (request && request->host.size() && request->host.find_last_of(".") != std::string::npos)
         response->SetItem("Content-Type", MimeType(request->host.substr(request->host.find_last_of(".") + 1)));
@@ -245,8 +281,11 @@ void Client::SetResponseMessage()
     }
   }
 
-  if (request && request->FindItem("Connection")->first == "Connection")
+  if (request && request->FindItem("Connection") != request->conf.end())
     response->SetItem("Connection", request->FindItem("Connection")->second->value);
-  else
+  else if (response->FindItem("Connection") == response->conf.end())
     response->SetItem("Connection", "keep-alive");
+
+  response->SetItem("Server", server->server_block.server_name);
+  response->SetItem("Date", GetDate());
 }

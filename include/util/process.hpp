@@ -4,6 +4,10 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include "GetMethod.hpp"
+#include "PutMethod.hpp"
+#include "PostMethod.hpp"
+#include "DeleteMethod.hpp"
+#include "Cgi.hpp"
 
 void Process(FdInterface *target, struct kevent event);
 

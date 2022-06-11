@@ -3,6 +3,7 @@
 
 Method::Method(KQueue &kq, Client *client, FdInterfaceType type) : FdInterface(kq, type), data(""), client(client)
 {
+  data = WSV_STR_EMPTY;
   target_fd = client->interface_fd;
   request = (client->request) ? client->request : new RequestHeader();
   response = (client->response) ? client->response : new ResponseHeader();
@@ -19,8 +20,9 @@ Method::~Method()
 
 int Method::EventRead()
 {
-  char buf[1024];
-  int n = read(interface_fd, buf, sizeof(buf) - 1);
+  char buf[BUFFER_SIZE];
+  memset(buf, 0, BUFFER_SIZE);
+  int n = read(interface_fd, buf, BUFFER_SIZE - 1);
   buf[n] = '\0';
   data += buf;
 
@@ -29,14 +31,24 @@ int Method::EventRead()
 
 int Method::EventWrite()
 {
-  std::string res = response->ToString();
-  int n = write(target_fd, res.c_str(), res.size());
+  if (response_data == WSV_STR_EMPTY) {
+    response_idx = 0;
+    response_data = response->ToString();
+    response_data_size = response_data.size();
+  }
+
+  int len = response_data_size - response_idx > 65535 ? 65535 : response_data_size - response_idx;
+  int n = write(target_fd, response_data.c_str() + response_idx, len);
+
   if (n <= 0)
     return n;
-  res = res.substr(n);
-  n = res.size();
 
-  return n;
+  response_idx += n;
+  if (response_data_size - response_idx <= 0) {
+    response->SetBody("");
+    std::cout << "- Response -" << std::endl << response->ToString() << std::endl;
+  }
+  return response_data_size - response_idx;
 }
 
 int Method::IsDir(const std::string &path)
@@ -72,7 +84,8 @@ void Method::ResponseErrorPage()
 
 void Method::SetResponseMessage()
 {
-  response->SetBody(data);
+  if (response->body.size() <= 0)
+    response->SetBody(data);
 
   if (response->status_code == "") {
     if (response->body.size() > 0)
@@ -84,9 +97,9 @@ void Method::SetResponseMessage()
   if (ft_stoi(response->status_code) >= 400)
     response->SetItem("Content-Type", "text/html");
 
-  if (response->body.size() > 0) {
-    response->SetItem("Content-Length", ft_itos(response->body.size()));
+  response->SetItem("Content-Length", ft_itos(response->body.size()));
 
+  if (response->body.size() > 0) {
     if (response->FindItem("Content-Type") == response->conf.end()) {
       if (request && request->host.size() && request->host.find_last_of(".") != std::string::npos)
         response->SetItem("Content-Type", MimeType(request->host.substr(request->host.find_last_of(".") + 1)));
@@ -95,8 +108,11 @@ void Method::SetResponseMessage()
     }
   }
 
-  if (request && request->FindItem("Connection")->first == "Connection")
+  if (request && request->FindItem("Connection") != request->conf.end())
     response->SetItem("Connection", request->FindItem("Connection")->second->value);
   else if (response->FindItem("Connection") == response->conf.end())
     response->SetItem("Connection", "keep-alive");
+
+  response->SetItem("Server", client->server->server_block.server_name);
+  response->SetItem("Date", GetDate());
 }

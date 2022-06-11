@@ -69,6 +69,16 @@ int ft_stoi(const std::string &s)
   return atoi(s.c_str());
 }
 
+int ft_hextoi(const std::string &s)
+{
+  int x;
+  std::stringstream ss;
+
+  ss << std::hex << s;
+  ss >> x;
+  return x;
+}
+
 int IsEOF(int fd)
 {
   char buf[1];
@@ -84,6 +94,15 @@ int IsRegularFile(const std::string &path)
   if (stat(path.c_str(), &st) < 0)
     return -1;
   return S_ISREG(st.st_mode);
+}
+
+std::string GetDate() // GMT TIME
+{
+  time_t t = time(NULL);
+  struct tm *tm = gmtime(&t);
+  char buf[128];
+  strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", tm);
+  return buf;
 }
 
 std::string StatusCode(const int &code)
@@ -110,6 +129,8 @@ std::string StatusCode(const int &code)
       return "404 Not Found";
     case 405:
       return "405 Method Not Allowed";
+    case 413:
+      return "413 Request Entity Too Large";
     case 500:
       return "500 Internal Server Error";
     case 501:

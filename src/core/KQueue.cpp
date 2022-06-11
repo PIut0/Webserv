@@ -22,7 +22,9 @@ void KQueue::ErrorIgnore(const char *err)
 
 void KQueue::Refresh()
 {
-  event_count = kevent(kq, NULL, 0, events, EVENT_SIZE, NULL);
+  //event_count = kevent(kq, NULL, 0, events, EVENT_SIZE, NULL);
+  event_count = kevent(kq, &event_list[0], event_list.size(), events, EVENT_SIZE, NULL);
+  event_list.clear();
   if (event_count == -1)
     ErrorIgnore("refresh");
 }
@@ -32,9 +34,10 @@ void KQueue::AddEvent(int ident, int16_t filter, void *udata)
   struct kevent ev;
   EV_SET(&ev, ident, filter, EV_ADD | EV_ENABLE, 0, 0, udata);
 
-  event_count = kevent(kq, &ev, 1, events, EVENT_SIZE, &timeout);
-  if (event_count == -1)
-    ErrorIgnore("add_event");
+  event_list.push_back(ev);
+  //event_count = kevent(kq, &ev, 1, events, EVENT_SIZE, &timeout);
+  //if (event_count == -1)
+  //  ErrorIgnore("add_event");
 }
 
 void KQueue::EnableEvent(int ident, int16_t filter, void *udata)
@@ -42,9 +45,10 @@ void KQueue::EnableEvent(int ident, int16_t filter, void *udata)
   struct kevent ev;
   EV_SET(&ev, ident, filter, EV_ENABLE, 0, 0, udata);
 
-  event_count = kevent(kq, &ev, 1, events, EVENT_SIZE, &timeout);
-  if (event_count == -1)
-    ErrorIgnore("enable_event");
+  event_list.push_back(ev);
+  //event_count = kevent(kq, &ev, 1, events, EVENT_SIZE, &timeout);
+  //if (event_count == -1)
+  //  ErrorIgnore("enable_event");
 }
 
 void KQueue::DisableEvent(int ident, int16_t filter, void *udata)
@@ -52,16 +56,19 @@ void KQueue::DisableEvent(int ident, int16_t filter, void *udata)
   struct kevent ev;
   EV_SET(&ev, ident, filter, EV_DISABLE, 0, 0, udata);
 
-  event_count = kevent(kq, &ev, 1, events, EVENT_SIZE, &timeout);
-  if (event_count == -1)
-    ErrorIgnore("disable_event");
+  event_list.push_back(ev);
+  //event_count = kevent(kq, &ev, 1, events, EVENT_SIZE, &timeout);
+  //if (event_count == -1)
+  //  ErrorIgnore("disable_event");
 }
 
 void KQueue::DeleteEvent(int ident, int16_t filter)
 {
   struct kevent ev;
-  EV_SET(&ev, ident, filter, EV_DELETE, 0, 0, &timeout);
+  EV_SET(&ev, ident, filter, EV_DELETE, 0, 0, NULL);
+  //TODO : udata 추가
 
+  //event_list.push_back(ev);
   event_count = kevent(kq, &ev, 1, events, EVENT_SIZE, &timeout);
   if (event_count == -1)
     ErrorIgnore("delete_event");

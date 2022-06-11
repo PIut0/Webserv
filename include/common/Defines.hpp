@@ -19,6 +19,8 @@
 #define CRLF                  "\r\n"
 #define CRLF_RETURN           "\r\n\r\n"
 
+#define WSV_STR_EMPTY         ""
+
 #define CLEAR_VECTOR(A)       (A).clear();
 #define SWAP_VECTOR(A)        std::vector<std::string>().swap(A);
 #define CLEAR_VECTOR_COMPLETLY(A) {CLEAR_VECTOR(A)}; {SWAP_VECTOR(A)}

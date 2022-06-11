@@ -7,6 +7,8 @@
 
 class KQueue;
 
+#define BUFFER_SIZE 65536
+
 enum FdInterfaceType {
   kFdServer,
   kFdClient,
