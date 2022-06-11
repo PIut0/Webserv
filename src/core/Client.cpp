@@ -16,6 +16,9 @@ Client::~Client()
     delete response;
   if (interface_fd > 2)
     close(interface_fd);
+  for (std::set<Method *>::iterator it = method_list.begin(); it != method_list.end(); it++) {
+    delete *it;
+  }
 }
 
 int Client::EventRead()

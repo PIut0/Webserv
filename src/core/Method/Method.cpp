@@ -16,6 +16,7 @@ Method::~Method()
   delete response;
   if (interface_fd > 2)
     close(interface_fd);
+  client->method_list.erase(this);
 }
 
 int Method::EventRead()
