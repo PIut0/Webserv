@@ -28,7 +28,7 @@ std::string ServerManager::CheckLine(const std::string &line)
     return str;
   ch = str[str.length() - 1];
   if (ch != ';' && ch != '}' && ch != '{' )
-    ExitWithPerror("error");
+    ExitWithMsg("error");
   return str;
 }
 
@@ -41,7 +41,7 @@ void ServerManager::InitServer(const std::string &path)
 
   config_file.open(path);
   if (!config_file.is_open())
-    ExitWithPerror("file open error");
+    ExitWithMsg("file open error");
 
   while (std::getline(config_file, line))
   {

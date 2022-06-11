@@ -21,12 +21,8 @@ time_t Monitor::getTimeStamp() {
 void Monitor::Log(const std::string &data)
 {
   std::string time = std::to_string(this->getTimeStamp());
-  std::string _log = time + " " + "Scope" + " " + data;
-  // TODO errnoo 사용 금지
-  if (errno > 0) {
-    _log += "(" + std::to_string(errno) + static_cast<std::string>(std::strerror(errno)) + ")";
-  }
-  _log += "\n";
+  std::string _log = time + " " + "Scope" + " " + data + "\n";
+  
   this->logfile_.write(_log.c_str(), _log.length());
 }
 

@@ -4,7 +4,7 @@
 Server::Server(KQueue &kq, ServerBlock &_sb) : FdInterface(kq, kFdServer), server_block(_sb)
 {
   if ((interface_fd = socket(PF_INET, SOCK_STREAM, 0)) == -1)
-    ExitWithPerror("socket");
+    ExitWithMsg("socket");
   int option = 1;
   setsockopt(interface_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 
@@ -14,10 +14,10 @@ Server::Server(KQueue &kq, ServerBlock &_sb) : FdInterface(kq, kFdServer), serve
   server_addr.sin_port = htons(_sb.port);
 
   if (bind(interface_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
-    ExitWithPerror("bind");
+    ExitWithMsg("bind");
 
   if (listen(interface_fd, 2048) == -1)
-    ExitWithPerror("listen");
+    ExitWithMsg("listen");
 
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
   kq.AddServer(*this);
@@ -33,7 +33,7 @@ int Server::EventRead()
 {
   int client_interface_fd;
   if ((client_interface_fd = accept(interface_fd, NULL, NULL)) == -1)
-    ExitWithPerror("server_event_read");
+    ExitWithMsg("server_event_read");
   fcntl(client_interface_fd, F_SETFL, O_NONBLOCK);
   new Client(kq, client_interface_fd, this);
 

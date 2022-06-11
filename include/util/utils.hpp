@@ -12,7 +12,7 @@
 
 static std::map<std::string, std::string> _mimes;
 
-void ExitWithPerror(const std::string &msg);
+void ExitWithMsg(const std::string &msg);
 std::string CheckArg(int argc, char **argv);
 std::vector<std::string> StringSplit(const std::string &data, const std::string &delim, const int &start_pos);
 

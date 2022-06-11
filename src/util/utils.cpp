@@ -9,7 +9,7 @@ std::string CheckArg(int argc, char **argv)
     return DEFAULT_CONFIG_PATH;
   }
   if (argc != 2)
-    ExitWithPerror("Usage: ./server [config_file]");
+    ExitWithMsg("Usage: ./server [config_file]");
   return argv[1];
 }
 
@@ -32,9 +32,9 @@ std::vector<std::string> StringSplit(const std::string &data,
   return res;
 }
 
-void ExitWithPerror(const std::string &msg)
+void ExitWithMsg(const std::string &msg)
 {
-  std::cerr << msg << ": " << strerror(errno) << std::endl;
+  std::cerr << msg << std::endl;
   exit(1);
 }
 
