@@ -12,43 +12,38 @@ void Server_Event_Write(Server *server)
 
 void Client_Event_Read(Client *client)
 {
-  int status = client->EventRead();
-  if (status <= 0) {
+  if (client->EventRead() <= 0) {
     // TODO : delete 부분과 밀접한 연관이 있음
     client->kq.delete_list.insert(client);
     return;
   }
 
-  switch(client->ParseReq())
+  FdInterfaceType type = client->ParseReq();
+  if (type == kFdNone)
+    return ;
+  switch(type)
   {
     case kFdGetMethod:
       client->method_list.insert(new GetMethod(client->kq, client->GetFilePath(), client));
-      client->request = nullptr;
-      client->response = nullptr;
       break;
     case kFdPutMethod:
       client->method_list.insert(new PutMethod(client->kq, client->GetFilePath(), client));
-      client->request = nullptr;
-      client->response = nullptr;
       break;
     case kFdPostMethod:
       client->method_list.insert(new PostMethod(client->kq, client->GetFilePath(), client));
-      client->request = nullptr;
-      client->response = nullptr;
       break;
     case kFdDeleteMethod:
       client->method_list.insert(new DeleteMethod(client->kq, client->GetFilePath(), client));
-      client->request = nullptr;
-      client->response = nullptr;
       break;
     case kFdCgi:
       client->method_list.insert(new Cgi(client->kq, client->GetFilePath(), client));
-      client->request = nullptr;
-      client->response = nullptr;
       break;
     default:
       break;
   }
+  client->request_message.clear();
+  client->request = nullptr;
+  client->response = nullptr;
 }
 
 void Client_Event_Write(Client *client)
