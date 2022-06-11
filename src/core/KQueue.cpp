@@ -6,7 +6,7 @@ KQueue::KQueue()
   timeout.tv_nsec = 0;
   // Create a new kqueue
   if ((kq = kqueue()) == -1)
-    ExitWithPerror("kqueue");
+    ExitWithMsg("kqueue");
 }
 
 KQueue::~KQueue()

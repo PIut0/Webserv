@@ -103,7 +103,7 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
             break;
 
           case kError:
-            ExitWithPerror("error in serverblock");
+            ExitWithMsg("error in serverblock");
 
           default:
             break;

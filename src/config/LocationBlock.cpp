@@ -167,7 +167,7 @@ void LocationBlock::InitLocationBlock(std::vector<std::string> &data)
         break;
 
       case kError:
-        ExitWithPerror("error");
+        ExitWithMsg("error");
         break;
 
       default:
