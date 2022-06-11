@@ -47,8 +47,9 @@ int ServerBlock::GetLocationBlockByPath(const std::string &path)
 void ServerBlock::ParseListen(const std::string &contents)
 {
   std::vector<std::string> split_data = StringSplit(contents, " ", 0);
-  this->port = atoi(split_data[0].c_str());
-  if (this->port <= 0)
+  char *ptr;
+  this->port = strtod(split_data[0].c_str(), &ptr);
+  if (this->port <= 0 || ptr[0])
     ExitWithMsg("listen Error");
   this->host = split_data[1];
 }

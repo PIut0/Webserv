@@ -40,8 +40,9 @@ LocationBlock& LocationBlock::operator=(const LocationBlock& rv)
 void LocationBlock::ParseRoot(const std::string &data)
 {
   this->root = data;
-  if (IsRegularFile(data) != 0)
+  if (IsRegularFile(data) < 0) {
     ExitWithMsg("Root Path Error");
+  }
 }
 
 void LocationBlock::ParseAllowMethod(const std::string &data)
@@ -92,8 +93,9 @@ void LocationBlock::ParseCgiInfo(const std::string &data)
 
 void LocationBlock::ParseRequestBodySize(const std::string &data)
 {
-  int size = atoi(data.c_str());
-  if (size <= 0)
+  char *ptr;
+  int size = strtod(data.c_str(), &ptr);
+  if (size <= 0 || ptr[0])
     ExitWithMsg("request_max_body_size Error");
   this->request_max_body_size = size;
 }
