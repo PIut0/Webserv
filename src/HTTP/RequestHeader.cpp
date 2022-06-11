@@ -1,6 +1,6 @@
 #include "RequestHeader.hpp"
 
-RequestHeader::RequestHeader() : pos_(0) {
+RequestHeader::RequestHeader() : method(0), pos_(0) {
   this->SetItem("", "");
 }
 
