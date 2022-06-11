@@ -48,6 +48,8 @@ void ServerBlock::ParseListen(const std::string &contents)
 {
   std::vector<std::string> split_data = StringSplit(contents, " ", 0);
   this->port = atoi(split_data[0].c_str());
+  if (this->port <= 0)
+    ExitWithMsg("listen Error");
   this->host = split_data[1];
 }
 void ServerBlock::ParseServerName(const std::string &contents)

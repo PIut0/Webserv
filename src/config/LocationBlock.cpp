@@ -40,6 +40,8 @@ LocationBlock& LocationBlock::operator=(const LocationBlock& rv)
 void LocationBlock::ParseRoot(const std::string &data)
 {
   this->root = data;
+  if (IsRegularFile(data) != 0)
+    ExitWithMsg("Root Path Error");
 }
 
 void LocationBlock::ParseAllowMethod(const std::string &data)
@@ -55,6 +57,8 @@ void LocationBlock::ParseAllowMethod(const std::string &data)
       this->allow_methods |= HTTP_GET;
     else if (split_data[i] == "DELETE")
       this->allow_methods |= HTTP_DELETE;
+    else
+      ExitWithMsg("Method input Error");
   }
 }
 
@@ -74,21 +78,30 @@ void LocationBlock::ParseAutoIndex(const std::string &data)
     this->auto_index = ON;
   else if (data == "off")
     this->auto_index = OFF;
+  else
+    ExitWithMsg("auto_index Value Error");
 }
 
 void LocationBlock::ParseCgiInfo(const std::string &data)
 {
   std::vector<std::string> split_data = StringSplit(data, " ", 0);
   this->cgi_info[split_data[0]] = split_data[1];
+  if (IsRegularFile(split_data[1]) != 1)
+    ExitWithMsg("cgi_info Error");
 }
 
 void LocationBlock::ParseRequestBodySize(const std::string &data)
 {
-  this->request_max_body_size = atoi(data.c_str());
+  int size = atoi(data.c_str());
+  if (size <= 0)
+    ExitWithMsg("request_max_body_size Error");
+  this->request_max_body_size = size;
 }
 
 void LocationBlock::ParseErrorPage(const std::string &data)
 {
+  if (access(data.c_str(), F_OK) != 0)
+    ExitWithMsg("error_page Error");
   this->error_page = data;
 }
 
