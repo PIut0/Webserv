@@ -1,7 +1,7 @@
 #include "PutMethod.hpp"
 #include "utils.hpp"
 
-PutMethod::PutMethod(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdPutMethod)
+PutMethod::PutMethod(KQueue &kq, const std::string &path, Client* &client) : Method(kq, client, kFdPutMethod)
 {
   if (ft_stoi(response->status_code) >= 400) {
     ResponseErrorPage();

@@ -31,7 +31,7 @@ class Method : public FdInterface
   Method(const Method &);
   Method &operator=(const Method &);
  public:
-  Method(KQueue &kq, Client *client, FdInterfaceType type);
+  Method(KQueue &kq, Client* &client, FdInterfaceType type);
   virtual ~Method();
 
   int EventRead();

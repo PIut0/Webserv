@@ -1,7 +1,7 @@
 #include "Method.hpp"
 #include "utils.hpp"
 
-Method::Method(KQueue &kq, Client *client, FdInterfaceType type) : FdInterface(kq, type), data(""), client(client)
+Method::Method(KQueue &kq, Client* &client, FdInterfaceType type) : FdInterface(kq, type), data(""), client(client)
 {
   data = WSV_STR_EMPTY;
   target_fd = client->interface_fd;

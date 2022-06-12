@@ -16,7 +16,7 @@ class PutMethod : public Method
   PutMethod(const PutMethod &);
   PutMethod &operator=(const PutMethod &);
  public:
-  PutMethod(KQueue &kq, const std::string &path, Client *client);
+  PutMethod(KQueue &kq, const std::string &path, Client* &client);
   ~PutMethod();
 
   int FileWrite();

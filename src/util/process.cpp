@@ -41,7 +41,8 @@ void Client_Event_Read(Client *client)
     default:
       break;
   }
-  client->request_message.clear();
+  client->kq.DisableEvent(client->interface_fd, EVFILT_READ, client);
+  //client->request_message.clear();
   client->request = nullptr;
   client->response = nullptr;
 }
@@ -78,6 +79,8 @@ void GetMethod_Event_Write(GetMethod *getmethod)
 
     if (getmethod->request->GetItem("Connection").value == "close")
       getmethod->kq.delete_list.insert(getmethod->client);
+    else
+      getmethod->kq.EnableEvent(getmethod->target_fd, EVFILT_READ, getmethod->client);
     //delete getmethod;
     getmethod->kq.delete_list.insert(getmethod);
   }
@@ -106,6 +109,8 @@ void PutMethod_Event_Write(PutMethod *putmethod, int fd)
       if (putmethod->request->GetItem("Connection").value == "close")
         //delete putmethod->client;
         putmethod->kq.delete_list.insert(putmethod->client);
+      else
+        putmethod->kq.EnableEvent(putmethod->target_fd, EVFILT_READ, putmethod->client);
       //delete putmethod;
       putmethod->kq.delete_list.insert(putmethod);
     }
@@ -145,6 +150,8 @@ void PostMethod_Event_Write(PostMethod *postmethod, int fd)
       if (postmethod->request->GetItem("Connection").value == "close")
         //delete postmethod->client;
         postmethod->kq.delete_list.insert(postmethod->client);
+      else
+        postmethod->kq.EnableEvent(postmethod->target_fd, EVFILT_READ, postmethod->client);
       //delete postmethod;
       postmethod->kq.delete_list.insert(postmethod);
     }
@@ -182,6 +189,8 @@ void DeleteMethod_Event_Write(DeleteMethod *deletemethod)
     if (deletemethod->request->GetItem("Connection").value == "close")
       //delete deletemethod->client;
       deletemethod->kq.delete_list.insert(deletemethod->client);
+    else
+      deletemethod->kq.EnableEvent(deletemethod->target_fd, EVFILT_READ, deletemethod->client);
     //delete deletemethod;
     deletemethod->kq.delete_list.insert(deletemethod);
   }
@@ -221,6 +230,8 @@ void Cgi_Event_Write(Cgi *cgi, int ident)
       if (cgi->request->GetItem("Connection").value == "close")
         //delete cgi->client;
         cgi->kq.delete_list.insert(cgi->client);
+      else
+        cgi->kq.EnableEvent(cgi->target_fd, EVFILT_READ, cgi->client);
       //delete cgi;
       cgi->kq.delete_list.insert(cgi);
     }

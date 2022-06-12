@@ -21,11 +21,11 @@ std::vector<std::string> GetFileList(const std::string &path)
   return res;
 }
 
-GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdGetMethod)
+GetMethod::GetMethod(KQueue &kq, const std::string &path, Client* &client) : Method(kq, client, kFdGetMethod)
 {
-  if (response->status_code != "") {
+  if (ft_stoi(response->status_code) >= 400) {
     ResponseErrorPage();
-    return;
+    return ;
   }
 
   target_path = path;
@@ -91,9 +91,9 @@ GetMethod::GetMethod(KQueue &kq, const std::string &path, Client *client) : Meth
     SetResponseStatus(response, 500);
   }
 
-  if (response->status_code != "") {
+  if (ft_stoi(response->status_code) >= 400) {
     ResponseErrorPage();
-    return;
+    return ;
   }
 
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
