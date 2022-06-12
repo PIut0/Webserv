@@ -55,16 +55,7 @@ void Client_Event_Write(Client *client)
     //client->kq.DeleteEvent(client->interface_fd, EVFILT_WRITE);
 
     if(client->request->GetItem("Connection").value == "close")
-      //delete client;
       client->kq.delete_list.insert(client);
-    //if (client->response) {
-    //  delete client->response;
-    //  client->response = nullptr;
-    //}
-    //if (client->request) {
-    //  delete client->request;
-    //  client->request = nullptr;
-    //}
   }
 }
 
@@ -247,7 +238,6 @@ void Cgi_Event_Write(Cgi *cgi, int ident)
 void Process(FdInterface *target, struct kevent event)
 {
   if (event.flags & EV_EOF && event.filter == EVFILT_READ && target->interface_type == kFdClient) {
-    break_point();
     target->kq.delete_list.insert(target);
     return ;
   }
