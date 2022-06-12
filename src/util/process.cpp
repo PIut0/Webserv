@@ -73,8 +73,8 @@ void GetMethod_Event_Read(GetMethod *getmethod)
   if (getmethod->EventRead() <= 0)
   {
     getmethod->SetResponseMessage();
-    getmethod->kq.DisableEvent(getmethod->interface_fd, EVFILT_READ, getmethod);
-    //getmethod->kq.DeleteEvent(getmethod->interface_fd, EVFILT_READ);
+    //getmethod->kq.DisableEvent(getmethod->interface_fd, EVFILT_READ, getmethod);
+    getmethod->kq.DeleteEvent(getmethod->interface_fd, EVFILT_READ);
 
     getmethod->kq.AddEvent(getmethod->target_fd, EVFILT_WRITE, getmethod);
   }
@@ -83,8 +83,7 @@ void GetMethod_Event_Read(GetMethod *getmethod)
 void GetMethod_Event_Write(GetMethod *getmethod)
 {
   if (getmethod->EventWrite() <= 0) {
-    //getmethod->kq.DisableEvent(getmethod->target_fd, EVFILT_WRITE, getmethod);
-    getmethod->kq.DeleteEvent(getmethod->target_fd, EVFILT_WRITE);
+    getmethod->kq.DisableEvent(getmethod->target_fd, EVFILT_WRITE, getmethod);
 
     if (getmethod->request->GetItem("Connection").value == "close")
       getmethod->kq.delete_list.insert(getmethod->client);
@@ -137,8 +136,8 @@ void PostMethod_Event_Read(PostMethod *postmethod)
   if (postmethod->EventRead() <= 0)
   {
     postmethod->SetResponseMessage();
-    postmethod->kq.DisableEvent(postmethod->interface_fd, EVFILT_READ, postmethod);
-    //postmethod->kq.DeleteEvent(postmethod->interface_fd, EVFILT_READ);
+    //postmethod->kq.DisableEvent(postmethod->interface_fd, EVFILT_READ, postmethod);
+    postmethod->kq.DeleteEvent(postmethod->interface_fd, EVFILT_READ);
 
     postmethod->kq.AddEvent(postmethod->target_fd, EVFILT_WRITE, postmethod);
   }
@@ -176,8 +175,8 @@ void DeleteMethod_Event_Read(DeleteMethod *deletemethod)
   if (deletemethod->EventRead() <= 0)
   {
     deletemethod->SetResponseMessage();
-    deletemethod->kq.DisableEvent(deletemethod->interface_fd, EVFILT_READ, deletemethod);
-    //deletemethod->kq.DeleteEvent(deletemethod->interface_fd, EVFILT_READ);
+    //deletemethod->kq.DisableEvent(deletemethod->interface_fd, EVFILT_READ, deletemethod);
+    deletemethod->kq.DeleteEvent(deletemethod->interface_fd, EVFILT_READ);
 
     deletemethod->kq.AddEvent(deletemethod->target_fd, EVFILT_WRITE, deletemethod);
   }
@@ -247,7 +246,7 @@ void Cgi_Event_Write(Cgi *cgi, int ident)
 
 void Process(FdInterface *target, struct kevent event)
 {
-  if (event.flags & EV_EOF && target->interface_type == kFdClient) {
+  if (event.flags & EV_EOF && event.filter == EVFILT_READ && target->interface_type == kFdClient) {
     break_point();
     target->kq.delete_list.insert(target);
     return ;
