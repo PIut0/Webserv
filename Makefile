@@ -5,13 +5,15 @@ INCLUDE 	=	-I./include -I./include/http -I./include/config -I./include/error -I.
 CXX				=	c++
 #CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 $(INCLUDE)
 CXXFLAGS	=	-g -Wall -Wextra -Werror -std=c++98 $(INCLUDE)
+# CXXFLAGS	=	-g -Wall -Wextra -Werror -std=c++98 $(INCLUDE) -fsanitize=address
 
 MAIN			= main.cpp
 
 SRC				=	core/KQueue.cpp \
 						core/Server.cpp \
-						core/Client.cpp \
 						core/Cgi.cpp \
+						core/Client.cpp \
+						core/FdInterface.cpp \
 						core/Method/Method.cpp \
 						core/Method/GetMethod.cpp \
 						core/Method/PutMethod.cpp \

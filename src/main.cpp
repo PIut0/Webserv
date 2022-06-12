@@ -15,10 +15,12 @@ int main(int argc, char** argv) {
 
   while (1) {
     kq.Refresh();
+    std::set<int> deleted_fd;
     for (int i = 0; i < kq.event_count; i++) {
       FdInterface *target = static_cast<FdInterface *>(kq.events[i].udata);
-      Process(target, kq.events[i]);
+      Process(target, kq.events[i], deleted_fd);
     }
+    kq.DeleteTimeoutList();
     kq.DeleteList();
   }
   return (0);

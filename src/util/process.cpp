@@ -235,10 +235,18 @@ void Cgi_Event_Write(Cgi *cgi, int ident)
   }
 }
 
-void Process(FdInterface *target, struct kevent event)
+void Process(FdInterface *target, struct kevent event, std::set<int> &deleted_fd)
 {
-  if (event.flags & EV_EOF && event.filter == EVFILT_READ && target->interface_type == kFdClient) {
-    target->kq.delete_list.insert(target);
+  if (deleted_fd.find(event.ident) != deleted_fd.end())
+    return;
+  if (event.flags & EV_EOF
+    && event.filter == EVFILT_READ
+    && target->interface_type == kFdClient
+    && target->kq.client_map.find(event.ident) != target->kq.client_map.end()) {
+    std::cout << "EOF: " << event.ident << std::endl;
+    delete target;
+    deleted_fd.insert(event.ident);
+    // target->kq.delete_list.insert(target);
     return ;
   }
   if (event.filter == EVFILT_READ)

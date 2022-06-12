@@ -5,7 +5,7 @@ Client::Client(KQueue &kq, int fd, Server *server) : FdInterface(kq, kFdClient, 
 {
   request = nullptr;
   response = nullptr;
-  setSocketHitTime();
+  SetSocketHitTime();
   kq.AddClient(this);
 }
 
@@ -16,6 +16,8 @@ Client::~Client()
   if (response)
     delete response;
   CloseFd(interface_fd);
+  if (kq.client_map.find(interface_fd) != kq.client_map.end())
+    kq.client_map.erase(interface_fd);
   for (std::set<Method *>::iterator it = method_list.begin(); it != method_list.end(); it++) {
     kq.delete_list.insert(*it);
   }
@@ -23,6 +25,7 @@ Client::~Client()
 
 int Client::EventRead()
 {
+  SetSocketHitTime();
   char buf[BUFFER_SIZE];
   memset(buf, 0, BUFFER_SIZE);
   int n = read(interface_fd, buf, BUFFER_SIZE - 1);
@@ -265,4 +268,9 @@ const std::string Client::GetFilePath()
     + request->host.substr(request->host.find(GetLocationBlock()->location_path) + GetLocationBlock()->location_path.size());
 
   return path;
+}
+
+void Client::SetSocketHitTime()
+{
+  this->socketHitTime = clock();
 }

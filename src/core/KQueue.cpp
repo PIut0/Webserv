@@ -1,4 +1,5 @@
 #include "KQueue.hpp"
+#include <errno.h>
 
 KQueue::KQueue()
 {
@@ -25,8 +26,10 @@ void KQueue::Refresh()
   //event_count = kevent(kq, NULL, 0, events, EVENT_SIZE, NULL);
   event_count = kevent(kq, &event_list[0], event_list.size(), events, EVENT_SIZE, NULL);
   event_list.clear();
-  if (event_count == -1)
+  if (event_count == -1) {
     ErrorIgnore("refresh");
+    std::cout << errno << std::endl;
+  }
 }
 
 void KQueue::DeleteList()
@@ -36,14 +39,30 @@ void KQueue::DeleteList()
   for (std::set<FdInterface *>::iterator it = delete_list.begin(); it != delete_list.end(); it++) {
     if ((*it)->interface_type == kFdClient && static_cast<Client *>(*it)->method_list.size() > 0)
       continue;
-    if (client_map[(*it)->interface_fd] == *it)
-      client_map.erase((*it)->interface_fd);
     delete *it;
     delete_list_it.push_back(it);
   }
   for (size_t i = 0; i < delete_list_it.size(); i++) {
     delete_list.erase(delete_list_it[i]);
   }
+}
+
+void KQueue::DeleteTimeoutList()
+{
+  std::vector<std::map<int, FdInterface *>::iterator> delete_list_it;
+  for (std::map<int, FdInterface *>::iterator it = client_map.begin(); it != client_map.end(); it++) {
+    if (it->second == nullptr) {
+      delete_list_it.push_back(it);
+      continue;
+    }
+    if (it->second->interface_type == kFdClient && static_cast<Client *>(it->second)->method_list.size() > 0)
+      continue;
+    if (CheckSocketAlive(it->second->socketHitTime))
+      continue;
+    delete_list.insert(it->second);
+  }
+  for(size_t i=0;i < delete_list_it.size();i++)
+    client_map.erase(delete_list_it[i]);
 }
 
 void KQueue::AddEvent(int ident, int16_t filter, void *udata)

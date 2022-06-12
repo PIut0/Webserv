@@ -20,6 +20,7 @@ Method::~Method()
 
 int Method::EventRead()
 {
+  client->SetSocketHitTime();
   char buf[BUFFER_SIZE];
   memset(buf, 0, BUFFER_SIZE);
   int n = read(interface_fd, buf, BUFFER_SIZE - 1);
@@ -47,6 +48,8 @@ int Method::EventWrite()
   if (response_data_size - response_idx <= 0) {
     response->SetBody("");
     std::cout << "- Response -" << std::endl << response->ToString() << std::endl;
+    std::cout << "response_data_size: " << response_data_size << std::endl;
+    std::cout << "response_idx: " << response_idx << std::endl;
   }
   return response_data_size - response_idx;
 }

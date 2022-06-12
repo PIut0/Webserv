@@ -9,6 +9,6 @@
 #include "DeleteMethod.hpp"
 #include "Cgi.hpp"
 
-void Process(FdInterface *target, struct kevent event);
+void Process(FdInterface *target, struct kevent event, std::set<int> &deleted_fd);
 
 #endif

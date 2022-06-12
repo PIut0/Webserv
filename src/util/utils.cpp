@@ -4,8 +4,8 @@
 int CheckSocketAlive(clock_t socketStartTime)
 {
   clock_t now = clock();
- 
-  return ((((double)(now - socketStartTime)) / CLOCKS_PER_SEC) > socketStartTime);
+
+  return (((double)(now - socketStartTime)) < MAX_SOCKET_LIFE_TIME);
 }
 
 // 인자가 없거나 많거나 체크
