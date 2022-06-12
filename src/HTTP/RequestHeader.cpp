@@ -17,14 +17,15 @@ RequestHeader::~RequestHeader() {
 
 RequestHeader& RequestHeader::operator=(const RequestHeader &rv)
 {
-  this->conf = rv.conf;
   this->method = rv.method;
   this->host = rv.host;
   this->http_major = rv.http_major;
   this->http_minor = rv.http_minor;
-  this->conf = rv.conf;
+  req_header_t temp = rv.conf;
+  for (req_header_it_t it = temp.begin() ; it != temp.end() ; ++it) {
+    this->SetItem(it->second->key, it->second->value);
+  }
   this->pos_ = rv.pos_;
-
   return *this;
 }
 

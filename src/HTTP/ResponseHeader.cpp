@@ -23,9 +23,10 @@ ResponseHeader& ResponseHeader::operator=(const ResponseHeader &rv)
   this->status_code = rv.status_code;
   this->status_msg = rv.status_msg;
   this->body = rv.body;
-  this->conf = rv.conf;
+  for (size_t i = 0 ; i < rv.conf.size() ; ++i) {
+    this->SetItem(rv.conf[i]->key, rv.conf[i]->value);
+  }
   this->pos_ = rv.pos_;
-  
   return *this;
 }
 

@@ -45,7 +45,7 @@
 #define wsb_str_8cmp(p, c0, c1, c2, c3, c4, c5, c6, c7) \
   p[0] == c0 && p[1] == c1 && p[2] == c2 && p[3] == c3 && p[4] == c4 && p[5] == c5 && p[6] == c6 && p[7] == c7
 #define wsv_str_2cmp_p(s, p, c0, c1) \
-  s[p] == c0 && s[p + 1] == char16_t
+  s[p] == c0 && s[p + 1] == c2
 #define wsv_str_5cmp_p(s, p, c0, c1, c2, c3, c4) \
   s[p] == c0 && s[p + 1] == c1 && s[p + 2] == c2  && s[p + 3] == c3  && s[p + 4] == c4
 #define wsv_str_4cmp_p(s, p, c0, c1, c2, c3) \
