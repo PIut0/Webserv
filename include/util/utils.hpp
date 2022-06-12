@@ -30,6 +30,7 @@ int IsRegularFile(const std::string &path);
 
 void CloseFd(int fd);
 void SetMime();
+std::string ToLower(const std::string &origin);
 std::string GetDate();
 std::string MimeType(const std::string &ext);
 std::string StatusCode(const int &code);

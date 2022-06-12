@@ -47,7 +47,10 @@ int ServerBlock::GetLocationBlockByPath(const std::string &path)
 void ServerBlock::ParseListen(const std::string &contents)
 {
   std::vector<std::string> split_data = StringSplit(contents, " ", 0);
-  this->port = atoi(split_data[0].c_str());
+  char *ptr;
+  this->port = strtod(split_data[0].c_str(), &ptr);
+  if (this->port <= 0 || ptr[0])
+    ExitWithMsg("listen Error");
   this->host = split_data[1];
 }
 void ServerBlock::ParseServerName(const std::string &contents)
@@ -80,6 +83,9 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
     switch (state)
     {
       case S_SERVER:
+        if (data[i][0] != '\t')
+          ExitWithMsg("Server Block Error");
+
         index = data[i].find(' ');
 
         command = data[i].substr(1, index - 1);
@@ -90,7 +96,7 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
         switch (type)
         {
           case kLocation:
-            location_path = data[i].substr(10, data[i].find('{', 0) - 11);
+            location_path = ToLower(data[i].substr(10, data[i].find('{', 0) - 11));
             state <<= 1;
             break;
 
