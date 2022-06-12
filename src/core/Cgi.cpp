@@ -2,6 +2,11 @@
 
 Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdCgi), cgi_write_idx(0)
 {
+  if (ft_stoi(response->status_code) >= 400) {
+    ResponseErrorPage();
+    return ;
+  }
+
   std::string cgi_path, extension;
   cgi_read_data.reserve(this->request->body.size());
 
