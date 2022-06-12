@@ -22,6 +22,7 @@ RequestHeader& RequestHeader::operator=(const RequestHeader &rv)
   this->host = rv.host;
   this->http_major = rv.http_major;
   this->http_minor = rv.http_minor;
+  this->conf = rv.conf;
   this->pos_ = rv.pos_;
 
   return *this;

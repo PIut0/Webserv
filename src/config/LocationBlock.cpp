@@ -33,6 +33,7 @@ LocationBlock& LocationBlock::operator=(const LocationBlock& rv)
   this->error_page = rv.error_page;
   this->request_max_body_size = rv.request_max_body_size;
   this->ret = rv.ret;
+  
   return *this;
 }
 
