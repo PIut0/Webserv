@@ -21,7 +21,10 @@ class Cgi : public Method
 {
  public:
   Cgi(KQueue &kq, const std::string &path, Client *client);
+  Cgi(const Cgi &origin);
   ~Cgi();
+  
+  Cgi &operator=(const Cgi &rv);
 
   int   EventReadToCgi();
   int   EventWriteToCgi();
@@ -32,8 +35,6 @@ class Cgi : public Method
 
  private:
   Cgi();
-  Cgi(const Cgi &);
-  Cgi &operator=(const Cgi &);
 
   int cgi_write_idx;
   int cgi_write_data_size;

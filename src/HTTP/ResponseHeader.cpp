@@ -7,6 +7,11 @@ ResponseHeader::ResponseHeader()
   this->status_msg  = "";
 }
 
+ResponseHeader::ResponseHeader(const ResponseHeader &origin)
+{
+  *this = origin;
+}
+
 ResponseHeader::~ResponseHeader() {
   for (res_header_it_t it = this->conf.begin(); it != this->conf.end(); ++it) {
     delete *it;
@@ -15,7 +20,12 @@ ResponseHeader::~ResponseHeader() {
 
 ResponseHeader& ResponseHeader::operator=(const ResponseHeader &rv)
 {
+  this->status_code = rv.status_code;
+  this->status_msg = rv.status_msg;
+  this->body = rv.body;
   this->conf = rv.conf;
+  this->pos_ = rv.pos_;
+  
   return *this;
 }
 

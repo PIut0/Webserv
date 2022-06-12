@@ -67,6 +67,21 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
   }
 }
 
+Cgi::Cgi(const Cgi &origin)
+{
+  *this = origin;
+}
+
+Cgi Cgi::&operator=(const Cgi &rv)
+{
+  this->fromCgi = rv.fromCgi;
+  this->toCgi = rv.toCgi;
+  this->cgi_write_idx = rv.cgi_write_idx;
+  this->cgi_write_data_size = rv.cgi_write_data_size;
+  this->cgi_read_data = rv.cgi_read_data;
+  this->cgi_write_data = rv.cgi_write_data;
+}
+
 int Cgi::EventReadToCgi()
 {
   char buf[BUFFER_SIZE];
@@ -96,14 +111,6 @@ int Cgi::EventWriteToCgi()
   return cgi_write_data_size - cgi_write_idx;
 }
 
-Cgi::~Cgi()
-{
-  CloseFd(fromCgi[FD_READ]);
-  CloseFd(fromCgi[FD_WRITE]);
-  CloseFd(toCgi[FD_READ]);
-  CloseFd(toCgi[FD_WRITE]);
-  CloseFd(interface_fd);
-}
 
 void Cgi::SetResponseMessageCgi()
 {
@@ -113,4 +120,13 @@ void Cgi::SetResponseMessageCgi()
     response->SetBody("");
   }
   SetResponseMessage();
+}
+
+Cgi::~Cgi()
+{
+  CloseFd(fromCgi[FD_READ]);
+  CloseFd(fromCgi[FD_WRITE]);
+  CloseFd(toCgi[FD_READ]);
+  CloseFd(toCgi[FD_WRITE]);
+  CloseFd(interface_fd);
 }
