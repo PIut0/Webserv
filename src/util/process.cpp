@@ -204,7 +204,7 @@ void Cgi_Event_Read(Cgi *cgi, int ident)
       //cgi->kq.DisableEvent(cgi->fromCgi[FD_READ], EVFILT_READ, cgi);
       cgi->kq.DeleteEvent(cgi->fromCgi[FD_READ], EVFILT_READ);
 
-      close(cgi->fromCgi[FD_READ]);
+      CloseFd(cgi->fromCgi[FD_READ]);
       // target_fd로 쓰는 이벤트 등록하기
       cgi->kq.AddEvent(cgi->target_fd, EVFILT_WRITE, cgi);
     }
@@ -230,7 +230,7 @@ void Cgi_Event_Write(Cgi *cgi, int ident)
       //cgi->kq.DisableEvent(cgi->toCgi[FD_WRITE], EVFILT_WRITE, cgi);
       cgi->kq.DeleteEvent(cgi->toCgi[FD_WRITE], EVFILT_WRITE);
 
-      close(cgi->toCgi[FD_WRITE]);
+      CloseFd(cgi->toCgi[FD_WRITE]);
     }
   }
 }

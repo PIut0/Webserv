@@ -39,12 +39,11 @@ class KQueue
   void AddServer(Server &serv);
   void AddClient(Client *cli);
 
-
   struct timespec timeout;
   int           kq;
   int           event_count;
   std::vector<struct kevent> event_list;
-  std::map<int, FdInterface *> fd_map;
+  std::map<int, FdInterface *> client_map;
   std::set<FdInterface *> delete_list;
   struct kevent events[EVENT_SIZE];
 };

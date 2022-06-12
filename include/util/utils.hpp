@@ -25,6 +25,7 @@ int ft_hextoi(const std::string &s);
 int IsEOF(int fd);
 int IsRegularFile(const std::string &path);
 
+void CloseFd(int fd);
 void SetMime();
 std::string GetDate();
 std::string MimeType(const std::string &ext);

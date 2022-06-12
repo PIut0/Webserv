@@ -96,6 +96,12 @@ int IsRegularFile(const std::string &path)
   return S_ISREG(st.st_mode);
 }
 
+void CloseFd(int fd)
+{
+  if (fd > 2)
+    close(fd);
+}
+
 std::string GetDate() // GMT TIME
 {
   time_t t = time(NULL);

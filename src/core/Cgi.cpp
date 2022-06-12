@@ -35,22 +35,22 @@ Cgi::Cgi(KQueue &kq, const std::string &path, Client *client) : Method(kq, clien
       if (dup2(toCgi[FD_READ], STDIN_FILENO) == -1)
         throw FdDupFailed();
 
-      close(fromCgi[FD_READ]);
-      close(toCgi[FD_WRITE]);
-      close(toCgi[FD_READ]);
+      CloseFd(fromCgi[FD_READ]);
+      CloseFd(toCgi[FD_WRITE]);
+      CloseFd(toCgi[FD_READ]);
 
       char *argv[2] = {const_cast<char *>(cgi_path.c_str()), 0};
       if (execve(cgi_path.c_str(), argv, env) == -1)
         throw FdDupFailed();
     } else {
-      close(fromCgi[FD_WRITE]);
-      close(toCgi[FD_READ]);
+      CloseFd(fromCgi[FD_WRITE]);
+      CloseFd(toCgi[FD_READ]);
 
       if (this->request->body.size() > 0 && this->request->method != HTTP_GET) {
         kq.AddEvent(toCgi[FD_WRITE], EVFILT_WRITE, this);
       }
       else {
-        close(toCgi[FD_WRITE]);
+        CloseFd(toCgi[FD_WRITE]);
       }
       kq.AddEvent(fromCgi[FD_READ], EVFILT_READ, this);
     }
@@ -98,12 +98,11 @@ int Cgi::EventWriteToCgi()
 
 Cgi::~Cgi()
 {
-  close(fromCgi[FD_READ]);
-  close(fromCgi[FD_WRITE]);
-  close(toCgi[FD_READ]);
-  close(toCgi[FD_WRITE]);
-  if (interface_fd > 2)
-    close(interface_fd);
+  CloseFd(fromCgi[FD_READ]);
+  CloseFd(fromCgi[FD_WRITE]);
+  CloseFd(toCgi[FD_READ]);
+  CloseFd(toCgi[FD_WRITE]);
+  CloseFd(interface_fd);
 }
 
 void Cgi::SetResponseMessageCgi()
