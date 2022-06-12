@@ -40,7 +40,6 @@ LocationBlock& LocationBlock::operator=(const LocationBlock& rv)
 void LocationBlock::ParseRoot(const std::string &data)
 {
   this->root = data;
-  // TODO  root 가 디렉토리가 아니라 파일인 경우가 있는듯
   if (IsRegularFile(data) < 0) {
     ExitWithMsg("Root Path Error");
   }
