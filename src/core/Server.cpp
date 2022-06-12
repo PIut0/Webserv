@@ -25,8 +25,7 @@ Server::Server(KQueue &kq, ServerBlock &_sb) : FdInterface(kq, kFdServer), serve
 
 Server::~Server()
 {
-  if (interface_fd > 2)
-    close(interface_fd);
+  CloseFd(interface_fd);
 }
 
 int Server::EventRead()

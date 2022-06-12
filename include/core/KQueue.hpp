@@ -32,6 +32,7 @@ class KQueue
   void ErrorIgnore(const char *err);
   void Refresh();
   void DeleteList();
+  void DeleteTimeoutList();
   void AddEvent(int ident, int16_t filter, void *udata);
   void EnableEvent(int ident, int16_t filter, void *udata);
   void DisableEvent(int ident, int16_t filter, void *udata);
@@ -39,12 +40,11 @@ class KQueue
   void AddServer(Server &serv);
   void AddClient(Client *cli);
 
-
   struct timespec timeout;
   int           kq;
   int           event_count;
   std::vector<struct kevent> event_list;
-  std::map<int, FdInterface *> fd_map;
+  std::map<int, FdInterface *> client_map;
   std::set<FdInterface *> delete_list;
   struct kevent events[EVENT_SIZE];
 };

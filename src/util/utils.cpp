@@ -1,6 +1,13 @@
 #include "utils.hpp"
 #include "Defines.hpp"
 
+int CheckSocketAlive(clock_t socketStartTime)
+{
+  clock_t now = clock();
+
+  return (((double)(now - socketStartTime)) < MAX_SOCKET_LIFE_TIME);
+}
+
 // 인자가 없거나 많거나 체크
 std::string CheckArg(int argc, char **argv)
 {
@@ -94,6 +101,12 @@ int IsRegularFile(const std::string &path)
   if (stat(path.c_str(), &st) < 0)
     return -1;
   return S_ISREG(st.st_mode);
+}
+
+void CloseFd(int fd)
+{
+  if (fd > 2)
+    close(fd);
 }
 
 std::string ToLower(const std::string &origin)

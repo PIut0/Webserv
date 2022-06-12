@@ -16,7 +16,7 @@ class DeleteMethod : public Method
   DeleteMethod(const DeleteMethod &);
   DeleteMethod &operator=(const DeleteMethod &);
  public:
-  DeleteMethod(KQueue &kq, const std::string &path, Client *client);
+  DeleteMethod(KQueue &kq, const std::string &path, Client* &client);
   ~DeleteMethod();
 };
 

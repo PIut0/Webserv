@@ -16,7 +16,7 @@ class GetMethod : public Method
   GetMethod(const GetMethod &);
   GetMethod &operator=(const GetMethod &);
  public:
-  GetMethod(KQueue &kq, const std::string &path, Client *client);
+  GetMethod(KQueue &kq, const std::string &path, Client* &client);
   ~GetMethod();
 
   std::vector<std::string> file_list;

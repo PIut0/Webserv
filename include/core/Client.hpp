@@ -37,6 +37,7 @@ class Client : public FdInterface
   FdInterfaceType ParseReq();
   const std::string GetFilePath();
   void SetResponseMessage();
+  void SetSocketHitTime();
 
   Server *server;
   RequestHeader *request;

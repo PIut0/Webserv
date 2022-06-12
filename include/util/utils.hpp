@@ -10,8 +10,11 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#define MAX_SOCKET_LIFE_TIME 1200000
+
 static std::map<std::string, std::string> _mimes;
 
+int CheckSocketAlive(clock_t socketStartTime);
 void ExitWithMsg(const std::string &msg);
 std::string CheckArg(int argc, char **argv);
 std::vector<std::string> StringSplit(const std::string &data, const std::string &delim, const int &start_pos);
@@ -25,6 +28,7 @@ int ft_hextoi(const std::string &s);
 int IsEOF(int fd);
 int IsRegularFile(const std::string &path);
 
+void CloseFd(int fd);
 void SetMime();
 std::string ToLower(const std::string &origin);
 std::string GetDate();

@@ -16,7 +16,7 @@ class PostMethod : public Method
   PostMethod(const PostMethod &);
   PostMethod &operator=(const PostMethod &);
  public:
-  PostMethod(KQueue &kq, const std::string &path, Client *client);
+  PostMethod(KQueue &kq, const std::string &path, Client* &client);
   ~PostMethod();
 
   int FileWrite();

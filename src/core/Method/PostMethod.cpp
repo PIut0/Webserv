@@ -1,7 +1,7 @@
 #include "PostMethod.hpp"
 #include "utils.hpp"
 
-PostMethod::PostMethod(KQueue &kq, const std::string &path, Client *client) : Method(kq, client, kFdPostMethod)
+PostMethod::PostMethod(KQueue &kq, const std::string &path, Client* &client) : Method(kq, client, kFdPostMethod)
 {
   if (ft_stoi(response->status_code) >= 400) {
     ResponseErrorPage();
