@@ -17,7 +17,8 @@ Client::~Client()
   if (interface_fd > 2)
     close(interface_fd);
   for (std::set<Method *>::iterator it = method_list.begin(); it != method_list.end(); it++) {
-    delete *it;
+    kq.delete_list.insert(*it);
+    // delete *it;
   }
 }
 
