@@ -5,6 +5,15 @@
 #include "process.hpp"
 #include "utils.hpp"
 
+#define MAX_SOCKET_LIFE_TIME 300
+
+int CheckSocketAlive(clock_t socketStartTime)
+{
+  clock_t now = clock();
+ 
+  return ((((double)(now - socketStartTime)) / CLOCKS_PER_SEC) > socketStartTime);
+}
+
 int main(int argc, char** argv) {
   ServerManager serverManager(CheckArg(argc, argv));
   std::vector<Server *> servers;

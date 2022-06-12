@@ -5,6 +5,7 @@ Client::Client(KQueue &kq, int fd, Server *server) : FdInterface(kq, kFdClient, 
 {
   request = nullptr;
   response = nullptr;
+  setSocketHitTime();
   kq.AddClient(this);
 }
 

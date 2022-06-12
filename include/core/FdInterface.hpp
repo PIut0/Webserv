@@ -30,8 +30,11 @@ class FdInterface : public System
   virtual int EventRead() = 0;
   virtual int EventWrite() = 0;
 
+  void            setSocketHitTime();
+
   KQueue          &kq;
   FdInterfaceType interface_type;
+  clock_t         socketHitTime;
   int             interface_fd;
 };
 
