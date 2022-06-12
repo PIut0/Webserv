@@ -10,6 +10,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#define MAX_SOCKET_LIFE_TIME 300
+
 static std::map<std::string, std::string> _mimes;
 
 void ExitWithMsg(const std::string &msg);

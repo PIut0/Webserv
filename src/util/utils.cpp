@@ -1,6 +1,13 @@
 #include "utils.hpp"
 #include "Defines.hpp"
 
+int CheckSocketAlive(clock_t socketStartTime)
+{
+  clock_t now = clock();
+ 
+  return ((((double)(now - socketStartTime)) / CLOCKS_PER_SEC) > socketStartTime);
+}
+
 // 인자가 없거나 많거나 체크
 std::string CheckArg(int argc, char **argv)
 {
