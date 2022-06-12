@@ -236,7 +236,7 @@ int RequestHeader::ParseRequestLine(const std::string &data)
         switch (ch) {
           case ' ':
             host_end = pos;
-            this->host = data.substr(host_start, host_end - host_start);
+            this->host = ToLower(data.substr(host_start, host_end - host_start));
             state = wsb_before_option;
             break;
 
