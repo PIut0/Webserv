@@ -24,17 +24,21 @@ KQueue::KQueue(const KQueue &other)
 
 KQueue::~KQueue()
 {
-  //CloseFd(kq);
+  CloseFd(kq);
+  for (std::set<Server *>::iterator it = servers.begin(); it != servers.end(); ++it)
+    delete *it;
 }
 
 void KQueue::loof()
 {
-  Refresh();
-  for (int i = 0; i < event_count; i++) {
-    FdInterface *target = static_cast<FdInterface *>(events[i].udata);
-    Process(target, events[i]);
+  while (1) {
+    Refresh();
+    for (int i = 0; i < event_count; i++) {
+      FdInterface *target = static_cast<FdInterface *>(events[i].udata);
+      Process(target, events[i]);
+    }
+    DeleteList();
   }
-  DeleteList();
 }
 
 void KQueue::ErrorIgnore(const char *err)
@@ -99,7 +103,6 @@ void KQueue::DeleteEvent(int ident, int16_t filter, void *udata)
 {
   struct kevent ev;
   EV_SET(&ev, ident, filter, EV_DELETE, 0, 0, udata);
-  //TODO : udata 추가
 
   event_list.push_back(ev);
   //event_count = kevent(kq, &ev, 1, events, EVENT_SIZE, &timeout);

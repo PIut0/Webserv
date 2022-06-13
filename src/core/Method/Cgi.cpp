@@ -14,6 +14,9 @@ void CgiMethod(Method* method)
     throw HTTP_STATUS_FORBIDDEN;
   }
 
+  fcntl(method->toCgi[FD_WRITE], F_SETFL, O_NONBLOCK);
+  fcntl(method->fromCgi[FD_READ], F_SETFL, O_NONBLOCK);
+
   pid_t pid = fork();
 
   if (pid == PS_CHILD) {
@@ -27,11 +30,6 @@ void CgiMethod(Method* method)
     CloseFd(method->toCgi[FD_WRITE]);
     CloseFd(method->toCgi[FD_READ]);
 
-    // print env
-    for (int i = 0; env[i] != NULL; i++) {
-      std::cout <<  env[i] << std::endl;
-    }
-
     char *argv[2] = {const_cast<char *>(cgi_path.c_str()), 0};
     execve(cgi_path.c_str(), argv, env);
 
@@ -39,15 +37,7 @@ void CgiMethod(Method* method)
     CloseFd(method->fromCgi[FD_WRITE]);
     CloseFd(method->toCgi[FD_READ]);
 
-    fcntl(method->toCgi[FD_WRITE], F_SETFL, O_NONBLOCK);
-    fcntl(method->fromCgi[FD_READ], F_SETFL, O_NONBLOCK);
-
-    if (method->client.request.body.size() > 0 && method->client.request.method != HTTP_GET) {
-      method->kq->AddEvent(method->toCgi[FD_WRITE], EVFILT_WRITE, method);
-    }
-    else {
-      CloseFd(method->toCgi[FD_WRITE]);
-    }
+    method->kq->AddEvent(method->toCgi[FD_WRITE], EVFILT_WRITE, method);
     method->kq->AddEvent(method->fromCgi[FD_READ], EVFILT_READ, method);
   }
 }
@@ -85,8 +75,10 @@ void Method::SetResponseMessageCgi()
 {
   try {
     client.response.Parse(read_data);
-  } catch (HttpParseInvalidResponse &e) {
-    client.response.SetBody("");
   }
+  catch (HttpParseInvalidResponse &e) {
+    client.response.SetItem("Status", "500");
+  }
+
   SetResponseMessage();
 }

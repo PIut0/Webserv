@@ -36,7 +36,9 @@ Server::Server(KQueue *kq, ServerBlock &_sb) : FdInterface(kq, kFdServer), serve
 
 Server::~Server()
 {
+  kq->servers.erase(this);
   CloseFd(interface_fd);
+  throw("Server Deleted");
 }
 
 int Server::EventRead()

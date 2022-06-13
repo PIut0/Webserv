@@ -53,6 +53,7 @@ class KQueue
   int           kq;
   int           event_count;
   std::vector<struct kevent> event_list;
+  std::set<Server *> servers;
   client_map_t client_map;
   delete_list_t delete_list;
 
