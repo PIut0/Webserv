@@ -94,11 +94,11 @@ void Method::Clear()
   write_data = WSV_STR_EMPTY;
   cgi_write_data = WSV_STR_EMPTY;
 
-  CloseFd(target_fd);
+  // CloseFd(target_fd);
   target_fd = -1;
 
-  // request.clear();
-  // response.clear();
+  client.request.Clear();
+  client.response.Clear();
 
   location = NULL;
   target_path = WSV_STR_EMPTY;
