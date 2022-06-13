@@ -65,7 +65,7 @@ void GetMethod_Event_Write(Method *getmethod)
   Client &client = getmethod->client;
 
   if (getmethod->EventWrite() <= 0) {
-    client.kq->DeleteEvent(client.interface_fd, EVFILT_WRITE, getmethod);
+    client.kq->DisableEvent(client.interface_fd, EVFILT_WRITE, getmethod);
 
     if (client.request.GetItem("Connection").value == "close")
       client.kq->delete_list.insert(client.interface_fd);
@@ -94,7 +94,7 @@ void PutMethod_Event_Write(Method *putmethod, int fd)
 
   if (fd == client.interface_fd) {
     if (putmethod->EventWrite() <= 0) {
-      client.kq->DeleteEvent(client.interface_fd, EVFILT_WRITE, putmethod);
+      client.kq->DisableEvent(client.interface_fd, EVFILT_WRITE, putmethod);
 
       if (client.request.GetItem("Connection").value == "close")
         client.kq->delete_list.insert(client.interface_fd);
@@ -132,7 +132,7 @@ void PostMethod_Event_Write(Method *postmethod, int fd)
 
   if (fd == client.interface_fd) {
     if (postmethod->EventWrite() <= 0) {
-      client.kq->DeleteEvent(client.interface_fd, EVFILT_WRITE, postmethod);
+      client.kq->DisableEvent(client.interface_fd, EVFILT_WRITE, postmethod);
 
       if (client.request.GetItem("Connection").value == "close")
         client.kq->delete_list.insert(client.interface_fd);
@@ -169,7 +169,7 @@ void DeleteMethod_Event_Write(Method *deletemethod)
   Client &client = deletemethod->client;
 
   if (deletemethod->EventWrite() <= 0) {
-    client.kq->DeleteEvent(client.interface_fd, EVFILT_WRITE, deletemethod);
+    client.kq->DisableEvent(client.interface_fd, EVFILT_WRITE, deletemethod);
 
     if (client.request.GetItem("Connection").value == "close")
       client.kq->delete_list.insert(client.interface_fd);
@@ -209,7 +209,7 @@ void Cgi_Event_Write(Method *cgi, int ident)
 
   if (ident == client.interface_fd) {
     if (cgi->EventWrite() <= 0) {
-      client.kq->DeleteEvent(client.interface_fd, EVFILT_WRITE, cgi);
+      client.kq->DisableEvent(client.interface_fd, EVFILT_WRITE, cgi);
 
       if (client.request.GetItem("Connection").value == "close")
         client.kq->delete_list.insert(client.interface_fd);
