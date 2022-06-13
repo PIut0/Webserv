@@ -2,6 +2,7 @@
 
 ResponseHeader::ResponseHeader()
 {
+  this->SetItem("_", "");
   this->status_code = WSV_STR_EMPTY;
   this->status_msg  = WSV_STR_EMPTY;
   this->state = 0;
@@ -41,7 +42,6 @@ void ResponseHeader::SetItem(const std::string &line)
   size_t index = line.find(":");
   std::string key = line.substr(0, index);
   std::string value = line.substr(index + 2, line.length() - 1);
-  // std::string trim_value = trim(value);
 
   SetItem(key, value);
 }
@@ -52,6 +52,11 @@ void ResponseHeader::SetItem(const std::string &key, const std::string &value)
     this->status_code = value.substr(0, 3);
     this->status_msg = value.substr(4);
     return ;
+  }
+  res_header_it_t it = FindItem(key);
+  if (it != this->conf.end()) {
+    delete *it;
+    this->conf.erase(it);
   }
 
   wsv_header_t *el = new wsv_header_t();
@@ -72,7 +77,14 @@ res_header_it_t ResponseHeader::FindItem(const std::string &key)
 
 wsv_header_t& ResponseHeader::GetItem(const std::string &key)
 {
-  return *(*FindItem(key));
+  res_header_it_t it = FindItem(key);
+  if (it == this->conf.end()) {
+    if (FindItem("_") == this->conf.end()) {
+      this->SetItem("_", "");
+    }
+    return *(*FindItem("_"));
+  }
+  return *(*it);
 }
 
 void ResponseHeader::Parse(const std::string &data)
@@ -325,4 +337,5 @@ void ResponseHeader::Clear()
     delete *it;
   }
   this->conf.clear();
+  this->SetItem("_", "");
 }
