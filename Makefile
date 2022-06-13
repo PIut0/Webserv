@@ -11,14 +11,13 @@ MAIN			= main.cpp
 
 SRC				=	core/KQueue.cpp \
 						core/Server.cpp \
-						core/Cgi.cpp \
 						core/Client.cpp \
-						core/FdInterface.cpp \
-						core/Method/Method.cpp \
+						core/Method.cpp \
 						core/Method/GetMethod.cpp \
 						core/Method/PutMethod.cpp \
 						core/Method/PostMethod.cpp \
 						core/Method/DeleteMethod.cpp \
+						core/Method/Cgi.cpp \
 						util/utils.cpp \
 						util/mimes.cpp \
 						util/process.cpp \

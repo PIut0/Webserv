@@ -7,21 +7,27 @@ int main(int argc, char **argv)
 {
     { // RequestHeader Copy Constructor Test
         const std::string dummy = "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\r\nHost: code.tutsplus.com\r\nUser-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-us,en;q=0.5\r\nAccept-Encoding: gzip,deflate\r\nAccept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\nKeep-Alive: 300\r\nConnection: keep-alive\r\nCookie: PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120\r\nPragma: no-cache\r\nCache-Control: no-cache\r\n\r\n";
-        RequestHeader rq1;
-        rq1.Parse(dummy);
-        RequestHeader rq2(rq1);
-        if (rq1.method != rq2.method ||
-            rq1.host != rq2.host ||
-            rq1.http_major != rq2.http_major ||
-            rq1.http_minor != rq2.http_minor ||
-            rq1.body != rq2.body) {
+        RequestHeader *rq1 = new RequestHeader();
+        rq1->Parse(dummy);
+        RequestHeader rq2(*rq1);
+        if (rq1->method != rq2.method ||
+            rq1->host != rq2.host ||
+            rq1->http_major != rq2.http_major ||
+            rq1->http_minor != rq2.http_minor ||
+            rq1->body != rq2.body) {
                 std::cout << "Fail" << std::endl;
             }
-        for (req_header_it_t it  = rq1.conf.begin() ; it != rq1.conf.end() ; ++it) {
+        rq2.GetItem("asdfsadfas");
+        for (req_header_it_t it  = rq1->conf.begin() ; it != rq1->conf.end() ; ++it) {
+            if (it->first == "_")
+                std::cout << "isEmpty" << std::endl;
             if (it->second->value != rq2.conf[it->first]->value) {
                 std::cout << "Fail" << std::endl;
             }
         }
+        delete rq1;
+        rq2.SetItem("User-Agent", "asdf");
+        std::cout << "val : [" << rq2.GetItem("User-Agent").value << "]" <<std::endl;
         std::cout << "Done" << std::endl;
     }
     { // ResponseHeader Copy Constructor Test
@@ -40,7 +46,7 @@ int main(int argc, char **argv)
             }
         }
         std::cout << "Done" << std::endl;
-    } 
+    }
     { // ServerBlock
         ServerManager sm1(CheckArg(argc, argv));
         ServerManager sm2(sm1);
@@ -50,13 +56,13 @@ int main(int argc, char **argv)
         std::cout << "Done" << std::endl;
 
         ServerBlock sb(sm1.serverBlock[0]);
-        
+
         if (sb.server_name != sm1.serverBlock[0].server_name ||
             sb.host != sm1.serverBlock[0].host ||
             sb.port != sm1.serverBlock[0].port) {
                 std::cout << "Fail" << std::endl;
             }
-        
+
         std::cout << "Done" << std::endl;
 
         LocationBlock lb(sm1.serverBlock[0].location[0]);
@@ -76,6 +82,6 @@ int main(int argc, char **argv)
                 std::cout << "Fail" << std::endl;
             }
         }
-        std::cout << "Done" << std::endl; 
+        std::cout << "Done" << std::endl;
     }
 }

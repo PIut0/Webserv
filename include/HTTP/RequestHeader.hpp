@@ -41,6 +41,8 @@ class RequestHeader : public Header
 
   char** ToCgi(const std::string &path);
 
+  void  Clear();
+
   // request line
   int           method;
   std::string   host;

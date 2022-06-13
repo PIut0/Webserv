@@ -1,7 +1,18 @@
 #include "Server.hpp"
 #include "utils.hpp"
 
-Server::Server(KQueue &kq, ServerBlock &_sb) : FdInterface(kq, kFdServer), server_block(_sb)
+Server &Server::operator=(const Server &other)
+{
+  this->server_addr = other.server_addr;
+  return (*this);
+}
+
+Server::Server(const Server &other) : FdInterface(other.kq, kFdServer), server_block(other.server_block)
+{
+  *this = other;
+}
+
+Server::Server(KQueue *kq, ServerBlock &_sb) : FdInterface(kq, kFdServer), server_block(_sb)
 {
   if ((interface_fd = socket(PF_INET, SOCK_STREAM, 0)) == -1)
     ExitWithMsg("socket");
@@ -20,7 +31,7 @@ Server::Server(KQueue &kq, ServerBlock &_sb) : FdInterface(kq, kFdServer), serve
     ExitWithMsg("listen");
 
   fcntl(interface_fd, F_SETFL, O_NONBLOCK);
-  kq.AddServer(*this);
+  kq->AddServer(*this);
 }
 
 Server::~Server()
@@ -34,7 +45,7 @@ int Server::EventRead()
   if ((client_interface_fd = accept(interface_fd, NULL, NULL)) == -1)
     ExitWithMsg("server_event_read");
   fcntl(client_interface_fd, F_SETFL, O_NONBLOCK);
-  new Client(kq, client_interface_fd, this);
+  kq->AddClient(client_interface_fd, this);
 
   return 1;
 }

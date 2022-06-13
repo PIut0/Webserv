@@ -11,6 +11,7 @@
 #include "AlreadyExistKey.hpp"
 #include "Defines.hpp"
 #include "utils.hpp"
+#include "HttpStatusCode.hpp"
 
 #define  HTTP_UNKNOWN  0x00000001
 #define  HTTP_GET      0x00000002
@@ -74,6 +75,8 @@ class Header : public System
 
   virtual void SetItem(const std::string &key, const std::string &value) = 0;
   virtual wsv_header_t& GetItem(const std::string &key) = 0;
+
+  int state;
 };
 
 #endif

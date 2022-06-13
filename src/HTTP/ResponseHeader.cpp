@@ -2,9 +2,10 @@
 
 ResponseHeader::ResponseHeader()
 {
+  this->status_code = WSV_STR_EMPTY;
+  this->status_msg  = WSV_STR_EMPTY;
+  this->state = 0;
   this->pos_ = 0;
-  this->status_code = "";
-  this->status_msg  = "";
 }
 
 ResponseHeader::ResponseHeader(const ResponseHeader &origin)
@@ -270,7 +271,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
 int ResponseHeader::ParseBody(const std::string &data)
 {
   if (this->pos_ == data.length()) {
-    this->body = "";
+    this->body = WSV_STR_EMPTY;
   } else {
     this->body = data.substr(this->pos_, data.length() - this->pos_);
   }
@@ -279,7 +280,7 @@ int ResponseHeader::ParseBody(const std::string &data)
 
 std::string ResponseHeader::ToString()
 {
-  std::string ret = "";
+  std::string ret = WSV_STR_EMPTY;
 
   ret += "HTTP/1.1 " + this->status_code + " " + this->status_msg + CRLF;
   for (size_t i = 0 ; i < conf.size() ; ++i) {
@@ -311,4 +312,17 @@ void ResponseHeader::PrintBody()
 {
   std::cout << COLOR_BLUE << "[ BODY LINE ]" << COLOR_DEFAULT << std::endl;
   std::cout << body << std::endl;
+}
+
+void ResponseHeader::Clear()
+{
+  this->status_code = WSV_STR_EMPTY;
+  this->status_msg = WSV_STR_EMPTY;
+  this->body = WSV_STR_EMPTY;
+  this->state = 0;
+  this->pos_ = 0;
+  for (res_header_it_t it = this->conf.begin(); it != this->conf.end(); ++it) {
+    delete *it;
+  }
+  this->conf.clear();
 }

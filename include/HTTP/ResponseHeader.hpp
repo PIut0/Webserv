@@ -29,6 +29,8 @@ class ResponseHeader : public Header
 
   std::string  ToString();
 
+  void Clear();
+
   // response line
   // header line
   std::string   status_code;

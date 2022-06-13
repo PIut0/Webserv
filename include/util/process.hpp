@@ -3,12 +3,8 @@
 
 #include "Server.hpp"
 #include "Client.hpp"
-#include "GetMethod.hpp"
-#include "PutMethod.hpp"
-#include "PostMethod.hpp"
-#include "DeleteMethod.hpp"
-#include "Cgi.hpp"
+#include "Method.hpp"
 
-void Process(FdInterface *target, struct kevent event, std::set<int> &deleted_fd);
+void Process(FdInterface* &target, struct kevent event);
 
 #endif

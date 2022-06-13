@@ -1,7 +1,11 @@
 #include "RequestHeader.hpp"
 
 RequestHeader::RequestHeader() : method(0), pos_(0) {
-  this->SetItem("", "");
+  this->SetItem("_", "");
+  this->host = WSV_STR_EMPTY;
+  this->http_major = 0;
+  this->http_minor = 0;
+  this->state = 0;
 }
 
 RequestHeader::RequestHeader(const RequestHeader &origin)
@@ -23,7 +27,7 @@ RequestHeader& RequestHeader::operator=(const RequestHeader &rv)
   this->http_minor = rv.http_minor;
   req_header_t temp = rv.conf;
   for (req_header_it_t it = temp.begin() ; it != temp.end() ; ++it) {
-    this->SetItem(it->second->key, it->second->value);
+    this->SetItem(it->first, it->second->value);
   }
   this->pos_ = rv.pos_;
   return *this;
@@ -63,8 +67,11 @@ void RequestHeader::SetItem(const std::string &line)
 
 void RequestHeader::SetItem(const std::string &key, const std::string &value)
 {
-  if (FindItem(key) != this->conf.end())
-    throw AlreadyExistKey();
+  req_header_it_t it = FindItem(key);
+  if (it != this->conf.end()) {
+    delete it->second;
+    this->conf.erase(it);
+  }
 
   wsv_header_t *el = new wsv_header_t();
   el->key = key;
@@ -96,14 +103,15 @@ int RequestHeader::SetChunked(const std::string &chunked)
 
 req_header_it_t RequestHeader::FindItem(const std::string &key)
 {
-  return this->conf.find(key);
+  req_header_it_t it = this->conf.find(key);
+  return it;
 }
 
 wsv_header_t& RequestHeader::GetItem(const std::string &key)
 {
   req_header_it_t it = FindItem(key);
   if (it == this->conf.end()) {
-    return *(this->conf[""]);
+    return *(this->conf["_"]);
   }
   return *(it->second);
 }
@@ -112,6 +120,7 @@ void  RequestHeader::Parse(const std::string &data)
   ParseRequestLine(data);
   ParseHeaderLine(data);
   ParseBodyLine(data);
+  this->state = 1;
 }
 // TODO return 에서 throw ParseError()로 바꾸기
 int RequestHeader::ParseRequestLine(const std::string &data)
@@ -141,7 +150,7 @@ int RequestHeader::ParseRequestLine(const std::string &data)
     {
       case wsb_start:
         if ((ch < 'A' || ch > 'Z') && ch != '_' && ch != '-') {
-          throw NotImplementedError();
+          throw HTTP_STATUS_NOT_IMPLEMENTED;
         }
 
         state = wsb_method;
@@ -170,18 +179,18 @@ int RequestHeader::ParseRequestLine(const std::string &data)
                 break;
               }
               if (wsb_str_4cmp(data, 'H', 'E', 'A', 'D')) {
-                throw NotAllowedError();
+                throw HTTP_STATUS_METHOD_NOT_ALLOWED;
               }
 
               break;
 
             case 5:
               if (wsb_str_5cmp(data, 'P', 'A', 'T', 'C', 'H')) {
-                throw NotAllowedError();
+                throw HTTP_STATUS_METHOD_NOT_ALLOWED;
               }
 
               if (wsb_str_5cmp(data, 'T', 'R', 'A', 'C', 'E')) {
-                throw NotAllowedError();
+                throw HTTP_STATUS_METHOD_NOT_ALLOWED;
               }
 
               break;
@@ -195,10 +204,10 @@ int RequestHeader::ParseRequestLine(const std::string &data)
 
             case 7:
               if (wsb_str_7cmp(data, 'C', 'O', 'N', 'N', 'E', 'C', 'T')) {
-                throw NotAllowedError();
+                throw HTTP_STATUS_METHOD_NOT_ALLOWED;
               }
               if (wsb_str_7cmp(data, 'O', 'P', 'T', 'I', 'O', 'N', 'S')) {
-                throw NotAllowedError();
+                throw HTTP_STATUS_METHOD_NOT_ALLOWED;
               }
 
               break;
@@ -209,7 +218,7 @@ int RequestHeader::ParseRequestLine(const std::string &data)
           }
 
           if (!this->method)
-            throw NotImplementedError();
+            throw HTTP_STATUS_NOT_IMPLEMENTED;
 
           state = wsb_before_uri;
 
@@ -629,3 +638,17 @@ void RequestHeader::PrintBodyLine()
   std::cout << body << std::endl;
 }
 
+void RequestHeader::Clear()
+{
+  this->method = 0;
+  this->host = WSV_STR_EMPTY;
+  this->http_major = 0;
+  this->http_minor = 0;
+  this->state = 0;
+  for (req_header_it_t it = this->conf.begin(); it != this->conf.end(); ++it) {
+    delete it->second;
+  }
+  this->conf.clear();
+  this->SetItem("_", "");
+  this->pos_ = 0;
+}

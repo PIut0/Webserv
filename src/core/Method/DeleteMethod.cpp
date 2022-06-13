@@ -1,45 +1,22 @@
-#include "DeleteMethod.hpp"
-#include "utils.hpp"
+#include "Method.hpp"
 
-DeleteMethod::DeleteMethod(KQueue &kq, const std::string &path, Client* &client) : Method(kq, client, kFdDeleteMethod)
+void DeleteMethod(Method* method)
 {
-  if (ft_stoi(response->status_code) >= 400) {
-    ResponseErrorPage();
-    return ;
-  }
+  std::string path = method->target_path;
 
-  target_path = path;
-  try {
-    int is_file = access(target_path.c_str(), F_OK);
+  int is_file = access(path.c_str(), F_OK);
 
-    if (is_file != 0)
-      throw NotFoundError();
+  if (is_file != 0)
+    throw HTTP_STATUS_NOT_FOUND;
 
-    if (access(target_path.substr(0, target_path.find_last_of("/")).c_str(), W_OK) != 0)
-      throw ForbiddenError();
+  if (access(path.substr(0, path.find_last_of("/")).c_str(), W_OK) != 0)
+    throw HTTP_STATUS_FORBIDDEN;
 
-    request->SetHost(target_path);
+  method->client.request.SetHost(path);
 
-    if (remove(target_path.c_str()))
-      throw InternalServerError();
+  if (remove(path.c_str()))
+    throw HTTP_STATUS_INTERNAL_SERVER_ERROR;
 
-  } catch (NotFoundError &e) {
-    SetResponseStatus(response, 404);
-  } catch (ForbiddenError &e) {
-    SetResponseStatus(response, 403);
-  } catch (InternalServerError &e) {
-    SetResponseStatus(response, 500);
-  }
-
-  if (ft_stoi(response->status_code) >= 400) {
-    ResponseErrorPage();
-    return ;
-  }
-
-  SetResponseMessage();
-  kq.AddEvent(target_fd, EVFILT_WRITE, this);
-}
-
-DeleteMethod::~DeleteMethod()
-{
+  method->SetResponseMessage();
+  method->kq->AddEvent(method->target_fd, EVFILT_WRITE, method);
 }
