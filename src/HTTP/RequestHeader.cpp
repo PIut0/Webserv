@@ -25,6 +25,7 @@ RequestHeader& RequestHeader::operator=(const RequestHeader &rv)
   this->host = rv.host;
   this->http_major = rv.http_major;
   this->http_minor = rv.http_minor;
+  this->body = rv.body;
   req_header_t temp = rv.conf;
   for (req_header_it_t it = temp.begin() ; it != temp.end() ; ++it) {
     this->SetItem(it->first, it->second->value);
@@ -111,6 +112,9 @@ wsv_header_t& RequestHeader::GetItem(const std::string &key)
 {
   req_header_it_t it = FindItem(key);
   if (it == this->conf.end()) {
+    if (FindItem("_") == this->conf.end()) {
+      this->SetItem("_", "");
+    }
     return *(this->conf["_"]);
   }
   return *(it->second);
