@@ -15,7 +15,7 @@
 static std::map<std::string, std::string> _mimes;
 
 int CheckSocketAlive(clock_t socketStartTime);
-void ExitWithMsg(const std::string &msg);
+void ThrowException(const std::string &msg);
 std::string CheckArg(int argc, char **argv);
 std::vector<std::string> StringSplit(const std::string &data, const std::string &delim, const int &start_pos);
 

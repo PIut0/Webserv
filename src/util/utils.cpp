@@ -16,7 +16,7 @@ std::string CheckArg(int argc, char **argv)
     return DEFAULT_CONFIG_PATH;
   }
   if (argc != 2)
-    ExitWithMsg("Usage: ./server [config_file]");
+    ThrowException("Usage: ./server [config_file]");
   return argv[1];
 }
 
@@ -39,10 +39,9 @@ std::vector<std::string> StringSplit(const std::string &data,
   return res;
 }
 
-void ExitWithMsg(const std::string &msg)
+void ThrowException(const std::string &msg)
 {
-  std::cerr << msg << std::endl;
-  exit(1);
+  throw std::runtime_error(msg);
 }
 
 std::string& ltrim(std::string& s)

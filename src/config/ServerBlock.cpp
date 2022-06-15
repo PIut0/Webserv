@@ -50,7 +50,7 @@ void ServerBlock::ParseListen(const std::string &contents)
   char *ptr;
   this->port = strtod(split_data[0].c_str(), &ptr);
   if (this->port <= 0 || ptr[0])
-    ExitWithMsg("listen Error");
+    ThrowException("listen Error");
   this->host = split_data[1];
 }
 void ServerBlock::ParseServerName(const std::string &contents)
@@ -84,7 +84,7 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
     {
       case S_SERVER:
         if (data[i][0] != '\t')
-          ExitWithMsg("Server Block Error");
+          ThrowException("Server Block Error");
 
         index = data[i].find(' ');
 
@@ -109,7 +109,7 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
             break;
 
           case kError:
-            ExitWithMsg("error in serverblock");
+            ThrowException("error in serverblock");
 
           default:
             break;
