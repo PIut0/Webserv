@@ -38,6 +38,7 @@ void KQueue::loof()
       FdInterface *target = static_cast<FdInterface *>(events[i].udata);
       Process(target, events[i]);
     }
+    DeleteTimeoutList();
     DeleteList();
   }
 }
@@ -50,7 +51,7 @@ void KQueue::ErrorIgnore(const char *err)
 
 void KQueue::Refresh()
 {
-  event_count = kevent(kq, &event_list[0], event_list.size(), events, EVENT_SIZE, NULL);
+  event_count = kevent(kq, &event_list[0], event_list.size(), events, EVENT_SIZE, &timeout);
   event_list.clear();
   if (event_count == -1) {
     ThrowException("refresh");
@@ -63,6 +64,16 @@ void KQueue::DeleteList()
     client_map.erase(*it);
   }
   delete_list.clear();
+}
+
+void KQueue::DeleteTimeoutList()
+{
+  std::vector<client_map_it_t> delete_list_it;
+  for (client_map_it_t it = client_map.begin(); it != client_map.end(); it++) {
+    if (CheckSocketAlive(it->second.socketHitTime))
+      continue;
+    delete_list.insert(it->second.interface_fd);
+  }
 }
 
 void KQueue::AddEvent(int ident, int16_t filter, void *udata)

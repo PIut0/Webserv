@@ -44,6 +44,7 @@ void CgiMethod(Method* method)
 
 int Method::EventReadToCgi()
 {
+  client.SetSocketHitTime();
   char buf[BUFFER_SIZE + 1];
   memset(buf, 0, BUFFER_SIZE + 1);
   int n = read(fromCgi[FD_READ], buf, BUFFER_SIZE);

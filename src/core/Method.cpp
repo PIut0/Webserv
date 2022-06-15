@@ -143,6 +143,7 @@ int Method::EventRead()
 
 int Method::EventWrite()
 {
+  client.SetSocketHitTime();
   if (write_data_idx == 0) {
     write_data = client.response.ToString();
     write_data_size = write_data.size();
@@ -166,6 +167,7 @@ int Method::EventWrite()
 
 int Method::FileWrite()
 {
+  client.SetSocketHitTime();
   if (cgi_write_data_idx == 0) {
     cgi_write_data_size = client.request.body.size();
   }

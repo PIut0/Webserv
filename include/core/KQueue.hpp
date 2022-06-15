@@ -42,6 +42,7 @@ class KQueue
   void ErrorIgnore(const char *err);
   void Refresh();
   void DeleteList();
+  void DeleteTimeoutList();
   void AddEvent(int ident, int16_t filter, void *udata);
   void EnableEvent(int ident, int16_t filter, void *udata);
   void DisableEvent(int ident, int16_t filter, void *udata);

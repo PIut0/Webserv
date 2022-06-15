@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#define MAX_SOCKET_LIFE_TIME 1200000
+#define MAX_SOCKET_LIFE_TIME 100
 
 static std::map<std::string, std::string> _mimes;
 
