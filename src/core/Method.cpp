@@ -25,6 +25,7 @@ Method::Method(Client &client) : FdInterface(client.kq, kFdNone, 0), client(clie
   this->fromCgi[1] = 0;
   this->toCgi[0] = 0;
   this->toCgi[1] = 0;
+  this->interface_fd = 0;
   this->target_fd = 0;
   this->read_data = "";
   this->cgi_write_data_idx = 0;
@@ -101,17 +102,21 @@ void Method::Clear()
   write_data = WSV_STR_EMPTY;
   cgi_write_data = WSV_STR_EMPTY;
 
-  // CloseFd(target_fd);
-  target_fd = -1;
+  fromCgi[0] = 0;
+  fromCgi[1] = 0;
+  toCgi[0] = 0;
+  toCgi[1] = 0;
+  interface_fd = 0;
+  target_fd = 0;
 
-  this->read_data = "";
-  this->cgi_write_data_idx = 0;
-  this->cgi_write_data_size = 0;
-  this->cgi_write_data = "";
-  this->write_data_idx = 0;
-  this->write_data_size = 0;
-  this->write_data = "";
-  this->target_path = "";
+  read_data = "";
+  cgi_write_data_idx = 0;
+  cgi_write_data_size = 0;
+  cgi_write_data = "";
+  write_data_idx = 0;
+  write_data_size = 0;
+  write_data = "";
+  target_path = "";
 
   client.request.Clear();
   client.response.Clear();
