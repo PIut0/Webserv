@@ -7,6 +7,7 @@
 
 int main(int argc, char** argv) {
   ServerManager serverManager(CheckArg(argc, argv));
+  signal(SIGPIPE, SIG_IGN);
   SetMime();
 
   while (1) {
