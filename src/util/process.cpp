@@ -184,7 +184,7 @@ void Cgi_Event_Read(Method *cgi, int ident)
 {
   Client &client = cgi->client;
 
-  if (ident == cgi->interface_fd) {
+  if (ident != cgi->interface_fd) {
     if (cgi->EventRead() <= 0)
     {
       cgi->SetResponseMessage();
@@ -267,6 +267,7 @@ void Process(FdInterface* &target, struct kevent event)
         break;
       case kFdCgi:
         Cgi_Event_Read(static_cast<Method *>(target), event.ident);
+        break;
       default:
         break;
     }
@@ -295,6 +296,7 @@ void Process(FdInterface* &target, struct kevent event)
         break;
       case kFdCgi:
         Cgi_Event_Write(static_cast<Method *>(target), event.ident);
+        break;
       default:
         break;
     }

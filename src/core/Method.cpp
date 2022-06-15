@@ -97,6 +97,15 @@ void Method::Clear()
   // CloseFd(target_fd);
   target_fd = -1;
 
+  this->read_data = "";
+  this->cgi_write_data_idx = 0;
+  this->cgi_write_data_size = 0;
+  this->cgi_write_data = "";
+  this->write_data_idx = 0;
+  this->write_data_size = 0;
+  this->write_data = "";
+  this->target_path = "";
+
   client.request.Clear();
   client.response.Clear();
 
@@ -118,8 +127,7 @@ int Method::EventRead()
 
 int Method::EventWrite()
 {
-  if (write_data == WSV_STR_EMPTY) {
-    write_data_idx = 0;
+  if (write_data_idx == 0) {
     write_data = client.response.ToString();
     write_data_size = write_data.size();
   }
