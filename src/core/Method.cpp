@@ -42,6 +42,10 @@ Method::~Method()
 {
   // request.clear();
   // response.clear();
+  CloseFd(fromCgi[0]);
+  CloseFd(fromCgi[1]);
+  CloseFd(toCgi[0]);
+  CloseFd(toCgi[1]);
   CloseFd(interface_fd);
 }
 
