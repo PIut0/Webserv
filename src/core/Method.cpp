@@ -6,7 +6,7 @@ int IsDir(const std::string &path)
   return (path.back() == '/');
 }
 
-Method::Method(const Method &other) : FdInterface(other.kq, kFdNone), client(other.client)
+Method::Method(const Method &other) : FdInterface(other.kq, kFdNone, other.interface_fd), client(other.client)
 {
   *this = other;
 }
@@ -19,7 +19,7 @@ Method &Method::operator=(const Method &other)
   return *this;
 }
 
-Method::Method(Client &client) : FdInterface(client.kq, kFdNone), client(client)
+Method::Method(Client &client) : FdInterface(client.kq, kFdNone, 0), client(client)
 {
   this->fromCgi[0] = 0;
   this->fromCgi[1] = 0;
@@ -88,7 +88,14 @@ void Method::SetMethod(FdInterfaceType type)
 
 void Method::Clear()
 {
+  close(fromCgi[0]);
+  close(fromCgi[1]);
+  close(toCgi[0]);
+  close(toCgi[1]);
+  close(interface_fd);
+
   interface_type = kFdNone;
+  interface_fd = 0;
 
   read_data = WSV_STR_EMPTY;
   write_data = WSV_STR_EMPTY;

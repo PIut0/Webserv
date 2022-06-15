@@ -184,7 +184,7 @@ void Cgi_Event_Read(Method *cgi, int ident)
 {
   Client &client = cgi->client;
 
-  if (ident != cgi->interface_fd) {
+  if (ident == cgi->interface_fd) {
     if (cgi->EventRead() <= 0)
     {
       cgi->SetResponseMessage();
