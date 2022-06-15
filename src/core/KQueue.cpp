@@ -24,9 +24,10 @@ KQueue::KQueue(const KQueue &other)
 
 KQueue::~KQueue()
 {
-  CloseFd(kq);
   for (std::set<Server *>::iterator it = servers.begin(); it != servers.end(); ++it)
     delete *it;
+  this->client_map.clear();
+  CloseFd(kq);
 }
 
 void KQueue::loof()
