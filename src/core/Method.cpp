@@ -88,11 +88,11 @@ void Method::SetMethod(FdInterfaceType type)
 
 void Method::Clear()
 {
-  close(fromCgi[0]);
-  close(fromCgi[1]);
-  close(toCgi[0]);
-  close(toCgi[1]);
-  close(interface_fd);
+  CloseFd(fromCgi[0]);
+  CloseFd(fromCgi[1]);
+  CloseFd(toCgi[0]);
+  CloseFd(toCgi[1]);
+  CloseFd(interface_fd);
 
   interface_type = kFdNone;
   interface_fd = 0;

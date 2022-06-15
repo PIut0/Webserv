@@ -233,7 +233,7 @@ void Process(FdInterface* &target, struct kevent event)
     && event.filter == EVFILT_READ
     && target->interface_type == kFdClient
     && target->kq->client_map.find(event.ident) != target->kq->client_map.end()) {
-    CloseFd(event.ident);
+    // CloseFd(event.ident);
     target->kq->delete_list.insert(event.ident);
     return;
   }
