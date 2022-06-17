@@ -174,7 +174,6 @@ int RequestHeader::ParseRequestLine(const std::string &data)
                 this->method = HTTP_PUT;
                 break;
               }
-
               break;
 
             case 4:
@@ -185,7 +184,6 @@ int RequestHeader::ParseRequestLine(const std::string &data)
               if (wsb_str_4cmp(data, 'H', 'E', 'A', 'D')) {
                 throw HTTP_STATUS_METHOD_NOT_ALLOWED;
               }
-
               break;
 
             case 5:
@@ -196,14 +194,12 @@ int RequestHeader::ParseRequestLine(const std::string &data)
               if (wsb_str_5cmp(data, 'T', 'R', 'A', 'C', 'E')) {
                 throw HTTP_STATUS_METHOD_NOT_ALLOWED;
               }
-
               break;
 
             case 6:
               if (wsb_str_6cmp(data, 'D', 'E', 'L', 'E', 'T', 'E')) {
                 this->method = HTTP_DELETE;
               }
-
               break;
 
             case 7:
@@ -213,11 +209,9 @@ int RequestHeader::ParseRequestLine(const std::string &data)
               if (wsb_str_7cmp(data, 'O', 'P', 'T', 'I', 'O', 'N', 'S')) {
                 throw HTTP_STATUS_METHOD_NOT_ALLOWED;
               }
-
               break;
 
             default:
-
               break;
           }
 
@@ -227,7 +221,6 @@ int RequestHeader::ParseRequestLine(const std::string &data)
           state = wsb_before_uri;
 
         }
-
         break;
 
       case wsb_before_uri:
@@ -258,14 +251,13 @@ int RequestHeader::ParseRequestLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       case wsb_before_option:
         if (wsv_str_5cmp_p(data, pos, 'H', 'T', 'T', 'P', '/') && \
-                         data[pos + 5] >= '0' && data[pos + 5] <= '9' && \
-                         data[pos + 6] == '.' && \
-                         data[pos + 7] >= '0' && data[pos + 7] <= '9' ) {
+                           data[pos + 5] >= '0' && data[pos + 5] <= '9' && \
+                           data[pos + 6] == '.' && \
+                           data[pos + 7] >= '0' && data[pos + 7] <= '9' ) {
           this->http_major = data[pos + 5] - '0';
           this->http_minor = data[pos + 7] - '0';
           pos += 7; // 하드코딩..
@@ -311,7 +303,6 @@ int RequestHeader::ParseRequestLine(const std::string &data)
 
 int RequestHeader::ParseHeaderLine(const std::string &data)
 {
-  // char          *key_start, *key_end, *value_start, *value_end;
   size_t        key_start, key_end, value_start, value_end;
   std::string   key, value;
   u_char        ch;
@@ -319,14 +310,14 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
 
   enum {
     wsv_start = 0,
-    wsv_header_key, // : 나오기 전까지
-    wsv_header_value_before, // 문자열 나오기 전까지
-    wsv_header_value, // CR나오기 전까지
-    wsv_invalid_key, // CR 나오기 전까지
+    wsv_header_key,
+    wsv_header_value_before,
+    wsv_header_value,
+    wsv_invalid_key,
     wsv_invalid_key_newline,
     wsv_valide_key_newline,
     wsv_almost_done,
-    wsv_done // LF 나오면 끝
+    wsv_done
   } state;
 
   state = wsv_start;
@@ -334,8 +325,7 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
   for (pos = this->pos_ ; data[pos] ; ++pos) {
     ch = data[pos];
 
-    switch (state)
-    {
+    switch (state) {
       case wsv_start:
         if ((ch < 'A' || ch > 'Z') && ch != '_' && ch != '-') {
           state = wsv_invalid_key;
@@ -349,7 +339,7 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
         if (ch == ' ') {
           break;
         }
-        // TODO 대문자 시작 체크 해야하나 ??
+
         if (isalpha(ch)) {
           key_start = pos;
           state = wsv_header_key;
@@ -357,11 +347,7 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
         break;
 
       case wsv_header_key:
-      // :나오면 wsv_header_value_before로
-      // CR나오면 wsv_invalid_key_newline으로
-      // 아니면 break;
-        switch (ch)
-        {
+        switch (ch) {
           case ':':
             key_end = pos - 1;
             state = wsv_header_value_before;
@@ -374,20 +360,16 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       case wsv_header_value_before:
-      // 문자열 나오면 ptr저장 wsv_header_value로
-      // 공백 나오면 break;
         if (ch != ' ' && isprint(ch)) {
           state = wsv_header_value;
           value_start = pos;
           break;
         }
 
-        switch (ch)
-        {
+        switch (ch) {
           case ' ':
             break;
 
@@ -398,14 +380,10 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       case wsv_header_value:
-      // CR 나오면 wsv_newline으로
-      // 아니면 break;
-        switch (ch)
-        {
+        switch (ch) {
           case CR:
             value_end = pos - 1;
             state = wsv_valide_key_newline;
@@ -414,14 +392,10 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       case wsv_invalid_key:
-      // CR 나오면 wsv_invalid_key_newline으로
-      // 아니면 break;
-        switch (ch)
-        {
+        switch (ch) {
           case CR:
             state = wsv_invalid_key_newline;
             break;
@@ -430,11 +404,9 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
             break;
         }
         break;
+
       case wsv_invalid_key_newline:
-      // LF 나오면 wsv_almost_done으로
-      // 아니면 error
-        switch (ch)
-        {
+        switch (ch) {
         case LF:
           state = wsv_almost_done;
           break;
@@ -442,14 +414,10 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
         default:
           break;
         }
-
         break;
 
       case wsv_valide_key_newline:
-      // LF 나오면 wsv_almost_done으로
-      // 아니면 error
-        switch (ch)
-        {
+        switch (ch) {
           case LF:
             state = wsv_almost_done;
             key = data.substr(key_start, key_end - key_start + 1);
@@ -460,14 +428,10 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       case wsv_almost_done:
-      // CR 나오면 almost_done
-      // 아니면 wsv_start로
-        switch (ch)
-        {
+        switch (ch) {
           case CR:
             state = wsv_done;
             break;
@@ -477,14 +441,10 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
             state = wsv_header_key;
             break;
         }
-
         break;
 
       case wsv_done:
-      // LF 나오면 끝
-      // 아니면 에러
-        switch (ch)
-        {
+        switch (ch) {
           case LF:
             this->pos_ = pos + 1;
             return WSV_OK;
@@ -492,14 +452,12 @@ int RequestHeader::ParseHeaderLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       default:
         break;
     }
   }
-
   throw HttpParseInvalidRequest();
 }
 
@@ -537,8 +495,7 @@ std::string RequestHeader::ToString()
 
 std::string RequestHeader::MethodToString()
 {
-  switch (this->method)
-  {
+  switch (this->method) {
     case HTTP_UNKNOWN:
       return "UNKNOWN";
 
@@ -581,7 +538,6 @@ char** RequestHeader::ToCgi(const std::string &path) {
   for (req_header_it_t it = this->conf.begin() ; it != this->conf.end() ; ++it) {
     if (wsb_str_2cmp(it->first, 'X', '-')) {
       cgi.push_back("HTTP_" + it->second->key + "=" + it->second->value);
-      // std::cout << "push !! " << "HTTP_" + it->second->key + "=" + it->second->value << std::endl;
     }
   }
 
@@ -619,9 +575,7 @@ void RequestHeader::Print()
 void RequestHeader::PrintRequestLine()
 {
   std::cout << COLOR_RED << "[ REQUEST LINE ]" << COLOR_DEFAULT << std::endl;
-  std::cout << "  [method] : ";
-
-  std::cout << std::endl;
+  std::cout << "  [method] : " << MethodToString() << std::endl;
   std::cout << "  [host] : " << host << std::endl;
   std::cout << "  [http version] : " << this->http_major << "." << this->http_minor << std::endl;
 }

@@ -9,8 +9,7 @@ std::vector<std::string> GetFileList(const std::string &path)
   if ((dir = opendir(path.c_str())) == NULL)
     throw HTTP_STATUS_NOT_FOUND;
 
-  while ((ent = readdir(dir)) != NULL)
-  {
+  while ((ent = readdir(dir)) != NULL) {
     std::string name(ent->d_name);
     if (ent->d_type == DT_DIR)
       name += '/';

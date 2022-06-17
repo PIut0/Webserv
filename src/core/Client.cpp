@@ -155,28 +155,30 @@ FdInterfaceType Client::ParseHeader()
 
   std::cout << "- Request -" << std::endl << request.ToString() << std::endl;
 
-  if (ft_stoi(request.GetItem("Content-Length").value) > 0 && request.body.size() <= 0)
+  if (ft_stoi(request.GetItem("Content-Length").value) > 0 && request.body.size() <= 0) {
     return kFdNone;
-  else if(request.GetItem("Transfer-Encoding").value == "chunked")
+  } else if(request.GetItem("Transfer-Encoding").value == "chunked") {
     return kFdNone;
+  }
 
   if (!(loc->allow_methods & request.method)) {
     response.SetItem("Status", StatusCode(405));
     return kFdGetMethod;
   }
 
-  if(CheckCgi())
+  if(CheckCgi()) {
     return kFdCgi;
-  else if(request.host != "" && request.method == HTTP_GET)
+  } else if(request.host != "" && request.method == HTTP_GET) {
     return kFdGetMethod;
-  else if(request.host != "" && request.method == HTTP_PUT)
+  } else if(request.host != "" && request.method == HTTP_PUT) {
     return kFdPutMethod;
-  else if(request.host != "" && request.method == HTTP_POST)
+  } else if(request.host != "" && request.method == HTTP_POST) {
     return kFdPostMethod;
-  else if(request.host != "" && request.method == HTTP_DELETE)
+  } else if(request.host != "" && request.method == HTTP_DELETE) {
     return kFdDeleteMethod;
-  else
+  } else {
     return kFdNone;
+  }
 }
 
 FdInterfaceType Client::ParseBody()
@@ -225,18 +227,19 @@ FdInterfaceType Client::ParseBody()
   if (!(loc->allow_methods & request.method))
     response.SetItem("Status", StatusCode(405));
 
-  if (CheckCgi())
+  if (CheckCgi()) {
     return kFdCgi;
-  else if (request.host != "" && request.method == HTTP_GET)
+  } else if (request.host != "" && request.method == HTTP_GET) {
     return kFdGetMethod;
-  else if (request.host != "" && request.method == HTTP_PUT)
+  } else if (request.host != "" && request.method == HTTP_PUT) {
     return kFdPutMethod;
-  else if (request.host != "" && request.method == HTTP_POST)
+  } else if (request.host != "" && request.method == HTTP_POST) {
     return kFdPostMethod;
-  else if (request.host != "" && request.method == HTTP_DELETE)
+  } else if (request.host != "" && request.method == HTTP_DELETE) {
     return kFdDeleteMethod;
-  else
+  } else {
     return kFdNone;
+  }
 }
 
 FdInterfaceType Client::ParseReq()

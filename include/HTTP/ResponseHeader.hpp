@@ -17,28 +17,23 @@ class ResponseHeader : public Header
   void            SetBody(const std::string &body);
   void            SetItem(const std::string &line);
   void            SetItem(const std::string &key, const std::string &value);
-  // void            SetItem(std::vector<std::pair<std::string, std::string> > &values);
+
   wsv_header_t&   GetItem(const std::string &key);
   res_header_it_t FindItem(const std::string &key);
 
   void  Parse(const std::string &data);
 
+  std::string  ToString();
+
+  void  Clear();
+
   void  Print();
   void  PrintHeaderLine();
   void  PrintBody();
 
-  std::string  ToString();
-
-  void Clear();
-
-  // response line
-  // header line
   std::string   status_code;
   std::string   status_msg;
-
   res_header_t  conf;
-
-  // body line
   std::string   body;
 
  private:

@@ -76,26 +76,30 @@ void CgiMethod(Method *method);
 
 class Client : public FdInterface
 {
- private:
  public:
   Client();
-  Client &operator=(const Client &);
-  Client(const Client &);
   Client(KQueue *kq, int fd, Server *server);
+  Client(const Client &origin);
   ~Client();
+
+  Client &operator=(const Client &rv);
 
   int EventRead();
   int EventWrite();
 
-  LocationBlock *GetLocationBlock();
+  LocationBlock     *GetLocationBlock();
+  const std::string GetFilePath();
+
   int CheckCgi();
   int CheckRequest();
+
   FdInterfaceType ParseHeader();
   FdInterfaceType ParseBody();
   FdInterfaceType ParseReq();
-  const std::string GetFilePath();
+
   void SetResponseMessage();
   void SetSocketHitTime();
+
   void Clear();
 
   Method cur_method;

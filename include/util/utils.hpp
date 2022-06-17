@@ -22,14 +22,17 @@ std::vector<std::string> StringSplit(const std::string &data, const std::string 
 std::string& ltrim(std::string& s);
 std::string& rtrim(std::string& s);
 std::string& trim(std::string& s);
+
 std::string ft_itos(int i);
 int ft_stoi(const std::string &s);
 int ft_hextoi(const std::string &s);
+
 int IsEOF(int fd);
 int IsRegularFile(const std::string &path);
 
 void CloseFd(int fd);
 void SetMime();
+
 std::string ToLower(const std::string &origin);
 std::string GetDate();
 std::string MimeType(const std::string &ext);

@@ -1,18 +1,18 @@
 #include "Server.hpp"
 #include "utils.hpp"
 
-Server &Server::operator=(const Server &other)
+Server &Server::operator=(const Server &rv)
 {
-  this->server_addr = other.server_addr;
+  this->server_addr = rv.server_addr;
   return (*this);
 }
 
-Server::Server(const Server &other) : FdInterface(other.kq, kFdServer), server_block(other.server_block)
+Server::Server(const Server &origin) : FdInterface(origin.kq, kFdServer), server_block(origin.server_block)
 {
-  *this = other;
+  *this = origin;
 }
 
-Server::Server(KQueue *kq, ServerBlock &_sb) : FdInterface(kq, kFdServer), server_block(_sb)
+Server::Server(KQueue *kq, ServerBlock &sb) : FdInterface(kq, kFdServer), server_block(sb)
 {
   if ((interface_fd = socket(PF_INET, SOCK_STREAM, 0)) == -1)
     ThrowException("socket");
@@ -22,7 +22,7 @@ Server::Server(KQueue *kq, ServerBlock &_sb) : FdInterface(kq, kFdServer), serve
   memset(&server_addr, 0, sizeof(server_addr));
   server_addr.sin_family = AF_INET;
   server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  server_addr.sin_port = htons(_sb.port);
+  server_addr.sin_port = htons(sb.port);
 
   if (bind(interface_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
     ThrowException("bind");

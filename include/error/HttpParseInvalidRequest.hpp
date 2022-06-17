@@ -5,7 +5,7 @@
 
 class HttpParseInvalidRequest : public std::exception
 {
-	const char * what () const throw () {
+  const char * what () const throw () {
     return "HttpParseInvalidRequest";
   };
 };

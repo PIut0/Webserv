@@ -20,12 +20,10 @@ class KQueue;
 
 class Server : public FdInterface
 {
- private:
-  Server();
  public:
-  Server &operator=(const Server &other);
-  Server(const Server &other);
-  Server(KQueue *kq, ServerBlock &_sb);
+  Server &operator=(const Server &rv);
+  Server(const Server &origin);
+  Server(KQueue *kq, ServerBlock &sb);
   ~Server();
 
   int EventRead();
@@ -33,6 +31,9 @@ class Server : public FdInterface
 
   struct sockaddr_in  server_addr;
   ServerBlock         &server_block;
+
+ private:
+  Server();
 };
 
 #endif

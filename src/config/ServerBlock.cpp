@@ -18,6 +18,7 @@ ServerBlock& ServerBlock::operator=(const ServerBlock& rv)
   this->server_name = rv.server_name;
   this->host = rv.host;
   this->port = rv.port;
+
   return *this;
 }
 
@@ -41,6 +42,7 @@ int ServerBlock::GetLocationBlockByPath(const std::string &path)
       idx = i;
     }
   }
+
   return idx;
 }
 
@@ -60,13 +62,18 @@ void ServerBlock::ParseServerName(const std::string &contents)
 
 ServerBlock::ServerAttribute ServerBlock::CheckValidate(const std::string &command)
 {
-  if (command == "server_name")
+  if (command == "server_name") {
     return kServerName;
-  else if (command == "listen")
+  }
+  else if (command == "listen") {
     return kListen;
-  else if (command == "location")
+  }
+  else if (command == "location") {
     return kLocation;
-  return kError;
+  }
+  else {
+    return kError;
+  }
 }
 
 void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
@@ -114,7 +121,6 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
           default:
             break;
         }
-
         break;
 
       case S_LOCATION:
@@ -126,7 +132,6 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
         }
 
         element.push_back(data[i]);
-
         break;
 
       default:

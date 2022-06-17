@@ -13,6 +13,7 @@
 #include "Color.hpp"
 
 class LocationBlock;
+
 class ServerBlock : public System
 {
  public:

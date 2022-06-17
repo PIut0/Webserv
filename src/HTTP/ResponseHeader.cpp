@@ -102,14 +102,14 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
 
   enum {
     wsv_start = 0,
-    wsv_header_key, // : 나오기 전까지
-    wsv_header_value_before, // 문자열 나오기 전까지
-    wsv_header_value, // CR나오기 전까지
-    wsv_invalid_key, // CR 나오기 전까지
+    wsv_header_key,
+    wsv_header_value_before,
+    wsv_header_value,
+    wsv_invalid_key,
     wsv_invalid_key_newline,
     wsv_valide_key_newline,
     wsv_almost_done,
-    wsv_done // LF 나오면 끝
+    wsv_done
   } state;
 
   state = wsv_start;
@@ -117,8 +117,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
   for (pos = this->pos_ ; (data)[pos] ; ++pos) {
     ch = (data)[pos];
 
-    switch (state)
-    {
+    switch (state) {
       case wsv_start:
         if ((ch < 'A' || ch > 'Z') && ch != '_' && ch != '-') {
           state = wsv_invalid_key;
@@ -127,7 +126,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
         if (ch == ' ') {
           break;
         }
-        // TODO 대문자 시작 체크 해야하나 ??
+
         if (isalpha(ch)) {
           key_start = pos;
           state = wsv_header_key;
@@ -135,11 +134,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
         break;
 
       case wsv_header_key:
-      // :나오면 wsv_header_value_before로
-      // CR나오면 wsv_invalid_key_newline으로
-      // 아니면 break;
-        switch (ch)
-        {
+        switch (ch) {
           case ':':
             key_end = pos - 1;
             state = wsv_header_value_before;
@@ -152,20 +147,16 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       case wsv_header_value_before:
-      // 문자열 나오면 ptr저장 wsv_header_value로
-      // 공백 나오면 break;
         if (ch != ' ' && isprint(ch)) {
           state = wsv_header_value;
           value_start = pos;
           break;
         }
 
-        switch (ch)
-        {
+        switch (ch) {
           case ' ':
             break;
 
@@ -176,14 +167,10 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       case wsv_header_value:
-      // CR 나오면 wsv_newline으로
-      // 아니면 break;
-        switch (ch)
-        {
+        switch (ch) {
           case CR:
             value_end = pos - 1;
             state = wsv_valide_key_newline;
@@ -196,10 +183,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
         break;
 
       case wsv_invalid_key:
-      // CR 나오면 wsv_invalid_key_newline으로
-      // 아니면 break;
-        switch (ch)
-        {
+        switch (ch) {
           case CR:
             state = wsv_invalid_key_newline;
             break;
@@ -209,10 +193,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
         }
         break;
       case wsv_invalid_key_newline:
-      // LF 나오면 wsv_almost_done으로
-      // 아니면 error
-        switch (ch)
-        {
+        switch (ch) {
         case LF:
           state = wsv_almost_done;
           break;
@@ -220,14 +201,10 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
         default:
           break;
         }
-
         break;
 
       case wsv_valide_key_newline:
-      // LF 나오면 wsv_almost_done으로
-      // 아니면 error
-        switch (ch)
-        {
+        switch (ch) {
           case LF:
             state = wsv_almost_done;
             key = (data).substr(key_start, key_end - key_start + 1);
@@ -238,14 +215,10 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       case wsv_almost_done:
-      // CR 나오면 almost_done
-      // 아니면 wsv_start로
-        switch (ch)
-        {
+        switch (ch) {
           case CR:
             state = wsv_done;
             break;
@@ -255,14 +228,10 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
             state = wsv_header_key;
             break;
         }
-
         break;
 
       case wsv_done:
-      // LF 나오면 끝
-      // 아니면 에러
-        switch (ch)
-        {
+        switch (ch) {
           case LF:
             this->pos_ = pos + 1;
             return WSV_OK;
@@ -270,7 +239,6 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       default:

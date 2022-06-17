@@ -76,8 +76,7 @@ void Method::SetResponseMessageCgi()
 {
   try {
     client.response.Parse(read_data);
-  }
-  catch (HttpParseInvalidResponse &e) {
+  } catch (HttpParseInvalidResponse &e) {
     client.response.SetItem("Status", "500");
   }
 

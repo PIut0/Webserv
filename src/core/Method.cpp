@@ -69,18 +69,23 @@ void Method::SetMethod(FdInterfaceType type)
       case kFdGetMethod:
         GetMethod(this);
         break;
+
       case kFdPutMethod:
         PutMethod(this);
         break;
+
       case kFdPostMethod:
         PostMethod(this);
         break;
+
       case kFdDeleteMethod:
         DeleteMethod(this);
         break;
+
       case kFdCgi:
         CgiMethod(this);
         break;
+
       default:
         break;
     }
@@ -225,17 +230,19 @@ void Method::SetResponseMessage()
 
   if (client.response.body.size() > 0) {
     if (client.response.FindItem("Content-Type") == client.response.conf.end()) {
-      if (client.request.host.size() && client.request.host.find_last_of(".") != std::string::npos)
+      if (client.request.host.size() && client.request.host.find_last_of(".") != std::string::npos) {
         client.response.SetItem("Content-Type", MimeType(client.request.host.substr(client.request.host.find_last_of(".") + 1)));
-      else
+      } else {
         client.response.SetItem("Content-Type", "application/octet-stream");
+      }
     }
   }
 
-  if (client.request.FindItem("Connection") != client.request.conf.end())
-    client.response.SetItem("Connection", client.request.FindItem("Connection")->second->value);
-  else if (client.response.FindItem("Connection") == client.response.conf.end())
+  if (client.request.FindItem("Connection") != client.request.conf.end()) {
+    client.response.SetItem("Connection", client.request.FindItem("Connection")->second->value);\
+  } else if (client.response.FindItem("Connection") == client.response.conf.end()) {
     client.response.SetItem("Connection", "keep-alive");
+  }
 
   client.response.SetItem("Server", client.server->server_block.server_name);
   client.response.SetItem("Date", GetDate());

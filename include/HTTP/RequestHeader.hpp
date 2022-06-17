@@ -28,30 +28,28 @@ class RequestHeader : public Header
   wsv_header_t&   GetItem(const std::string &key);
   req_header_it_t FindItem(const std::string &key);
 
+  char** ToCgi(const std::string &path);
+
   void  Parse(const std::string &data);
+
+  std::string ToString();
+  std::string MethodToString();
+  std::string HttpVersionToString();
+
+  void  Clear();
 
   void  Print();
   void  PrintRequestLine();
   void  PrintHeaderLine();
   void  PrintBodyLine();
 
-  std::string ToString();
-  std::string MethodToString();
-  std::string HttpVersionToString();
 
-  char** ToCgi(const std::string &path);
-
-  void  Clear();
-
-  // request line
   int           method;
   std::string   host;
   short         http_major;
   short         http_minor;
-  // header line
   req_header_t  conf;
-  // body line
-  std::string   body; // TODO body를 복사하는게 맞는가
+  std::string   body;
 
  private:
   int   ParseHeaderLine(const std::string &data);

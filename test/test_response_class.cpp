@@ -29,8 +29,7 @@ int main()
 
     if (dummyr == responseHeader.ToString()) {
       std::cout << "TRUE" << std::endl;
-    }
-    else {
+    } else {
       std::cout << responseHeader.ToString() << "끝" << std::endl;
       std::cout << dummyr << "끝" << std::endl;
       std::cout << "Dummyr length : " << dummyr.length() << std::endl;

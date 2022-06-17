@@ -5,9 +5,9 @@
 #include "System.hpp"
 #include "utils.hpp"
 
-class KQueue;
-
 #define BUFFER_SIZE 65535
+
+class KQueue;
 
 enum FdInterfaceType {
   kFdServer,
