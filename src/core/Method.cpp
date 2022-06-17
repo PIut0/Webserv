@@ -21,10 +21,10 @@ Method &Method::operator=(const Method &other)
 
 Method::Method(Client &client) : FdInterface(client.kq, kFdNone, 0), client(client)
 {
-  this->fromCgi[0] = 0;
-  this->fromCgi[1] = 0;
-  this->toCgi[0] = 0;
-  this->toCgi[1] = 0;
+  this->from_cgi[0] = 0;
+  this->from_cgi[1] = 0;
+  this->to_cgi[0] = 0;
+  this->to_cgi[1] = 0;
   this->interface_fd = 0;
   this->target_fd = 0;
   this->read_data = "";
@@ -42,10 +42,10 @@ Method::~Method()
 {
   // request.clear();
   // response.clear();
-  CloseFd(fromCgi[0]);
-  CloseFd(fromCgi[1]);
-  CloseFd(toCgi[0]);
-  CloseFd(toCgi[1]);
+  CloseFd(from_cgi[0]);
+  CloseFd(from_cgi[1]);
+  CloseFd(to_cgi[0]);
+  CloseFd(to_cgi[1]);
   CloseFd(interface_fd);
 }
 
@@ -98,10 +98,10 @@ void Method::SetMethod(FdInterfaceType type)
 
 void Method::Clear()
 {
-  CloseFd(fromCgi[0]);
-  CloseFd(fromCgi[1]);
-  CloseFd(toCgi[0]);
-  CloseFd(toCgi[1]);
+  CloseFd(from_cgi[0]);
+  CloseFd(from_cgi[1]);
+  CloseFd(to_cgi[0]);
+  CloseFd(to_cgi[1]);
   CloseFd(interface_fd);
 
   interface_type = kFdNone;
@@ -111,10 +111,10 @@ void Method::Clear()
   write_data = WSV_STR_EMPTY;
   cgi_write_data = WSV_STR_EMPTY;
 
-  fromCgi[0] = 0;
-  fromCgi[1] = 0;
-  toCgi[0] = 0;
-  toCgi[1] = 0;
+  from_cgi[0] = 0;
+  from_cgi[1] = 0;
+  to_cgi[0] = 0;
+  to_cgi[1] = 0;
   interface_fd = 0;
   target_fd = 0;
 

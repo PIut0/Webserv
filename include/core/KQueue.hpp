@@ -18,6 +18,9 @@
 
 #define EVENT_SIZE 64
 
+class Server;
+class Client;
+class FdInterface;
 
 typedef std::map<int, Client> client_map_t;
 typedef client_map_t::iterator client_map_it_t;
@@ -25,9 +28,6 @@ typedef client_map_t::iterator client_map_it_t;
 typedef std::set<int> delete_list_t;
 typedef delete_list_t::iterator delete_list_it_t;
 
-class Server;
-class Client;
-class FdInterface;
 
 class KQueue
 {

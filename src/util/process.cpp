@@ -200,8 +200,8 @@ void Cgi_Event_Read(Method *cgi, int ident)
   else {
     if (cgi->EventReadToCgi() <= 0) { // 2
       cgi->SetResponseMessageCgi();
-      CloseFd(cgi->fromCgi[FD_READ]);
-      //client.kq->DisableEvent(cgi->fromCgi[FD_READ], EVFILT_READ, cgi);
+      CloseFd(cgi->from_cgi[FD_READ]);
+      //client.kq->DisableEvent(cgi->from_cgi[FD_READ], EVFILT_READ, cgi);
       client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, cgi);
     }
   }
@@ -225,8 +225,8 @@ void Cgi_Event_Write(Method *cgi, int ident)
   }
   else {
     if (cgi->EventWriteToCgi() <= 0) { // request to cgi process 1
-      CloseFd(cgi->toCgi[FD_WRITE]);
-      //client.kq->DeleteEvent(cgi->toCgi[FD_WRITE], EVFILT_WRITE, cgi);
+      CloseFd(cgi->to_cgi[FD_WRITE]);
+      //client.kq->DeleteEvent(cgi->to_cgi[FD_WRITE], EVFILT_WRITE, cgi);
     }
   }
 }

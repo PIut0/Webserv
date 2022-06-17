@@ -5,8 +5,8 @@ void CgiMethod(Method* method)
   std::string cgi_path, extension;
   method->read_data.reserve(method->client.request.body.size());
 
-  pipe(method->fromCgi);
-  pipe(method->toCgi);
+  pipe(method->from_cgi);
+  pipe(method->to_cgi);
 
   extension = method->client.request.host.substr(method->client.request.host.find_last_of('.'));
   cgi_path = method->location->cgi_info[extension];
@@ -14,31 +14,31 @@ void CgiMethod(Method* method)
     throw HTTP_STATUS_FORBIDDEN;
   }
 
-  fcntl(method->toCgi[FD_WRITE], F_SETFL, O_NONBLOCK);
-  fcntl(method->fromCgi[FD_READ], F_SETFL, O_NONBLOCK);
+  fcntl(method->to_cgi[FD_WRITE], F_SETFL, O_NONBLOCK);
+  fcntl(method->from_cgi[FD_READ], F_SETFL, O_NONBLOCK);
 
   pid_t pid = fork();
 
   if (pid == PS_CHILD) {
     char **env = method->client.request.ToCgi(method->target_path);
 
-    dup2(method->fromCgi[FD_WRITE], STDOUT_FILENO);
-    dup2(method->toCgi[FD_READ], STDIN_FILENO);
+    dup2(method->from_cgi[FD_WRITE], STDOUT_FILENO);
+    dup2(method->to_cgi[FD_READ], STDIN_FILENO);
 
-    CloseFd(method->fromCgi[FD_READ]);
-    CloseFd(method->fromCgi[FD_WRITE]);
-    CloseFd(method->toCgi[FD_WRITE]);
-    CloseFd(method->toCgi[FD_READ]);
+    CloseFd(method->from_cgi[FD_READ]);
+    CloseFd(method->from_cgi[FD_WRITE]);
+    CloseFd(method->to_cgi[FD_WRITE]);
+    CloseFd(method->to_cgi[FD_READ]);
 
     char *argv[2] = {const_cast<char *>(cgi_path.c_str()), 0};
     execve(cgi_path.c_str(), argv, env);
 
   } else {
-    CloseFd(method->fromCgi[FD_WRITE]);
-    CloseFd(method->toCgi[FD_READ]);
+    CloseFd(method->from_cgi[FD_WRITE]);
+    CloseFd(method->to_cgi[FD_READ]);
 
-    method->kq->AddEvent(method->toCgi[FD_WRITE], EVFILT_WRITE, method);
-    method->kq->AddEvent(method->fromCgi[FD_READ], EVFILT_READ, method);
+    method->kq->AddEvent(method->to_cgi[FD_WRITE], EVFILT_WRITE, method);
+    method->kq->AddEvent(method->from_cgi[FD_READ], EVFILT_READ, method);
   }
 }
 
@@ -47,7 +47,7 @@ int Method::EventReadToCgi()
   client.SetSocketHitTime();
   char buf[BUFFER_SIZE + 1];
   memset(buf, 0, BUFFER_SIZE + 1);
-  int n = read(fromCgi[FD_READ], buf, BUFFER_SIZE);
+  int n = read(from_cgi[FD_READ], buf, BUFFER_SIZE);
   if (n <= 0)	// n == 0: 클라이언트에서 close & n == -1: 클라이언트 프로세스가 종료됨
     return n;
   buf[n] = '\0';
@@ -63,7 +63,7 @@ int Method::EventWriteToCgi()
   }
 
   int len = cgi_write_data_size - cgi_write_data_idx > BUFFER_SIZE ? BUFFER_SIZE : cgi_write_data_size - cgi_write_data_idx;
-  int n = write(toCgi[FD_WRITE], client.request.body.c_str() + cgi_write_data_idx, len);
+  int n = write(to_cgi[FD_WRITE], client.request.body.c_str() + cgi_write_data_idx, len);
 
   if (n <= 0)
     return n;

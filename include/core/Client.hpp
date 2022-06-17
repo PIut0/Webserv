@@ -46,8 +46,8 @@ class Method : public FdInterface
   int EventWriteToCgi();
   void SetResponseMessageCgi();
 
-  int fromCgi[2];
-  int toCgi[2];
+  int from_cgi[2];
+  int to_cgi[2];
   int target_fd;
 
   std::string read_data;
