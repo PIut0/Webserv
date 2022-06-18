@@ -30,7 +30,10 @@ int ServerBlock::GetLocationBlockByPath(const std::string &path)
   size_t max_length;
 
   max_length = 0;
-  idx = -1;
+  idx = 0;
+  if (path.length() == 0)
+    throw HTTP_STATUS_NOT_FOUND;
+
   line = path[path.length() -1] == '/' ? path.substr(0, path.length() - 1) : path;
   for (size_t i = 0 ; i < this->location.size() ; ++i) {
     if (this->location[i].location_path == path) {
@@ -42,7 +45,6 @@ int ServerBlock::GetLocationBlockByPath(const std::string &path)
       idx = i;
     }
   }
-
   return idx;
 }
 
