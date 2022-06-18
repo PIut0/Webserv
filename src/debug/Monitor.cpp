@@ -1,14 +1,8 @@
 #include "Monitor.hpp"
 
-Monitor::Monitor()
-{
-    this->logfile_.open("./log/log.txt");
-}
+Monitor::Monitor() {}
 
-Monitor::~Monitor()
-{
-  this->logfile_.close();
-}
+Monitor::~Monitor() {}
 
 time_t Monitor::getTimeStamp() {
   struct timeval time_now;
@@ -24,7 +18,7 @@ void Monitor::Log(const std::string &data)
   std::string time = std::to_string(this->getTimeStamp());
   std::string _log = time + " " + "Scope" + " " + data + "\n";
 
-  this->logfile_.write(_log.c_str(), _log.length());
+  std::cout <<_log.c_str() << std::endl;
 }
 
 void Monitor::Print(const std::string &color, const std::string &data)

@@ -2,7 +2,6 @@
 #define MONITOR_HPP
 
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <sys/time.h>
 
@@ -27,10 +26,6 @@ class Monitor
   void Error();
 
   time_t getTimeStamp();
-
- private:
-  std::ofstream logfile_;
-  int           seek_;
 };
 
 #endif
