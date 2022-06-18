@@ -257,12 +257,9 @@ const std::string Client::GetFilePath()
   if (response.status_code != "")
     return path;
 
-  int location_index = server->server_block.GetLocationBlockByPath(request.host);
-
-  if (location_index == -1)
-    throw HTTP_STATUS_NOT_FOUND;
-  path = GetLocationBlock()->root
-    + request.host.substr(request.host.find(GetLocationBlock()->location_path) + GetLocationBlock()->location_path.size());
+  LocationBlock *loc = GetLocationBlock();
+  path = loc->root
+    + request.host.substr(request.host.find(loc->location_path) + loc->location_path.size());
 
   return path;
 }
