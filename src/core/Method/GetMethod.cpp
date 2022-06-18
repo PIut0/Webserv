@@ -26,7 +26,7 @@ void GetMethod(Method* method)
   if (access(path.c_str(), F_OK) != 0)
     throw HTTP_STATUS_NOT_FOUND;
 
-  if (!IsRegularFile(path))
+  if (!IsRegularFile(path) && !IsDir(path))
     path += "/";
 
   if (IsDir(path)) {
