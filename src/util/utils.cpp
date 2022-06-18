@@ -91,7 +91,7 @@ int IsEOF(int fd)
   int cur = lseek(fd, 0, SEEK_CUR);
   int end = lseek(fd, 0, SEEK_END);
   lseek(fd, cur, SEEK_SET);
-  return cur == end;
+  return cur < end;
 }
 
 int IsRegularFile(const std::string &path)
