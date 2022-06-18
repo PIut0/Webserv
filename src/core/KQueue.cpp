@@ -1,6 +1,5 @@
 #include "KQueue.hpp"
 #include "process.hpp"
-#include <errno.h>
 
 KQueue::KQueue()
 {
