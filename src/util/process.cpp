@@ -87,7 +87,6 @@ void PutMethod_Event_Read(Method *putmethod)
   if (putmethod->EventRead() <= 0) {
     putmethod->SetResponseMessage();
     CloseFd(putmethod->interface_fd);
-    //client.kq->DeleteEvent(putmethod->interface_fd, EVFILT_READ, putmethod);
     client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, putmethod);
   }
 }
@@ -107,12 +106,10 @@ void PutMethod_Event_Write(Method *putmethod, int fd)
       }
       client.cur_method.Clear();
     }
-  }
-  else {
+  } else {
     if (putmethod->FileWrite() <= 0) {
       putmethod->SetResponseMessage();
       CloseFd(putmethod->interface_fd);
-      //client.kq->DeleteEvent(putmethod->interface_fd, EVFILT_WRITE, putmethod);
       client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, putmethod);
     }
   }
@@ -125,7 +122,6 @@ void PostMethod_Event_Read(Method *postmethod)
   if (postmethod->EventRead() <= 0) {
     postmethod->SetResponseMessage();
     CloseFd(postmethod->interface_fd);
-    //client.kq->DeleteEvent(postmethod->interface_fd, EVFILT_READ, postmethod);
     client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, postmethod);
   }
 }
@@ -145,12 +141,10 @@ void PostMethod_Event_Write(Method *postmethod, int fd)
       }
       client.cur_method.Clear();
     }
-  }
-  else {
+  } else {
     if (postmethod->FileWrite() <= 0) {
       postmethod->SetResponseMessage();
       CloseFd(postmethod->interface_fd);
-      //client.kq->DeleteEvent(postmethod->interface_fd, EVFILT_WRITE, postmethod);
       client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, postmethod);
     }
   }
@@ -163,7 +157,6 @@ void DeleteMethod_Event_Read(Method *deletemethod)
   if (deletemethod->EventRead() <= 0) {
     deletemethod->SetResponseMessage();
     CloseFd(deletemethod->interface_fd);
-    //client.kq->DeleteEvent(deletemethod->interface_fd, EVFILT_READ, deletemethod);
     client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, deletemethod);
   }
 }
@@ -193,15 +186,12 @@ void Cgi_Event_Read(Method *cgi, int ident)
     {
       cgi->SetResponseMessage();
       CloseFd(cgi->interface_fd);
-      //client.kq->DeleteEvent(cgi->interface_fd, EVFILT_READ, cgi);
       client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, cgi);
     }
-  }
-  else {
-    if (cgi->EventReadToCgi() <= 0) { // 2
+  } else {
+    if (cgi->EventReadToCgi() <= 0) {
       cgi->SetResponseMessageCgi();
       CloseFd(cgi->from_cgi[FD_READ]);
-      //client.kq->DisableEvent(cgi->from_cgi[FD_READ], EVFILT_READ, cgi);
       client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, cgi);
     }
   }
@@ -222,11 +212,9 @@ void Cgi_Event_Write(Method *cgi, int ident)
       }
       client.cur_method.Clear();
     }
-  }
-  else {
-    if (cgi->EventWriteToCgi() <= 0) { // request to cgi process 1
+  } else {
+    if (cgi->EventWriteToCgi() <= 0) {
       CloseFd(cgi->to_cgi[FD_WRITE]);
-      //client.kq->DeleteEvent(cgi->to_cgi[FD_WRITE], EVFILT_WRITE, cgi);
     }
   }
 }
@@ -237,16 +225,9 @@ void Process(FdInterface* &target, struct kevent event)
     && event.filter == EVFILT_READ
     && target->interface_type == kFdClient
     && target->kq->client_map.find(event.ident) != target->kq->client_map.end()) {
-    // CloseFd(event.ident);
     target->kq->delete_list.insert(event.ident);
     return;
   }
-  //if (event.flags & EV_EOF && event.filter == EVFILT_READ) {
-  //  CloseFd(event.ident);
-  //  if (target->interface_type == kFdClient && target->kq->client_map.find(event.ident) != target->kq->client_map.end())
-  //    target->kq->delete_list.insert(event.ident);
-  //  return;
-  //}
   if (event.filter == EVFILT_READ) {
     switch (target->interface_type) {
       case kFdServer:

@@ -44,24 +44,15 @@ int Client::EventRead()
   int n = read(interface_fd, buf, BUFFER_SIZE);
   if (n <= 0) {
     return n;
-  }	// n == 0: 클라이언트에서 close & n == -1: 클라이언트 프로세스가 종료됨
+  }
   buf[n] = '\0';
   request_message += buf;
-  //std::cout << "- Request Row Message -" << std::endl << request_message << std::endl;
 
   return n;
 }
 
 int Client::EventWrite()
 {
-  //std::string res = response.ToString();
-  //int n = write(interface_fd, res.c_str(), res.size());
-  //if (n <= 0)
-  //  return n;
-  //res = res.substr(n);
-  //n = res.size();
-
-  //return n;
   return 1;
 }
 
@@ -77,8 +68,6 @@ LocationBlock *Client::GetLocationBlock()
 
 int Client::CheckCgi()
 {
-  // TODO : CGI 처리를 해야하는지 확인하는 부분
-  // request.host 의 . 뒷부분을 locationblock cgi_info에서 찾아서 있으면 OK
   size_t pos;
   cgiinfo_it_t it;
   LocationBlock *locationBlock;

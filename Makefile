@@ -33,7 +33,7 @@ SRC				=	core/KQueue.cpp \
 
 SRC_DIR 	=	./src
 OBJ_DIR		=	./obj
-TEST_DIR	= ./test
+TEST_DIR	=	./test
 
 SRCS		= $(addprefix $(SRC_DIR)/, $(SRC))
 OBJS		=	$(addprefix $(OBJ_DIR)/, $(patsubst %.cpp,%.o,$(SRC)))

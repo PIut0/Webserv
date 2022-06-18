@@ -61,7 +61,6 @@ void RequestHeader::SetItem(const std::string &line)
   size_t index = line.find(":");
   std::string key = line.substr(0, index);
   std::string value = line.substr(index + 2, line.length() - 1);
-  // std::string trim_value = trim(value);
 
   SetItem(key, value);
 }
@@ -96,7 +95,6 @@ int RequestHeader::SetChunked(const std::string &chunked)
 
   pos = chunked.find(CRLF);
   contents_length = ft_hextoi(chunked.substr(0, pos));
-  //std::cout << "contents_length: " << contents_length << std::endl;
   if (contents_length == 0) return 0;
   this->body += chunked.substr(pos + 2, contents_length);
   return contents_length;
@@ -126,7 +124,7 @@ void  RequestHeader::Parse(const std::string &data)
   ParseBodyLine(data);
   this->state = 1;
 }
-// TODO return 에서 throw ParseError()로 바꾸기
+
 int RequestHeader::ParseRequestLine(const std::string &data)
 {
   size_t  pos, host_start, host_end;
@@ -260,7 +258,7 @@ int RequestHeader::ParseRequestLine(const std::string &data)
                            data[pos + 7] >= '0' && data[pos + 7] <= '9' ) {
           this->http_major = data[pos + 5] - '0';
           this->http_minor = data[pos + 7] - '0';
-          pos += 7; // 하드코딩..
+          pos += 7;
           break;
         }
 

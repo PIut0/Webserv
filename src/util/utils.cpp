@@ -9,7 +9,6 @@ int CheckSocketAlive(clock_t socketStartTime)
   return (((static_cast<double>(now - socketStartTime)) / CLOCKS_PER_SEC) < MAX_SOCKET_LIFE_TIME);
 }
 
-// 인자가 없거나 많거나 체크
 std::string CheckArg(int argc, char **argv)
 {
   if (argc == 1)
@@ -28,7 +27,7 @@ std::vector<std::string> StringSplit(const std::string &data,
   std::vector<std::string> res;
   std::string token;
   u_long pos = start_pos;
-  u_long bpos = start_pos; // block scope 만큼 탭 제외
+  u_long bpos = start_pos;
 
   while ((pos = data.find(delim, pos + 1)) != std::string::npos)
   {
@@ -122,7 +121,7 @@ std::string ToLower(const std::string &origin)
   return ret;
 }
 
-std::string GetDate() // GMT TIME
+std::string GetDate()
 {
   time_t t = time(NULL);
   struct tm *tm = gmtime(&t);

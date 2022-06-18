@@ -48,7 +48,7 @@ int Method::EventReadToCgi()
   char buf[BUFFER_SIZE + 1];
   memset(buf, 0, BUFFER_SIZE + 1);
   int n = read(from_cgi[FD_READ], buf, BUFFER_SIZE);
-  if (n <= 0)	// n == 0: 클라이언트에서 close & n == -1: 클라이언트 프로세스가 종료됨
+  if (n <= 0)
     return n;
   buf[n] = '\0';
   read_data += buf;

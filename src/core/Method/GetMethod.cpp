@@ -68,12 +68,12 @@ void GetMethod(Method* method)
 
   int is_eof = IsEOF(method->interface_fd);
 
-  if (!is_eof) { // empty file
+  if (!is_eof) {
     method->SetResponseMessage();
     method->kq->AddEvent(method->target_fd, EVFILT_WRITE, method);
     return ;
   }
-  else if (is_eof < 0) // read error | file is directory
+  else if (is_eof < 0)
     throw HTTP_STATUS_INTERNAL_SERVER_ERROR;
 
   method->kq->AddEvent(method->interface_fd, EVFILT_READ, method);

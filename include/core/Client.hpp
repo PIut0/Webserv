@@ -1,11 +1,9 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-// #include "KQueue.hpp"
 #include "Method.hpp"
 #include "Server.hpp"
 #include "FdInterface.hpp"
-// #include "utils.hpp"
 #include "RequestHeader.hpp"
 #include "ResponseHeader.hpp"
 

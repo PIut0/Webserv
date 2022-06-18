@@ -40,8 +40,6 @@ Method::Method(Client &client) : FdInterface(client.kq, kFdNone, 0), client(clie
 
 Method::~Method()
 {
-  // request.clear();
-  // response.clear();
   CloseFd(from_cgi[0]);
   CloseFd(from_cgi[1]);
   CloseFd(to_cgi[0]);

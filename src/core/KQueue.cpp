@@ -6,7 +6,6 @@ KQueue::KQueue()
 {
   timeout.tv_sec = 0;
   timeout.tv_nsec = 0;
-  // Create a new kqueue
   if ((kq = kqueue()) == -1)
     ThrowException("kqueue");
 }

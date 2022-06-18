@@ -21,7 +21,6 @@ class System
  public:
   Monitor& GetMonitor();
 
-
   std::__1::chrono::steady_clock::time_point t0, t1;
 
   void printClock(const std::string &origin) {

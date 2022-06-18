@@ -70,9 +70,6 @@ class Header : public System
   Header();
   virtual ~Header();
 
-  void CheckValidateKey(std::string &key);
-  void CheckValidateValue(std::string &value);
-
   virtual void SetItem(const std::string &key, const std::string &value) = 0;
   virtual wsv_header_t& GetItem(const std::string &key) = 0;
 
