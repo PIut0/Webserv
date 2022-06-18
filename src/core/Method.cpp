@@ -58,12 +58,12 @@ void Method::SetMethod(FdInterfaceType type)
   cgi_write_data = WSV_STR_EMPTY;
   target_fd = client.interface_fd;
 
-  location = client.GetLocationBlock();
-  target_path = client.GetFilePath();
-
   try {
     if (ft_stoi(client.response.status_code) >= 400)
       throw ft_stoi(client.response.status_code);
+      
+    location = client.GetLocationBlock();
+    target_path = client.GetFilePath();
     switch (type)
     {
       case kFdGetMethod:
@@ -131,7 +131,6 @@ void Method::Clear()
   client.response.Clear();
 
   location = NULL;
-  target_path = WSV_STR_EMPTY;
 }
 
 int Method::EventRead()

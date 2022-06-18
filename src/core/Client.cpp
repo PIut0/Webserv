@@ -72,8 +72,6 @@ int IsCRLF(const std::string &request_message)
 
 LocationBlock *Client::GetLocationBlock()
 {
-  if (server->server_block.GetLocationBlockByPath(request.host) < 0)
-    return nullptr;
   return &(server->server_block.location[server->server_block.GetLocationBlockByPath(request.host)]);
 }
 
@@ -104,19 +102,16 @@ int Client::CheckRequest()
   //std::cout << request_message << std::endl;
   std::string req = request_message.substr(0, request_message.find(D_CRLF) + 4);
   request_message = request_message.substr(request_message.find(D_CRLF) + 4);
-  try {
-    response.Clear();
-    request.Clear();
-    request.Parse(req);
-  } catch(int status) {
-    return status;
-  }
+
+  response.Clear();
+  request.Clear();
+  request.Parse(req);
 
   if (request.HttpVersionToString() != "HTTP/1.1")
-    return 505;
+    throw 505;
 
   if (!request.method || request.host.size() <= 0 || request.host[0] != '/')
-    return 400;
+    throw 400;
 
   return 0;
 }
@@ -134,111 +129,119 @@ size_t FindSecondCRLF(std::string &request_message)
 
 FdInterfaceType Client::ParseHeader()
 {
-  int status = CheckRequest();
-  LocationBlock *loc = GetLocationBlock();
+  try {
+    int status = CheckRequest();
+    LocationBlock *loc = GetLocationBlock();
 
-  if (status == 0 && loc->ret != "") {
-    status = ft_stoi(loc->ret.substr(0, 3));
+    if (status == 0 && loc->ret != "") {
+      status = ft_stoi(loc->ret.substr(0, 3));
 
-    if (loc->ret.size() > 4) {
-      std::string ret = loc->ret.substr(4);
-      ret = trim(ret);
-      if (ret.size() > 0)
-        response.SetItem("Location", ret);
+      if (loc->ret.size() > 4) {
+        std::string ret = loc->ret.substr(4);
+        ret = trim(ret);
+        if (ret.size() > 0)
+          response.SetItem("Location", ret);
+      }
+    }
+    
+    std::cout << "- Request -" << std::endl << request.ToString() << std::endl;
+
+    if (ft_stoi(request.GetItem("Content-Length").value) > 0 && request.body.size() <= 0) {
+      return kFdNone;
+    } else if(request.GetItem("Transfer-Encoding").value == "chunked") {
+      return kFdNone;
+    }
+
+    if (!(loc->allow_methods & request.method)) {
+      response.SetItem("Status", StatusCode(405));
+      return kFdGetMethod;
+    }
+
+    if(CheckCgi()) {
+      return kFdCgi;
+    } else if(request.host != "" && request.method == HTTP_GET) {
+      return kFdGetMethod;
+    } else if(request.host != "" && request.method == HTTP_PUT) {
+      return kFdPutMethod;
+    } else if(request.host != "" && request.method == HTTP_POST) {
+      return kFdPostMethod;
+    } else if(request.host != "" && request.method == HTTP_DELETE) {
+      return kFdDeleteMethod;
+    } else {
+      return kFdNone;
     }
   }
-
-  if (status) {
+  catch(int status) {
+    break_point();
     response.SetItem("Status", StatusCode(status));
     return kFdGetMethod;
-  }
-
-  std::cout << "- Request -" << std::endl << request.ToString() << std::endl;
-
-  if (ft_stoi(request.GetItem("Content-Length").value) > 0 && request.body.size() <= 0) {
-    return kFdNone;
-  } else if(request.GetItem("Transfer-Encoding").value == "chunked") {
-    return kFdNone;
-  }
-
-  if (!(loc->allow_methods & request.method)) {
-    response.SetItem("Status", StatusCode(405));
-    return kFdGetMethod;
-  }
-
-  if(CheckCgi()) {
-    return kFdCgi;
-  } else if(request.host != "" && request.method == HTTP_GET) {
-    return kFdGetMethod;
-  } else if(request.host != "" && request.method == HTTP_PUT) {
-    return kFdPutMethod;
-  } else if(request.host != "" && request.method == HTTP_POST) {
-    return kFdPostMethod;
-  } else if(request.host != "" && request.method == HTTP_DELETE) {
-    return kFdDeleteMethod;
-  } else {
-    return kFdNone;
   }
 }
 
 FdInterfaceType Client::ParseBody()
 {
-  std::string req;
-  int content_length;
+  try {
+    std::string req;
+    int content_length;
 
-  if (request.GetItem("Transfer-Encoding").value == "chunked") {
-    size_t pos;
-    if ((pos = FindSecondCRLF(request_message)) == std::string::npos)
-      return kFdNone;
-
-    req = request_message.substr(0, pos);
-    request_message = request_message.substr(pos + 2);
-
-    int chunked_status = request.SetChunked(req);
-    if (chunked_status && FindSecondCRLF(request_message) != std::string::npos)
-      return ParseBody();
-    if (chunked_status != 0)
-      return kFdNone;
-  }
-
-  else {
-    if (IsCRLF(request_message)) {
-      req = request_message.substr(0, request_message.find(D_CRLF));
-      request_message = request_message.substr(request_message.find(D_CRLF) + 4);
-    } else {
-      req = request_message;
-      request_message = "";
-    }
-
-    if((content_length = ft_stoi(request.GetItem("Content-Length").value)) > 0) {
-      request.SetBody(request.body + req);
-      if (request.body.length() < static_cast<unsigned long>(content_length))
+    if (request.GetItem("Transfer-Encoding").value == "chunked") {
+      size_t pos;
+      if ((pos = FindSecondCRLF(request_message)) == std::string::npos)
         return kFdNone;
-      request.SetBody(request.body.substr(0, content_length));
+
+      req = request_message.substr(0, pos);
+      request_message = request_message.substr(pos + 2);
+
+      int chunked_status = request.SetChunked(req);
+      if (chunked_status && FindSecondCRLF(request_message) != std::string::npos)
+        return ParseBody();
+      if (chunked_status != 0)
+        return kFdNone;
+    }
+
+    else {
+      if (IsCRLF(request_message)) {
+        req = request_message.substr(0, request_message.find(D_CRLF));
+        request_message = request_message.substr(request_message.find(D_CRLF) + 4);
+      } else {
+        req = request_message;
+        request_message = "";
+      }
+
+      if((content_length = ft_stoi(request.GetItem("Content-Length").value)) > 0) {
+        request.SetBody(request.body + req);
+        if (request.body.length() < static_cast<unsigned long>(content_length))
+          return kFdNone;
+        request.SetBody(request.body.substr(0, content_length));
+      }
+    }
+
+    LocationBlock *loc = GetLocationBlock();
+    size_t max_body_size = loc->request_max_body_size;
+
+    if (request.body.size() > max_body_size)
+      response.SetItem("Status", StatusCode(413));
+
+    if (!(loc->allow_methods & request.method))
+      response.SetItem("Status", StatusCode(405));
+
+    if (CheckCgi()) {
+      return kFdCgi;
+    } else if (request.host != "" && request.method == HTTP_GET) {
+      return kFdGetMethod;
+    } else if (request.host != "" && request.method == HTTP_PUT) {
+      return kFdPutMethod;
+    } else if (request.host != "" && request.method == HTTP_POST) {
+      return kFdPostMethod;
+    } else if (request.host != "" && request.method == HTTP_DELETE) {
+      return kFdDeleteMethod;
+    } else {
+      return kFdNone;
     }
   }
-
-  LocationBlock *loc = GetLocationBlock();
-  size_t max_body_size = loc->request_max_body_size;
-
-  if (request.body.size() > max_body_size)
-    response.SetItem("Status", StatusCode(413));
-
-  if (!(loc->allow_methods & request.method))
-    response.SetItem("Status", StatusCode(405));
-
-  if (CheckCgi()) {
-    return kFdCgi;
-  } else if (request.host != "" && request.method == HTTP_GET) {
+  catch (int status) {
+    response.SetItem("Status", StatusCode(status));
     return kFdGetMethod;
-  } else if (request.host != "" && request.method == HTTP_PUT) {
-    return kFdPutMethod;
-  } else if (request.host != "" && request.method == HTTP_POST) {
-    return kFdPostMethod;
-  } else if (request.host != "" && request.method == HTTP_DELETE) {
-    return kFdDeleteMethod;
-  } else {
-    return kFdNone;
   }
 }
 

@@ -4,6 +4,7 @@
 int CheckSocketAlive(clock_t socketStartTime)
 {
   clock_t now = clock();
+  std::cout << "cur: " << (static_cast<double>(now - socketStartTime)) / CLOCKS_PER_SEC << std::endl;
 
   return (((static_cast<double>(now - socketStartTime)) / CLOCKS_PER_SEC) < MAX_SOCKET_LIFE_TIME);
 }
@@ -134,6 +135,8 @@ std::string StatusCode(const int &code)
 {
   switch (code)
   {
+    case 0:
+      return "";
     case 200:
       return "200 OK";
     case 201:
