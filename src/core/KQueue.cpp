@@ -12,7 +12,6 @@ KQueue::KQueue()
 
 KQueue &KQueue::operator=(const KQueue &)
 {
-  //kq = other.kq;
   return (*this);
 }
 

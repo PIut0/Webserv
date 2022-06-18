@@ -88,7 +88,6 @@ int Client::CheckCgi()
 
 int Client::CheckRequest()
 {
-  //std::cout << request_message << std::endl;
   std::string req = request_message.substr(0, request_message.find(D_CRLF) + 4);
   request_message = request_message.substr(request_message.find(D_CRLF) + 4);
 
@@ -236,7 +235,6 @@ FdInterfaceType Client::ParseBody()
 
 FdInterfaceType Client::ParseReq()
 {
-  //std::cout << "ParseReq: " << request_message << std::endl;
   FdInterfaceType type;
 
   if (!request.state) {
@@ -262,7 +260,7 @@ const std::string Client::GetFilePath()
   int location_index = server->server_block.GetLocationBlockByPath(request.host);
 
   if (location_index == -1)
-    throw HTTP_STATUS_NOT_FOUND; // TODO : Catch 추가
+    throw HTTP_STATUS_NOT_FOUND;
   path = GetLocationBlock()->root
     + request.host.substr(request.host.find(GetLocationBlock()->location_path) + GetLocationBlock()->location_path.size());
 

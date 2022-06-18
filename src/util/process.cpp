@@ -59,7 +59,6 @@ void GetMethod_Event_Read(Method *getmethod)
   if (getmethod->EventRead() <= 0) {
     getmethod->SetResponseMessage();
     CloseFd(getmethod->interface_fd);
-    //client.kq->DeleteEvent(getmethod->interface_fd, EVFILT_READ, getmethod);
     client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, getmethod);
   }
 }
