@@ -121,6 +121,8 @@ FdInterfaceType Client::ParseHeader()
     int status = CheckRequest();
     LocationBlock *loc = GetLocationBlock();
 
+    std::cout << "- Request -" << std::endl << request.ToString() << std::endl;
+
     if (status == 0 && loc->ret != "") {
       status = ft_stoi(loc->ret.substr(0, 3));
 
@@ -130,9 +132,8 @@ FdInterfaceType Client::ParseHeader()
         if (ret.size() > 0)
           response.SetItem("Location", ret);
       }
+      throw status;
     }
-    
-    std::cout << "- Request -" << std::endl << request.ToString() << std::endl;
 
     if (ft_stoi(request.GetItem("Content-Length").value) > 0 && request.body.size() <= 0) {
       return kFdNone;
@@ -160,7 +161,6 @@ FdInterfaceType Client::ParseHeader()
     }
   }
   catch(int status) {
-    break_point();
     response.SetItem("Status", StatusCode(status));
     return kFdGetMethod;
   }
@@ -257,12 +257,9 @@ const std::string Client::GetFilePath()
   if (response.status_code != "")
     return path;
 
-  int location_index = server->server_block.GetLocationBlockByPath(request.host);
-
-  if (location_index == -1)
-    throw HTTP_STATUS_NOT_FOUND;
-  path = GetLocationBlock()->root
-    + request.host.substr(request.host.find(GetLocationBlock()->location_path) + GetLocationBlock()->location_path.size());
+  LocationBlock *loc = GetLocationBlock();
+  path = loc->root
+    + request.host.substr(request.host.find(loc->location_path) + loc->location_path.size());
 
   return path;
 }

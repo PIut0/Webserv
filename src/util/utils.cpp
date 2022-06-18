@@ -89,11 +89,10 @@ int ft_hextoi(const std::string &s)
 
 int IsEOF(int fd)
 {
-  char buf[1];
-  int n = read(fd, buf, sizeof(buf));
-  if (n > 0)
-    lseek(fd, -1, SEEK_CUR);
-  return n;
+  int cur = lseek(fd, 0, SEEK_CUR);
+  int end = lseek(fd, 0, SEEK_END);
+  lseek(fd, cur, SEEK_SET);
+  return cur < end;
 }
 
 int IsRegularFile(const std::string &path)
