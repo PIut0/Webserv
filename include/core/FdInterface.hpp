@@ -5,9 +5,9 @@
 #include "System.hpp"
 #include "utils.hpp"
 
-class KQueue;
+#define BUFFER_SIZE 65535
 
-#define BUFFER_SIZE 65536
+class KQueue;
 
 enum FdInterfaceType {
   kFdServer,
@@ -23,14 +23,14 @@ enum FdInterfaceType {
 class FdInterface : public System
 {
  public:
-  FdInterface(KQueue &kq, FdInterfaceType type) : kq(kq), interface_type(type) {};
-  FdInterface(KQueue &kq, FdInterfaceType type, int fd) : kq(kq), interface_type(type), interface_fd(fd) {};
+  FdInterface(KQueue *kq, FdInterfaceType type) : kq(kq), interface_type(type) {};
+  FdInterface(KQueue *kq, FdInterfaceType type, int fd) : kq(kq), interface_type(type), interface_fd(fd) {};
   virtual ~FdInterface() {};
 
   virtual int EventRead() = 0;
   virtual int EventWrite() = 0;
 
-  KQueue          &kq;
+  KQueue          *kq;
   FdInterfaceType interface_type;
   clock_t         socketHitTime;
   int             interface_fd;

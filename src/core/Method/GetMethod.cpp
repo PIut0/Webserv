@@ -1,5 +1,4 @@
-#include "GetMethod.hpp"
-#include "utils.hpp"
+#include "Method.hpp"
 
 std::vector<std::string> GetFileList(const std::string &path)
 {
@@ -8,10 +7,9 @@ std::vector<std::string> GetFileList(const std::string &path)
   struct dirent *ent;
 
   if ((dir = opendir(path.c_str())) == NULL)
-    throw NotFoundError();
+    throw HTTP_STATUS_NOT_FOUND;
 
-  while ((ent = readdir(dir)) != NULL)
-  {
+  while ((ent = readdir(dir)) != NULL) {
     std::string name(ent->d_name);
     if (ent->d_type == DT_DIR)
       name += '/';
@@ -21,85 +19,62 @@ std::vector<std::string> GetFileList(const std::string &path)
   return res;
 }
 
-GetMethod::GetMethod(KQueue &kq, const std::string &path, Client* &client) : Method(kq, client, kFdGetMethod)
+void GetMethod(Method* method)
 {
-  if (ft_stoi(response->status_code) >= 400) {
-    ResponseErrorPage();
-    return ;
-  }
+  std::string path = method->target_path;
 
-  target_path = path;
-  try {
-    if (access(target_path.c_str(), F_OK) != 0)
-      throw NotFoundError();
+  if (access(path.c_str(), F_OK) != 0)
+    throw HTTP_STATUS_NOT_FOUND;
 
-    if (!IsRegularFile(target_path))
-      target_path += "/";
+  if (!IsRegularFile(path))
+    path += "/";
 
-    if (IsDir(target_path)) {
-      file_list = GetFileList(target_path);
+  if (IsDir(path)) {
+    std::vector<std::string> file_list = GetFileList(path);
 
-      for(size_t i=0; i<location->index.size(); i++) {
-        for (size_t j=0; j<file_list.size(); j++) {
-          if (file_list[j] == location->index[i]) {
-            target_path += file_list[j];
-            break;
-          }
-        }
-        if (!IsDir(target_path))
+    for(size_t i=0; i<method->location->index.size(); i++) {
+      for (size_t j=0; j<file_list.size(); j++) {
+        if (file_list[j] == method->location->index[i]) {
+          path += file_list[j];
           break;
-      }
-
-      if (IsDir(target_path)) {
-        if (location->auto_index) {
-          data = GetAutoindexPage(target_path, file_list);
-          response->SetItem("Content-Type", "text/html");
-          SetResponseMessage();
-          kq.AddEvent(target_fd, EVFILT_WRITE, this);
-          return ;
         }
-        else
-          throw NotFoundError();
       }
+      if (!IsDir(path))
+        break;
     }
 
-    if (access(target_path.c_str(), R_OK) != 0)
-      throw ForbiddenError();
-
-    request->SetHost(target_path);
-    interface_fd = open(request->host.c_str(), O_RDONLY);
-
-    if (interface_fd < 0)
-      throw InternalServerError();
-
-    int is_eof = IsEOF(interface_fd);
-
-    if (is_eof == 0) { // empty file
-      SetResponseMessage();
-      kq.AddEvent(target_fd, EVFILT_WRITE, this);
-      return ;
+    if (IsDir(path)) {
+      if (method->location->auto_index) {
+        method->read_data = GetAutoindexPage(path, file_list);
+        method->client.response.SetItem("Content-Type", "text/html");
+        method->SetResponseMessage();
+        method->kq->AddEvent(method->target_fd, EVFILT_WRITE, method);
+        return ;
+      }
+      throw HTTP_STATUS_NOT_FOUND;
     }
-
-    else if (is_eof < 0) // read error | file is directory
-      throw InternalServerError();
-
-  } catch (NotFoundError &e) {
-    SetResponseStatus(response, 404);
-  } catch (ForbiddenError &e) {
-    SetResponseStatus(response, 403);
-  } catch (InternalServerError &e) {
-    SetResponseStatus(response, 500);
   }
 
-  if (ft_stoi(response->status_code) >= 400) {
-    ResponseErrorPage();
+  if (access(path.c_str(), R_OK) != 0)
+    throw HTTP_STATUS_FORBIDDEN;
+
+  method->client.request.SetHost(path);
+  method->interface_fd = open(path.c_str(), O_RDONLY);
+
+  if (method->interface_fd == -1)
+    throw HTTP_STATUS_INTERNAL_SERVER_ERROR;
+
+  fcntl(method->interface_fd, F_SETFL, O_NONBLOCK);
+
+  int is_eof = IsEOF(method->interface_fd);
+
+  if (!is_eof) {
+    method->SetResponseMessage();
+    method->kq->AddEvent(method->target_fd, EVFILT_WRITE, method);
     return ;
   }
+  else if (is_eof < 0)
+    throw HTTP_STATUS_INTERNAL_SERVER_ERROR;
 
-  fcntl(interface_fd, F_SETFL, O_NONBLOCK);
-  kq.AddEvent(interface_fd, EVFILT_READ, this);
-}
-
-GetMethod::~GetMethod()
-{
+  method->kq->AddEvent(method->interface_fd, EVFILT_READ, method);
 }

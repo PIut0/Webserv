@@ -5,10 +5,9 @@ int CheckSocketAlive(clock_t socketStartTime)
 {
   clock_t now = clock();
 
-  return (((double)(now - socketStartTime)) < MAX_SOCKET_LIFE_TIME);
+  return (((static_cast<double>(now - socketStartTime)) / CLOCKS_PER_SEC) < MAX_SOCKET_LIFE_TIME);
 }
 
-// 인자가 없거나 많거나 체크
 std::string CheckArg(int argc, char **argv)
 {
   if (argc == 1)
@@ -16,7 +15,7 @@ std::string CheckArg(int argc, char **argv)
     return DEFAULT_CONFIG_PATH;
   }
   if (argc != 2)
-    ExitWithMsg("Usage: ./server [config_file]");
+    ThrowException("Usage: ./server [config_file]");
   return argv[1];
 }
 
@@ -27,7 +26,7 @@ std::vector<std::string> StringSplit(const std::string &data,
   std::vector<std::string> res;
   std::string token;
   u_long pos = start_pos;
-  u_long bpos = start_pos; // block scope 만큼 탭 제외
+  u_long bpos = start_pos;
 
   while ((pos = data.find(delim, pos + 1)) != std::string::npos)
   {
@@ -39,10 +38,9 @@ std::vector<std::string> StringSplit(const std::string &data,
   return res;
 }
 
-void ExitWithMsg(const std::string &msg)
+void ThrowException(const std::string &msg)
 {
-  std::cerr << msg << std::endl;
-  exit(1);
+  throw std::runtime_error(msg);
 }
 
 std::string& ltrim(std::string& s)
@@ -52,6 +50,7 @@ std::string& ltrim(std::string& s)
 	s.erase(0, s.find_first_not_of(t));
 	return s;
 }
+
 std::string& rtrim(std::string& s)
 {
   const char* t = " \t\n\r\f\v";
@@ -59,6 +58,7 @@ std::string& rtrim(std::string& s)
 	s.erase(s.find_last_not_of(t) + 1);
 	return s;
 }
+
 std::string& trim(std::string& s)
 {
 	return ltrim(rtrim(s));
@@ -120,7 +120,7 @@ std::string ToLower(const std::string &origin)
   return ret;
 }
 
-std::string GetDate() // GMT TIME
+std::string GetDate()
 {
   time_t t = time(NULL);
   struct tm *tm = gmtime(&t);
@@ -133,6 +133,8 @@ std::string StatusCode(const int &code)
 {
   switch (code)
   {
+    case 0:
+      return "";
     case 200:
       return "200 OK";
     case 201:

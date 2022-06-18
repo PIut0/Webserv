@@ -13,14 +13,13 @@ MAIN			= main.cpp
 
 SRC				=	core/KQueue.cpp \
 						core/Server.cpp \
-						core/Cgi.cpp \
 						core/Client.cpp \
-						core/FdInterface.cpp \
-						core/Method/Method.cpp \
+						core/Method.cpp \
 						core/Method/GetMethod.cpp \
 						core/Method/PutMethod.cpp \
 						core/Method/PostMethod.cpp \
 						core/Method/DeleteMethod.cpp \
+						core/Method/Cgi.cpp \
 						util/utils.cpp \
 						util/mimes.cpp \
 						util/process.cpp \
@@ -36,7 +35,7 @@ SRC				=	core/KQueue.cpp \
 
 SRC_DIR 	=	./src
 OBJ_DIR		=	./obj
-TEST_DIR	= ./test
+TEST_DIR	=	./test
 
 SRCS		= $(addprefix $(SRC_DIR)/, $(SRC))
 OBJS		=	$(addprefix $(OBJ_DIR)/, $(patsubst %.cpp,%.o,$(SRC)))

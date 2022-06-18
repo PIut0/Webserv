@@ -7,21 +7,20 @@
 
 int main(int argc, char** argv) {
   ServerManager serverManager(CheckArg(argc, argv));
-  std::vector<Server *> servers;
-  KQueue kq;
-  for(size_t i = 0 ; i < serverManager.serverBlock.size() ; i++)
-    servers.push_back(new Server(kq, serverManager.serverBlock[i]));
+  signal(SIGPIPE, SIG_IGN);
   SetMime();
 
   while (1) {
-    kq.Refresh();
-    std::set<int> deleted_fd;
-    for (int i = 0; i < kq.event_count; i++) {
-      FdInterface *target = static_cast<FdInterface *>(kq.events[i].udata);
-      Process(target, kq.events[i], deleted_fd);
+    try {
+      KQueue kq;
+      for(size_t i = 0 ; i < serverManager.serverBlock.size() ; i++)
+        kq.servers.insert(new Server(&kq, serverManager.serverBlock[i]));
+      kq.loof();
+    } catch (const std::exception &e) {
+      std::cerr << "Webserv: Restarting...: " << e.what() << std::endl;
+    } catch (...) {
+      std::cerr << "Webserv: Restarting..." << std::endl;
     }
-    kq.DeleteTimeoutList();
-    kq.DeleteList();
   }
   return (0);
 }

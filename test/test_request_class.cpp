@@ -11,8 +11,7 @@ int main()
     requestHeader.Parse(dummy);
     if (dummy.length() == requestHeader.ToString().length()) {
       std::cout << "TRUE" << std::endl;
-    }
-    else {
+    } else {
       std::cout << "Dummy length : " << dummy.length() << std::endl;
       std::cout << "Parser length : " << requestHeader.ToString().length() << std::endl;
       exit(1);

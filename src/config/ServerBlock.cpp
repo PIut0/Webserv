@@ -18,6 +18,7 @@ ServerBlock& ServerBlock::operator=(const ServerBlock& rv)
   this->server_name = rv.server_name;
   this->host = rv.host;
   this->port = rv.port;
+
   return *this;
 }
 
@@ -29,7 +30,10 @@ int ServerBlock::GetLocationBlockByPath(const std::string &path)
   size_t max_length;
 
   max_length = 0;
-  idx = -1;
+  idx = 0;
+  if (path.length() == 0)
+    throw HTTP_STATUS_NOT_FOUND;
+
   line = path[path.length() -1] == '/' ? path.substr(0, path.length() - 1) : path;
   for (size_t i = 0 ; i < this->location.size() ; ++i) {
     if (this->location[i].location_path == path) {
@@ -50,7 +54,7 @@ void ServerBlock::ParseListen(const std::string &contents)
   char *ptr;
   this->port = strtod(split_data[0].c_str(), &ptr);
   if (this->port <= 0 || ptr[0])
-    ExitWithMsg("listen Error");
+    ThrowException("listen Error");
   this->host = split_data[1];
 }
 void ServerBlock::ParseServerName(const std::string &contents)
@@ -60,13 +64,18 @@ void ServerBlock::ParseServerName(const std::string &contents)
 
 ServerBlock::ServerAttribute ServerBlock::CheckValidate(const std::string &command)
 {
-  if (command == "server_name")
+  if (command == "server_name") {
     return kServerName;
-  else if (command == "listen")
+  }
+  else if (command == "listen") {
     return kListen;
-  else if (command == "location")
+  }
+  else if (command == "location") {
     return kLocation;
-  return kError;
+  }
+  else {
+    return kError;
+  }
 }
 
 void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
@@ -84,7 +93,7 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
     {
       case S_SERVER:
         if (data[i][0] != '\t')
-          ExitWithMsg("Server Block Error");
+          ThrowException("Server Block Error");
 
         index = data[i].find(' ');
 
@@ -109,12 +118,11 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
             break;
 
           case kError:
-            ExitWithMsg("error in serverblock");
+            ThrowException("error in serverblock");
 
           default:
             break;
         }
-
         break;
 
       case S_LOCATION:
@@ -126,7 +134,6 @@ void ServerBlock::InitServerBlock(const std::vector<std::string> &data)
         }
 
         element.push_back(data[i]);
-
         break;
 
       default:

@@ -5,7 +5,7 @@ LocationBlock::LocationBlock(std::string &location_path, std::vector<std::string
 {
   this->location_path = location_path;
   this->allow_methods = HTTP_GET | HTTP_POST | HTTP_PUT | HTTP_DELETE;
-  this->root = "./"; // 기본값은 현재 디렉토리
+  this->root = "./";
   this->index.push_back("index.html");
   this->auto_index = OFF;
   this->request_max_body_size = DEFAULT_REQUEST_MAX_BODY_SIZE;
@@ -33,7 +33,7 @@ LocationBlock& LocationBlock::operator=(const LocationBlock& rv)
   this->error_page = rv.error_page;
   this->request_max_body_size = rv.request_max_body_size;
   this->ret = rv.ret;
-  
+
   return *this;
 }
 
@@ -42,7 +42,7 @@ void LocationBlock::ParseRoot(const std::string &data)
 {
   this->root = data;
   if (IsRegularFile(data) < 0) {
-    ExitWithMsg("Root Path Error");
+    ThrowException("Root Path Error");
   }
 }
 
@@ -51,23 +51,23 @@ void LocationBlock::ParseAllowMethod(const std::string &data)
   this->allow_methods = 0;
   std::vector<std::string> split_data = StringSplit(data, " ", 0);
   for (size_t i = 0 ; i < split_data.size() ; i++) {
-    if (split_data[i] == "POST")
+    if (split_data[i] == "POST") {
       this->allow_methods |= HTTP_POST;
-    else if (split_data[i] == "PUT")
+    } else if (split_data[i] == "PUT") {
       this->allow_methods |= HTTP_PUT;
-    else if (split_data[i] == "GET")
+    } else if (split_data[i] == "GET") {
       this->allow_methods |= HTTP_GET;
-    else if (split_data[i] == "DELETE")
+    } else if (split_data[i] == "DELETE") {
       this->allow_methods |= HTTP_DELETE;
-    else
-      ExitWithMsg("Method input Error");
+    } else {
+      ThrowException("Method input Error");
+    }
   }
 }
 
 void LocationBlock::ParseIndex(const std::string &data)
 {
-   // "index index.html index.htm"
-  this->index.erase(this->index.begin()); // TODO 나중에 index 제거 로직으로 바꾸기
+  this->index.erase(this->index.begin());
   std::vector<std::string> split_data = StringSplit(data, " ", 0);
   for (size_t i = 0 ; i < split_data.size() ; i++) {
     this->index.push_back(split_data[i]);
@@ -76,12 +76,13 @@ void LocationBlock::ParseIndex(const std::string &data)
 
 void LocationBlock::ParseAutoIndex(const std::string &data)
 {
-  if (data == "on")
+  if (data == "on") {
     this->auto_index = ON;
-  else if (data == "off")
+  } else if (data == "off") {
     this->auto_index = OFF;
-  else
-    ExitWithMsg("auto_index Value Error");
+  } else {
+    ThrowException("auto_index Value Error");
+  }
 }
 
 void LocationBlock::ParseCgiInfo(const std::string &data)
@@ -89,7 +90,7 @@ void LocationBlock::ParseCgiInfo(const std::string &data)
   std::vector<std::string> split_data = StringSplit(data, " ", 0);
   this->cgi_info[split_data[0]] = split_data[1];
   if (IsRegularFile(split_data[1]) != 1)
-    ExitWithMsg("cgi_info Error");
+    ThrowException("cgi_info Error");
 }
 
 void LocationBlock::ParseRequestBodySize(const std::string &data)
@@ -97,14 +98,14 @@ void LocationBlock::ParseRequestBodySize(const std::string &data)
   char *ptr;
   int size = strtod(data.c_str(), &ptr);
   if (size <= 0 || ptr[0])
-    ExitWithMsg("request_max_body_size Error");
+    ThrowException("request_max_body_size Error");
   this->request_max_body_size = size;
 }
 
 void LocationBlock::ParseErrorPage(const std::string &data)
 {
   if (access(data.c_str(), F_OK) != 0)
-    ExitWithMsg("error_page Error");
+    ThrowException("error_page Error");
   this->error_page = data;
 }
 
@@ -115,23 +116,25 @@ void LocationBlock::ParseReturn(const std::string &data)
 
 LocationBlock::LocationAttribute LocationBlock::CheckValidate(const std::string &command)
 {
-  if (command == "root")
+  if (command == "root") {
     return kRoot;
-  else if (command == "allow_methods")
+  } else if (command == "allow_methods") {
     return kAllowMethods;
-  else if (command == "index")
+  } else if (command == "index") {
     return kIndex;
-  else if (command == "auto_index")
+  } else if (command == "auto_index") {
     return kAutoIndex;
-  else if (command == "cgi_info")
+  } else if (command == "cgi_info") {
     return kCgiInfo;
-  else if (command == "error_page")
+  } else if (command == "error_page") {
     return kErrorPage;
-  else if (command == "return")
+  } else if (command == "return") {
     return kRet;
-  else if (command == "request_max_body_size")
+  } else if (command == "request_max_body_size") {
     return kRequestMaxBodySize;
-  return kError;
+  } else {
+    return kError;
+  }
 }
 
 void LocationBlock::InitLocationBlock(std::vector<std::string> &data)
@@ -142,7 +145,7 @@ void LocationBlock::InitLocationBlock(std::vector<std::string> &data)
 
   for (size_t i = 0 ; i < data.size() ; i++) {
     if (!(data[i][0] == '\t' && data[i][1] == '\t'))
-      ExitWithMsg("Location Block Error");
+      ThrowException("Location Block Error");
 
     index = data[i].find(' ');
 
@@ -151,8 +154,7 @@ void LocationBlock::InitLocationBlock(std::vector<std::string> &data)
 
     type = CheckValidate(command);
 
-    switch (type)
-    {
+    switch (type) {
       case kRoot:
         ParseRoot(contents);
         break;
@@ -186,7 +188,7 @@ void LocationBlock::InitLocationBlock(std::vector<std::string> &data)
         break;
 
       case kError:
-        ExitWithMsg("error");
+        ThrowException("error");
         break;
 
       default:

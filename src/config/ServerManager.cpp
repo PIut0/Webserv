@@ -28,7 +28,8 @@ std::string ServerManager::CheckLine(const std::string &line)
     return str;
   ch = str[str.length() - 1];
   if (ch != ';' && ch != '}' && ch != '{' )
-    ExitWithMsg("config Syntax error");
+    ThrowException("config Syntax error");
+
   return str;
 }
 
@@ -41,10 +42,9 @@ void ServerManager::InitServer(const std::string &path)
 
   config_file.open(path);
   if (!config_file.is_open())
-    ExitWithMsg("file open error");
+    ThrowException("file open error");
 
-  while (std::getline(config_file, line))
-  {
+  while (std::getline(config_file, line)) {
     line = CheckLine(line);
 
     switch (state)
@@ -53,7 +53,6 @@ void ServerManager::InitServer(const std::string &path)
         if (line == SERVER_BLOCK_OPEN) {
           state <<= 1;
         }
-
         break;
 
       case S_SERVER:
@@ -67,7 +66,6 @@ void ServerManager::InitServer(const std::string &path)
         if (line.length() > 0) {
           serverBlock.push_back(line);
         }
-
         break;
 
       default:

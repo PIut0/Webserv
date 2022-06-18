@@ -11,24 +11,17 @@
 #include <fcntl.h>
 
 #include "FdInterface.hpp"
-#include "Client.hpp"
-#include "utils.hpp"
+#include "KQueue.hpp"
 #include "ServerBlock.hpp"
 
-#define PORT 8080
-
-class Client;
 class KQueue;
-class ServerBlock;
 
 class Server : public FdInterface
 {
- private:
-  Server();
-  Server(const Server &);
-  Server &operator=(const Server &);
  public:
-  Server(KQueue &kq, ServerBlock &_sb);
+  Server &operator=(const Server &rv);
+  Server(const Server &origin);
+  Server(KQueue *kq, ServerBlock &sb);
   ~Server();
 
   int EventRead();
@@ -36,6 +29,9 @@ class Server : public FdInterface
 
   struct sockaddr_in  server_addr;
   ServerBlock         &server_block;
+
+ private:
+  Server();
 };
 
 #endif

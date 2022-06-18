@@ -14,12 +14,6 @@
 #include "HttpParseInvalidResponse.hpp"
 #include "HttpParseInvalidVersion.hpp"
 
-#include "NotFoundError.hpp"
-#include "ForbiddenError.hpp"
-#include "NotAllowedError.hpp"
-#include "NotImplementedError.hpp"
-#include "InternalServerError.hpp"
-
 #include "FdDupFailed.hpp"
 
 class Monitor

@@ -2,9 +2,11 @@
 
 ResponseHeader::ResponseHeader()
 {
+  this->SetItem("_", "");
+  this->status_code = WSV_STR_EMPTY;
+  this->status_msg  = WSV_STR_EMPTY;
+  this->state = 0;
   this->pos_ = 0;
-  this->status_code = "";
-  this->status_msg  = "";
 }
 
 ResponseHeader::ResponseHeader(const ResponseHeader &origin)
@@ -40,7 +42,6 @@ void ResponseHeader::SetItem(const std::string &line)
   size_t index = line.find(":");
   std::string key = line.substr(0, index);
   std::string value = line.substr(index + 2, line.length() - 1);
-  // std::string trim_value = trim(value);
 
   SetItem(key, value);
 }
@@ -51,6 +52,11 @@ void ResponseHeader::SetItem(const std::string &key, const std::string &value)
     this->status_code = value.substr(0, 3);
     this->status_msg = value.substr(4);
     return ;
+  }
+  res_header_it_t it = FindItem(key);
+  if (it != this->conf.end()) {
+    delete *it;
+    this->conf.erase(it);
   }
 
   wsv_header_t *el = new wsv_header_t();
@@ -71,7 +77,14 @@ res_header_it_t ResponseHeader::FindItem(const std::string &key)
 
 wsv_header_t& ResponseHeader::GetItem(const std::string &key)
 {
-  return *(*FindItem(key));
+  res_header_it_t it = FindItem(key);
+  if (it == this->conf.end()) {
+    if (FindItem("_") == this->conf.end()) {
+      this->SetItem("_", "");
+    }
+    return *(*FindItem("_"));
+  }
+  return *(*it);
 }
 
 void ResponseHeader::Parse(const std::string &data)
@@ -89,14 +102,14 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
 
   enum {
     wsv_start = 0,
-    wsv_header_key, // : 나오기 전까지
-    wsv_header_value_before, // 문자열 나오기 전까지
-    wsv_header_value, // CR나오기 전까지
-    wsv_invalid_key, // CR 나오기 전까지
+    wsv_header_key,
+    wsv_header_value_before,
+    wsv_header_value,
+    wsv_invalid_key,
     wsv_invalid_key_newline,
     wsv_valide_key_newline,
     wsv_almost_done,
-    wsv_done // LF 나오면 끝
+    wsv_done
   } state;
 
   state = wsv_start;
@@ -104,8 +117,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
   for (pos = this->pos_ ; (data)[pos] ; ++pos) {
     ch = (data)[pos];
 
-    switch (state)
-    {
+    switch (state) {
       case wsv_start:
         if ((ch < 'A' || ch > 'Z') && ch != '_' && ch != '-') {
           state = wsv_invalid_key;
@@ -114,7 +126,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
         if (ch == ' ') {
           break;
         }
-        // TODO 대문자 시작 체크 해야하나 ??
+
         if (isalpha(ch)) {
           key_start = pos;
           state = wsv_header_key;
@@ -122,11 +134,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
         break;
 
       case wsv_header_key:
-      // :나오면 wsv_header_value_before로
-      // CR나오면 wsv_invalid_key_newline으로
-      // 아니면 break;
-        switch (ch)
-        {
+        switch (ch) {
           case ':':
             key_end = pos - 1;
             state = wsv_header_value_before;
@@ -139,20 +147,16 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       case wsv_header_value_before:
-      // 문자열 나오면 ptr저장 wsv_header_value로
-      // 공백 나오면 break;
         if (ch != ' ' && isprint(ch)) {
           state = wsv_header_value;
           value_start = pos;
           break;
         }
 
-        switch (ch)
-        {
+        switch (ch) {
           case ' ':
             break;
 
@@ -163,14 +167,10 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       case wsv_header_value:
-      // CR 나오면 wsv_newline으로
-      // 아니면 break;
-        switch (ch)
-        {
+        switch (ch) {
           case CR:
             value_end = pos - 1;
             state = wsv_valide_key_newline;
@@ -183,10 +183,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
         break;
 
       case wsv_invalid_key:
-      // CR 나오면 wsv_invalid_key_newline으로
-      // 아니면 break;
-        switch (ch)
-        {
+        switch (ch) {
           case CR:
             state = wsv_invalid_key_newline;
             break;
@@ -196,10 +193,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
         }
         break;
       case wsv_invalid_key_newline:
-      // LF 나오면 wsv_almost_done으로
-      // 아니면 error
-        switch (ch)
-        {
+        switch (ch) {
         case LF:
           state = wsv_almost_done;
           break;
@@ -207,14 +201,10 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
         default:
           break;
         }
-
         break;
 
       case wsv_valide_key_newline:
-      // LF 나오면 wsv_almost_done으로
-      // 아니면 error
-        switch (ch)
-        {
+        switch (ch) {
           case LF:
             state = wsv_almost_done;
             key = (data).substr(key_start, key_end - key_start + 1);
@@ -225,14 +215,10 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       case wsv_almost_done:
-      // CR 나오면 almost_done
-      // 아니면 wsv_start로
-        switch (ch)
-        {
+        switch (ch) {
           case CR:
             state = wsv_done;
             break;
@@ -242,14 +228,10 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
             state = wsv_header_key;
             break;
         }
-
         break;
 
       case wsv_done:
-      // LF 나오면 끝
-      // 아니면 에러
-        switch (ch)
-        {
+        switch (ch) {
           case LF:
             this->pos_ = pos + 1;
             return WSV_OK;
@@ -257,7 +239,6 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
           default:
             break;
         }
-
         break;
 
       default:
@@ -270,7 +251,7 @@ int ResponseHeader::ParseHeaderLine(const std::string &data)
 int ResponseHeader::ParseBody(const std::string &data)
 {
   if (this->pos_ == data.length()) {
-    this->body = "";
+    this->body = WSV_STR_EMPTY;
   } else {
     this->body = data.substr(this->pos_, data.length() - this->pos_);
   }
@@ -279,7 +260,7 @@ int ResponseHeader::ParseBody(const std::string &data)
 
 std::string ResponseHeader::ToString()
 {
-  std::string ret = "";
+  std::string ret = WSV_STR_EMPTY;
 
   ret += "HTTP/1.1 " + this->status_code + " " + this->status_msg + CRLF;
   for (size_t i = 0 ; i < conf.size() ; ++i) {
@@ -311,4 +292,18 @@ void ResponseHeader::PrintBody()
 {
   std::cout << COLOR_BLUE << "[ BODY LINE ]" << COLOR_DEFAULT << std::endl;
   std::cout << body << std::endl;
+}
+
+void ResponseHeader::Clear()
+{
+  this->status_code = WSV_STR_EMPTY;
+  this->status_msg = WSV_STR_EMPTY;
+  this->body = WSV_STR_EMPTY;
+  this->state = 0;
+  this->pos_ = 0;
+  for (res_header_it_t it = this->conf.begin(); it != this->conf.end(); ++it) {
+    delete *it;
+  }
+  this->conf.clear();
+  this->SetItem("_", "");
 }

@@ -13,307 +13,285 @@ void Server_Event_Write(Server *server)
 void Client_Event_Read(Client *client)
 {
   if (client->EventRead() <= 0) {
-    // TODO : delete 부분과 밀접한 연관이 있음
-    client->kq.delete_list.insert(client);
+    client->kq->delete_list.insert(client->interface_fd);
     return;
   }
 
   FdInterfaceType type = client->ParseReq();
   if (type == kFdNone)
-    return ;
-  switch(type)
-  {
+    return;
+  switch(type) {
     case kFdGetMethod:
-      client->method_list.insert(new GetMethod(client->kq, client->GetFilePath(), client));
+      client->cur_method.SetMethod(kFdGetMethod);
       break;
+
     case kFdPutMethod:
-      client->method_list.insert(new PutMethod(client->kq, client->GetFilePath(), client));
+      client->cur_method.SetMethod(kFdPutMethod);
       break;
+
     case kFdPostMethod:
-      client->method_list.insert(new PostMethod(client->kq, client->GetFilePath(), client));
+      client->cur_method.SetMethod(kFdPostMethod);
       break;
+
     case kFdDeleteMethod:
-      client->method_list.insert(new DeleteMethod(client->kq, client->GetFilePath(), client));
+      client->cur_method.SetMethod(kFdDeleteMethod);
       break;
+
     case kFdCgi:
-      client->method_list.insert(new Cgi(client->kq, client->GetFilePath(), client));
+      client->cur_method.SetMethod(kFdCgi);
       break;
+
     default:
       break;
   }
-  client->kq.DisableEvent(client->interface_fd, EVFILT_READ, client);
-  //client->request_message.clear();
-  client->request = nullptr;
-  client->response = nullptr;
+  client->kq->DisableEvent(client->interface_fd, EVFILT_READ, client);
 }
 
 void Client_Event_Write(Client *client)
 {
-  if (client->EventWrite() <= 0)
-  {
-    client->kq.EnableEvent(client->interface_fd, EVFILT_READ, client);
-    client->kq.DisableEvent(client->interface_fd, EVFILT_WRITE, client);
-    //client->kq.DeleteEvent(client->interface_fd, EVFILT_WRITE);
-
-    if(client->request->GetItem("Connection").value == "close")
-      client->kq.delete_list.insert(client);
-  }
+  client->EventWrite();
 }
 
-void GetMethod_Event_Read(GetMethod *getmethod)
+void GetMethod_Event_Read(Method *getmethod)
 {
-  if (getmethod->EventRead() <= 0)
-  {
+  Client &client = getmethod->client;
+
+  if (getmethod->EventRead() <= 0) {
     getmethod->SetResponseMessage();
-    //getmethod->kq.DisableEvent(getmethod->interface_fd, EVFILT_READ, getmethod);
-    getmethod->kq.DeleteEvent(getmethod->interface_fd, EVFILT_READ);
-
-    getmethod->kq.AddEvent(getmethod->target_fd, EVFILT_WRITE, getmethod);
+    CloseFd(getmethod->interface_fd);
+    client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, getmethod);
   }
 }
 
-void GetMethod_Event_Write(GetMethod *getmethod)
+void GetMethod_Event_Write(Method *getmethod)
 {
+  Client &client = getmethod->client;
+
   if (getmethod->EventWrite() <= 0) {
-    getmethod->kq.DisableEvent(getmethod->target_fd, EVFILT_WRITE, getmethod);
+    client.kq->DisableEvent(client.interface_fd, EVFILT_WRITE, getmethod);
 
-    if (getmethod->request->GetItem("Connection").value == "close")
-      getmethod->kq.delete_list.insert(getmethod->client);
-    else
-      getmethod->kq.EnableEvent(getmethod->target_fd, EVFILT_READ, getmethod->client);
-    //delete getmethod;
-    getmethod->kq.delete_list.insert(getmethod);
-  }
-}
-
-void PutMethod_Event_Read(PutMethod *putmethod)
-{
-  if (putmethod->EventRead() <= 0)
-  {
-    putmethod->SetResponseMessage();
-    //putmethod->kq.DisableEvent(putmethod->interface_fd, EVFILT_READ, putmethod);
-    putmethod->kq.DeleteEvent(putmethod->interface_fd, EVFILT_READ);
-
-    putmethod->kq.AddEvent(putmethod->target_fd, EVFILT_WRITE, putmethod);
-  }
-}
-
-void PutMethod_Event_Write(PutMethod *putmethod, int fd)
-{
-  if (fd == putmethod->target_fd)
-  {
-    if (putmethod->EventWrite() <= 0) {
-      putmethod->kq.DisableEvent(putmethod->target_fd, EVFILT_WRITE, putmethod);
-      //putmethod->kq.DeleteEvent(putmethod->target_fd, EVFILT_WRITE);
-
-      if (putmethod->request->GetItem("Connection").value == "close")
-        //delete putmethod->client;
-        putmethod->kq.delete_list.insert(putmethod->client);
-      else
-        putmethod->kq.EnableEvent(putmethod->target_fd, EVFILT_READ, putmethod->client);
-      //delete putmethod;
-      putmethod->kq.delete_list.insert(putmethod);
+    if (client.request.GetItem("Connection").value == "close") {
+      client.kq->delete_list.insert(client.interface_fd);
+    } else {
+      client.kq->EnableEvent(client.interface_fd, EVFILT_READ, &(client));
     }
+    client.cur_method.Clear();
   }
-  else
-  {
+}
+
+void PutMethod_Event_Read(Method *putmethod)
+{
+  Client &client = putmethod->client;
+
+  if (putmethod->EventRead() <= 0) {
+    putmethod->SetResponseMessage();
+    CloseFd(putmethod->interface_fd);
+    client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, putmethod);
+  }
+}
+
+void PutMethod_Event_Write(Method *putmethod, int fd)
+{
+  Client &client = putmethod->client;
+
+  if (fd == client.interface_fd) {
+    if (putmethod->EventWrite() <= 0) {
+      client.kq->DisableEvent(client.interface_fd, EVFILT_WRITE, putmethod);
+
+      if (client.request.GetItem("Connection").value == "close") {
+        client.kq->delete_list.insert(client.interface_fd);
+      } else {
+        client.kq->EnableEvent(client.interface_fd, EVFILT_READ, &(client));
+      }
+      client.cur_method.Clear();
+    }
+  } else {
     if (putmethod->FileWrite() <= 0) {
       putmethod->SetResponseMessage();
-      putmethod->kq.DisableEvent(putmethod->interface_fd, EVFILT_WRITE, putmethod);
-      //putmethod->kq.DeleteEvent(putmethod->interface_fd, EVFILT_WRITE);
-
-      putmethod->kq.AddEvent(putmethod->target_fd, EVFILT_WRITE, putmethod);
+      CloseFd(putmethod->interface_fd);
+      client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, putmethod);
     }
   }
 }
 
-void PostMethod_Event_Read(PostMethod *postmethod)
+void PostMethod_Event_Read(Method *postmethod)
 {
-  if (postmethod->EventRead() <= 0)
-  {
+  Client &client = postmethod->client;
+
+  if (postmethod->EventRead() <= 0) {
     postmethod->SetResponseMessage();
-    //postmethod->kq.DisableEvent(postmethod->interface_fd, EVFILT_READ, postmethod);
-    postmethod->kq.DeleteEvent(postmethod->interface_fd, EVFILT_READ);
-
-    postmethod->kq.AddEvent(postmethod->target_fd, EVFILT_WRITE, postmethod);
+    CloseFd(postmethod->interface_fd);
+    client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, postmethod);
   }
 }
 
-void PostMethod_Event_Write(PostMethod *postmethod, int fd)
+void PostMethod_Event_Write(Method *postmethod, int fd)
 {
-  if (fd == postmethod->target_fd)
-  {
-    if (postmethod->EventWrite() <= 0) {
-      postmethod->kq.DisableEvent(postmethod->target_fd, EVFILT_WRITE, postmethod);
-      //postmethod->kq.DeleteEvent(postmethod->target_fd, EVFILT_WRITE);
+  Client &client = postmethod->client;
 
-      if (postmethod->request->GetItem("Connection").value == "close")
-        //delete postmethod->client;
-        postmethod->kq.delete_list.insert(postmethod->client);
-      else
-        postmethod->kq.EnableEvent(postmethod->target_fd, EVFILT_READ, postmethod->client);
-      //delete postmethod;
-      postmethod->kq.delete_list.insert(postmethod);
+  if (fd == client.interface_fd) {
+    if (postmethod->EventWrite() <= 0) {
+      client.kq->DisableEvent(client.interface_fd, EVFILT_WRITE, postmethod);
+
+      if (client.request.GetItem("Connection").value == "close") {
+        client.kq->delete_list.insert(client.interface_fd);
+      } else {
+        client.kq->EnableEvent(client.interface_fd, EVFILT_READ, &(client));
+      }
+      client.cur_method.Clear();
     }
-  }
-  else
-  {
+  } else {
     if (postmethod->FileWrite() <= 0) {
       postmethod->SetResponseMessage();
-      postmethod->kq.DisableEvent(postmethod->interface_fd, EVFILT_WRITE, postmethod);
-      //postmethod->kq.DeleteEvent(postmethod->interface_fd, EVFILT_WRITE);
-
-      postmethod->kq.AddEvent(postmethod->target_fd, EVFILT_WRITE, postmethod);
+      CloseFd(postmethod->interface_fd);
+      client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, postmethod);
     }
   }
 }
 
-void DeleteMethod_Event_Read(DeleteMethod *deletemethod)
+void DeleteMethod_Event_Read(Method *deletemethod)
 {
-  if (deletemethod->EventRead() <= 0)
-  {
+  Client &client = deletemethod->client;
+
+  if (deletemethod->EventRead() <= 0) {
     deletemethod->SetResponseMessage();
-    //deletemethod->kq.DisableEvent(deletemethod->interface_fd, EVFILT_READ, deletemethod);
-    deletemethod->kq.DeleteEvent(deletemethod->interface_fd, EVFILT_READ);
-
-    deletemethod->kq.AddEvent(deletemethod->target_fd, EVFILT_WRITE, deletemethod);
+    CloseFd(deletemethod->interface_fd);
+    client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, deletemethod);
   }
 }
 
-void DeleteMethod_Event_Write(DeleteMethod *deletemethod)
+void DeleteMethod_Event_Write(Method *deletemethod)
 {
+  Client &client = deletemethod->client;
+
   if (deletemethod->EventWrite() <= 0) {
-    deletemethod->kq.DisableEvent(deletemethod->target_fd, EVFILT_WRITE, deletemethod);
-    //deletemethod->kq.DeleteEvent(deletemethod->target_fd, EVFILT_WRITE);
+    client.kq->DisableEvent(client.interface_fd, EVFILT_WRITE, deletemethod);
 
-    if (deletemethod->request->GetItem("Connection").value == "close")
-      //delete deletemethod->client;
-      deletemethod->kq.delete_list.insert(deletemethod->client);
-    else
-      deletemethod->kq.EnableEvent(deletemethod->target_fd, EVFILT_READ, deletemethod->client);
-    //delete deletemethod;
-    deletemethod->kq.delete_list.insert(deletemethod);
+    if (client.request.GetItem("Connection").value == "close") {
+      client.kq->delete_list.insert(client.interface_fd);
+    } else {
+      client.kq->EnableEvent(client.interface_fd, EVFILT_READ, &(client));
+    }
+    client.cur_method.Clear();
   }
 }
 
-void Cgi_Event_Read(Cgi *cgi, int ident)
+void Cgi_Event_Read(Method *cgi, int ident)
 {
+  Client &client = cgi->client;
+
   if (ident == cgi->interface_fd) {
     if (cgi->EventRead() <= 0)
     {
       cgi->SetResponseMessage();
-      cgi->kq.DisableEvent(cgi->interface_fd, EVFILT_READ, cgi);
-      //cgi->kq.DeleteEvent(cgi->interface_fd, EVFILT_READ);
-
-      cgi->kq.AddEvent(cgi->target_fd, EVFILT_WRITE, cgi);
+      CloseFd(cgi->interface_fd);
+      client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, cgi);
     }
   } else {
-    if (cgi->EventReadToCgi() <= 0) { // 2
+    if (cgi->EventReadToCgi() <= 0) {
       cgi->SetResponseMessageCgi();
-      //cgi->kq.DisableEvent(cgi->fromCgi[FD_READ], EVFILT_READ, cgi);
-      cgi->kq.DeleteEvent(cgi->fromCgi[FD_READ], EVFILT_READ);
-
-      CloseFd(cgi->fromCgi[FD_READ]);
-      // target_fd로 쓰는 이벤트 등록하기
-      cgi->kq.AddEvent(cgi->target_fd, EVFILT_WRITE, cgi);
+      CloseFd(cgi->from_cgi[FD_READ]);
+      client.kq->AddEvent(client.interface_fd, EVFILT_WRITE, cgi);
     }
   }
 }
 
-void Cgi_Event_Write(Cgi *cgi, int ident)
+void Cgi_Event_Write(Method *cgi, int ident)
 {
-  if (ident == cgi->target_fd) {
-    if (cgi->EventWrite() <= 0) {
-      cgi->kq.DisableEvent(cgi->target_fd, EVFILT_WRITE, cgi);
-      //cgi->kq.DeleteEvent(cgi->target_fd, EVFILT_WRITE);
+  Client &client = cgi->client;
 
-      if (cgi->request->GetItem("Connection").value == "close")
-        //delete cgi->client;
-        cgi->kq.delete_list.insert(cgi->client);
-      else
-        cgi->kq.EnableEvent(cgi->target_fd, EVFILT_READ, cgi->client);
-      //delete cgi;
-      cgi->kq.delete_list.insert(cgi);
+  if (ident == client.interface_fd) {
+    if (cgi->EventWrite() <= 0) {
+      client.kq->DisableEvent(client.interface_fd, EVFILT_WRITE, cgi);
+
+      if (client.request.GetItem("Connection").value == "close") {
+        client.kq->delete_list.insert(client.interface_fd);
+      } else {
+        client.kq->EnableEvent(client.interface_fd, EVFILT_READ, &(client));
+      }
+      client.cur_method.Clear();
     }
   } else {
-    if (cgi->EventWriteToCgi() <= 0) { // request to cgi process 1
-      // cgi에 다 썼으면 쓰는 이벤트 지우기
-      //cgi->kq.DisableEvent(cgi->toCgi[FD_WRITE], EVFILT_WRITE, cgi);
-      cgi->kq.DeleteEvent(cgi->toCgi[FD_WRITE], EVFILT_WRITE);
-
-      CloseFd(cgi->toCgi[FD_WRITE]);
+    if (cgi->EventWriteToCgi() <= 0) {
+      CloseFd(cgi->to_cgi[FD_WRITE]);
     }
   }
 }
 
-void Process(FdInterface *target, struct kevent event, std::set<int> &deleted_fd)
+void Process(FdInterface* &target, struct kevent event)
 {
-  if (deleted_fd.find(event.ident) != deleted_fd.end())
-    return;
   if (event.flags & EV_EOF
     && event.filter == EVFILT_READ
     && target->interface_type == kFdClient
-    && target->kq.client_map.find(event.ident) != target->kq.client_map.end()) {
-    std::cout << "EOF: " << event.ident << std::endl;
-    delete target;
-    deleted_fd.insert(event.ident);
-    // target->kq.delete_list.insert(target);
-    return ;
+    && target->kq->client_map.find(event.ident) != target->kq->client_map.end()) {
+    target->kq->delete_list.insert(event.ident);
+    return;
   }
-  if (event.filter == EVFILT_READ)
-  {
-    switch (target->interface_type)
-    {
-    case kFdServer:
-      Server_Event_Read(static_cast<Server *>(target));
-      break;
-    case kFdClient:
-      Client_Event_Read(static_cast<Client *>(target));
-      break;
-    case kFdGetMethod:
-      GetMethod_Event_Read(static_cast<GetMethod *>(target));
-      break;
-    case kFdPutMethod:
-      PutMethod_Event_Read(static_cast<PutMethod *>(target));
-      break;
-    case kFdPostMethod:
-      PostMethod_Event_Read(static_cast<PostMethod *>(target));
-      break;
-    case kFdDeleteMethod:
-      DeleteMethod_Event_Read(static_cast<DeleteMethod *>(target));
-      break;
-    case kFdCgi:
-      Cgi_Event_Read(static_cast<Cgi *>(target), event.ident);
-    default:
-      break;
+  if (event.filter == EVFILT_READ) {
+    switch (target->interface_type) {
+      case kFdServer:
+        Server_Event_Read(static_cast<Server *>(target));
+        break;
+
+      case kFdClient:
+        Client_Event_Read(static_cast<Client *>(target));
+        break;
+
+      case kFdGetMethod:
+        GetMethod_Event_Read(static_cast<Method *>(target));
+        break;
+
+      case kFdPutMethod:
+        PutMethod_Event_Read(static_cast<Method *>(target));
+        break;
+
+      case kFdPostMethod:
+        PostMethod_Event_Read(static_cast<Method *>(target));
+        break;
+
+      case kFdDeleteMethod:
+        DeleteMethod_Event_Read(static_cast<Method *>(target));
+        break;
+
+      case kFdCgi:
+        Cgi_Event_Read(static_cast<Method *>(target), event.ident);
+        break;
+
+      default:
+        break;
     }
-  }
-  else if (event.filter == EVFILT_WRITE)
-  {
-    switch (target->interface_type)
-    {
-    case kFdServer:
-      Server_Event_Write(static_cast<Server *>(target));
-      break;
-    case kFdClient:
-      Client_Event_Write(static_cast<Client *>(target));
-      break;
-    case kFdGetMethod:
-      GetMethod_Event_Write(static_cast<GetMethod *>(target));
-      break;
-    case kFdPutMethod:
-      PutMethod_Event_Write(static_cast<PutMethod *>(target), event.ident);
-      break;
-    case kFdPostMethod:
-      PostMethod_Event_Write(static_cast<PostMethod *>(target), event.ident);
-      break;
-    case kFdDeleteMethod:
-      DeleteMethod_Event_Write(static_cast<DeleteMethod *>(target));
-      break;
-    case kFdCgi:
-      Cgi_Event_Write(static_cast<Cgi *>(target), event.ident);
-    default:
-      break;
+  } else if (event.filter == EVFILT_WRITE) {
+    switch (target->interface_type) {
+      case kFdServer:
+        Server_Event_Write(static_cast<Server *>(target));
+        break;
+
+      case kFdClient:
+        Client_Event_Write(static_cast<Client *>(target));
+        break;
+
+      case kFdGetMethod:
+        GetMethod_Event_Write(static_cast<Method *>(target));
+        break;
+
+      case kFdPutMethod:
+        PutMethod_Event_Write(static_cast<Method *>(target), event.ident);
+        break;
+
+      case kFdPostMethod:
+        PostMethod_Event_Write(static_cast<Method *>(target), event.ident);
+        break;
+
+      case kFdDeleteMethod:
+        DeleteMethod_Event_Write(static_cast<Method *>(target));
+        break;
+
+      case kFdCgi:
+        Cgi_Event_Write(static_cast<Method *>(target), event.ident);
+        break;
+
+      default:
+        break;
     }
   }
 }

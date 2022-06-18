@@ -5,7 +5,7 @@
 
 class HttpParseInvalidBody : public std::exception
 {
-	const char * what () const throw () {
+  const char * what () const throw () {
     return "HttpParseInvalidBody";
   };
 };
