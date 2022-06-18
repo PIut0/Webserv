@@ -59,8 +59,15 @@ void Method::SetMethod(FdInterfaceType type)
   try {
     if (ft_stoi(client.response.status_code) >= 400)
       throw ft_stoi(client.response.status_code);
-      
+
     location = client.GetLocationBlock();
+
+    if (location->ret != "") {
+      SetResponseMessage();
+      kq->AddEvent(target_fd, EVFILT_WRITE, this);
+      return ;
+    }
+
     target_path = client.GetFilePath();
     switch (type)
     {

@@ -121,6 +121,8 @@ FdInterfaceType Client::ParseHeader()
     int status = CheckRequest();
     LocationBlock *loc = GetLocationBlock();
 
+    std::cout << "- Request -" << std::endl << request.ToString() << std::endl;
+
     if (status == 0 && loc->ret != "") {
       status = ft_stoi(loc->ret.substr(0, 3));
 
@@ -130,9 +132,8 @@ FdInterfaceType Client::ParseHeader()
         if (ret.size() > 0)
           response.SetItem("Location", ret);
       }
+      throw status;
     }
-    
-    std::cout << "- Request -" << std::endl << request.ToString() << std::endl;
 
     if (ft_stoi(request.GetItem("Content-Length").value) > 0 && request.body.size() <= 0) {
       return kFdNone;
@@ -160,7 +161,6 @@ FdInterfaceType Client::ParseHeader()
     }
   }
   catch(int status) {
-    break_point();
     response.SetItem("Status", StatusCode(status));
     return kFdGetMethod;
   }
