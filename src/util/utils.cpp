@@ -40,7 +40,8 @@ std::vector<std::string> StringSplit(const std::string &data,
 
 void ThrowException(const std::string &msg)
 {
-  throw std::runtime_error(msg);
+  std::cerr << msg << std::endl;
+  exit(1);
 }
 
 std::string& ltrim(std::string& s)
