@@ -15,10 +15,9 @@ time_t Monitor::getTimeStamp() {
 
 void Monitor::Log(const std::string &data)
 {
-  std::string time = std::to_string(this->getTimeStamp());
-  std::string _log = time + " " + "Scope" + " " + data + "\n";
+  std::string _log = " Scope " + data + "\n";
 
-  std::cout <<_log.c_str() << std::endl;
+  std::cout << this->getTimeStamp() << _log.c_str() << std::endl;
 }
 
 void Monitor::Print(const std::string &color, const std::string &data)

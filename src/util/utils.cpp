@@ -1,11 +1,14 @@
 #include "utils.hpp"
 #include "Defines.hpp"
 
-int CheckSocketAlive(clock_t socketStartTime)
+int CheckSocketAlive(time_t socketStartTime)
 {
-  clock_t now = clock();
+  struct timeval time_now;
+  gettimeofday(&time_now, nullptr);
 
-  return (((static_cast<double>(now - socketStartTime)) / CLOCKS_PER_SEC) < MAX_SOCKET_LIFE_TIME);
+  time_t now = (time_now.tv_sec * 1000) + (time_now.tv_usec / 1000);
+  
+  return (((static_cast<double>(now - socketStartTime)) / 1000) < MAX_SOCKET_LIFE_TIME);
 }
 
 std::string CheckArg(int argc, char **argv)

@@ -27,6 +27,4 @@
 #define SWAP_VECTOR(A)        std::vector<std::string>().swap(A);
 #define CLEAR_VECTOR_COMPLETLY(A) {CLEAR_VECTOR(A)}; {SWAP_VECTOR(A)}
 
-#define TO_SERVER(A) (A & S_SERVER) ? A >>= 1 : A;
-
 #endif

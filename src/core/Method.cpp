@@ -167,9 +167,8 @@ int Method::EventWrite()
   write_data_idx += n;
   if (write_data_size - write_data_idx <= 0) {
     client.response.body = WSV_STR_EMPTY;
-    std::cout << "- Response -" << std::endl << client.response.ToString() << std::endl;
-    std::cout << "write_data_size: " << write_data_size << std::endl;
-    std::cout << "write_data_idx: " << write_data_idx << std::endl;
+
+    client.response.PrintResponseLine();
   }
   return write_data_size - write_data_idx;
 }

@@ -572,7 +572,7 @@ void RequestHeader::Print()
 
 void RequestHeader::PrintRequestLine()
 {
-  std::cout << COLOR_RED << "[ REQUEST LINE ]" << COLOR_DEFAULT << std::endl;
+  std::cout << COLOR_CYAN << "[ REQUEST LINE ]" << COLOR_DEFAULT << std::endl;
   std::cout << "  [method] : " << MethodToString() << std::endl;
   std::cout << "  [host] : " << host << std::endl;
   std::cout << "  [http version] : " << this->http_major << "." << this->http_minor << std::endl;

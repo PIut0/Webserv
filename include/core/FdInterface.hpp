@@ -32,7 +32,7 @@ class FdInterface : public System
 
   KQueue          *kq;
   FdInterfaceType interface_type;
-  clock_t         socketHitTime;
+  time_t         socketHitTime;
   int             interface_fd;
 };
 

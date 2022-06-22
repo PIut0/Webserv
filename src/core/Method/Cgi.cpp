@@ -76,6 +76,7 @@ void Method::SetResponseMessageCgi()
 {
   try {
     client.response.Parse(read_data);
+    read_data = WSV_STR_EMPTY;
   } catch (HttpParseInvalidResponse &e) {
     client.response.SetItem("Status", "500");
   }

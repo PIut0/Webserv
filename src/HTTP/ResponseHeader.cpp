@@ -279,6 +279,12 @@ void ResponseHeader::Print()
   PrintBody();
 }
 
+void ResponseHeader::PrintResponseLine()
+{
+  std::cout << COLOR_MAGENTA << "[ Response LINE ]" << COLOR_DEFAULT << std::endl;
+  std::cout << "  Status:  " + this->status_code + " " + this->status_msg << std::endl;
+}
+
 void ResponseHeader::PrintHeaderLine()
 {
   std::cout << COLOR_GREEN << "[ HEADER LINE ]" << COLOR_DEFAULT << std::endl;

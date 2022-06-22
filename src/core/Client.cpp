@@ -121,7 +121,7 @@ FdInterfaceType Client::ParseHeader()
     int status = CheckRequest();
     LocationBlock *loc = GetLocationBlock();
 
-    std::cout << "- Request -" << std::endl << request.ToString() << std::endl;
+    request.PrintRequestLine();
 
     if (status == 0 && loc->ret != "") {
       status = ft_stoi(loc->ret.substr(0, 3));
@@ -266,7 +266,12 @@ const std::string Client::GetFilePath()
 
 void Client::SetSocketHitTime()
 {
-  this->socketHitTime = clock();
+  struct timeval time_now;
+  gettimeofday(&time_now, nullptr);
+
+  time_t time = (time_now.tv_sec * 1000) + (time_now.tv_usec / 1000);
+  
+  this->socketHitTime = time;
 }
 
 void Client::Clear()

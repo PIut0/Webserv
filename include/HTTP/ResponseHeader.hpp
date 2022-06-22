@@ -28,6 +28,7 @@ class ResponseHeader : public Header
   void  Clear();
 
   void  Print();
+  void  PrintResponseLine();
   void  PrintHeaderLine();
   void  PrintBody();
 
