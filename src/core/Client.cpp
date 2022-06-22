@@ -159,10 +159,11 @@ FdInterfaceType Client::ParseHeader()
     } else {
       return kFdNone;
     }
-  }
-  catch(int status) {
+  } catch (int status) {
     response.SetItem("Status", StatusCode(status));
     return kFdGetMethod;
+  } catch (std::exception &e) {
+    return kFdNone;
   }
 }
 
