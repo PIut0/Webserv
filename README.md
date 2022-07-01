@@ -21,6 +21,7 @@
 - Status Logger
 
 ![siegetest in macos](./asset/siegetest.gif)
+![siegetest result in macos](./asset/siegeresult.png)
 
 # Useage
 
