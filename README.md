@@ -2,7 +2,58 @@
 
 42Seoul Webserv Project [klim, sehyan, suhshin]
 
+| klim                             | sehyan                               | suhshin                                |
+| -------------------------------- | ------------------------------------ | -------------------------------------- |
+| @PIut0                           | @ash0814                             | @rkskekzzz                             |
+| ![klimprofile](./asset/klim.png) | ![sehyanprofile](./asset/sehyan.png) | ![suhshinprofile](./asset/suhshin.png) |
+
+# Introdution
+
+**web server like nginx!**
+
+### server spec
+
+- Multiplexing IO
+- Configuration file
+- CGI process
+- HTTP/1.1 Protocol
+- Light Weight
+- Status Logger
+
+![siegetest in macos](./asset/siegetest.gif)
+
+# Useage
+
+Anyone can use this server! Folllow this step!
+
+```shell
+git clone https://github.com/piut0/webserv
+cd webserv
+make
+./webserv config_example.config
+```
+
+You are free to edit the config file at will.
+However, the following must be observed.
+
+```
+server { # There must not be a newline between the server and parentheses. It must be a single space.
+
+	server_name default; # semicolon is required
+	listen 8176 127.0.0.1; # server block need single indent(\t)
+
+	location / { # root location block is required
+		allow_methods GET; # location block need double indent(\t\t)
+		root ./;
+		index index.html index2.html;
+		auto_index on;
+		cgi_info .bla ./cgi_tester;
+	}
+```
+
 # Convention
+
+Refer to the Google Style Guide.
 
 ## Variable
 
