@@ -50,6 +50,7 @@ server { # There must not be a newline between the server and parentheses. It mu
 		auto_index on;
 		cgi_info .bla ./cgi_tester;
 	}
+}
 ```
 
 # Convention
